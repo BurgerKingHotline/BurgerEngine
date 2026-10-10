@@ -298,6 +298,76 @@ public static class Specs
         Template = "{id} = {\n\tname = \"New Resource\"\n\tdesc = \"\"\n\tstart = 0\n\tmin = 0\n\tmax = 100\n\tmonthly = {\n\t\tvalue = 0.1          # change per month (a script value: can use if/add/multiply...)\n\t}\n\tcolor = { 200 200 120 }\n}\n",
     };
 
+    public static readonly BlockSpec Ideologies = new()
+    {
+        Title = "Ideologies",
+        Source = "common/ideologies",
+        DefaultFile = "common/ideologies/00_ideologies.txt",
+        Help = "Political ideologies (politics feature). Every country has a popularity for each; the ruling party has one. Scripts: ruling_ideology = <id>, popularity_<id> >= 0.3, add_popularity = { ideology = <id> value = 0.05 }.",
+        ValidateId = IdRule,
+        Fields =
+        {
+            F("name", "Name", FieldKind.Text),
+            F("adjective", "Adjective", FieldKind.Text, "Used for rebel countries (\"Nationalist Spain\")"),
+            F("party_name", "Party name", FieldKind.Text, "Default name of its party in every country"),
+            F("color", "Color", FieldKind.Color),
+            F("elections", "Holds elections", FieldKind.Bool, "Countries ruled by it hold elections"),
+            F("extremist", "Extremist", FieldKind.Bool, "Gains support when stability is low or wars are lost"),
+            F("coalition", "Coalition partners", FieldKind.List, "Ideologies it governs with (both must list each other)"),
+            F("government", "Government word", FieldKind.Word, "Optional: the country's government when it takes power"),
+        },
+        Template = "{id} = {\n\tname = \"New Ideology\"\n\tcolor = { 150 150 150 }\n\telections = no\n\topinion = { {id} = 10 }\n\tmodifier = { }\n}\n",
+    };
+
+    public static readonly BlockSpec Governments = new()
+    {
+        Title = "Government setups",
+        Source = "common/governments",
+        DefaultFile = "common/governments/00_governments.txt",
+        Help = "Starting politics by government word (politics feature): ruling party, popularity and laws for countries not listed in history/politics. 'default' is used for any other word.",
+        ValidateId = IdRule,
+        Fields =
+        {
+            F("ruling_party", "Ruling ideology", FieldKind.Word),
+            F("seats", "Parliament seats", FieldKind.Number),
+        },
+        Template = "{id} = {\n\truling_party = neutrality\n\tpopularity = { neutrality = 60 democratic = 40 }\n}\n",
+        ScriptFirst = true,
+    };
+
+    public static readonly BlockSpec LawGroups = new()
+    {
+        Title = "Law groups",
+        Source = "common/laws",
+        DefaultFile = "common/laws/00_laws.txt",
+        Help = "Law groups (laws feature). Each group holds its laws as blocks; a country has one law of every group. Law keys: cost, potential, allow, modifier, bans, single_party, suspends_elections, on_enact, ai_will_do.",
+        ValidateId = IdRule,
+        Fields =
+        {
+            F("name", "Name", FieldKind.Text),
+            F("desc", "Description", FieldKind.Text),
+            F("default", "Default law", FieldKind.Word),
+        },
+        Template = "{id} = {\n\tname = \"New Law Group\"\n\tdefault = first_law\n\tfirst_law = {\n\t\tname = \"First Law\"\n\t\tmodifier = { }\n\t}\n\tsecond_law = {\n\t\tname = \"Second Law\"\n\t\tcost = 100\n\t\tmodifier = { manpower = 0.1 }\n\t}\n}\n",
+        ScriptFirst = true,
+    };
+
+    public static readonly BlockSpec CabinetPosts = new()
+    {
+        Title = "Cabinet posts",
+        Source = "common/cabinet",
+        DefaultFile = "common/cabinet/00_cabinet.txt",
+        Help = "Cabinet posts (cabinet feature). Ministers come from the governing parties; per_point modifiers are multiplied by the minister's stat.",
+        ValidateId = IdRule,
+        Fields =
+        {
+            F("name", "Name", FieldKind.Text),
+            F("stat", "Stat", FieldKind.Word, "Character stat that makes a minister good at it"),
+            F("cost", "Cost (political power)", FieldKind.Number),
+        },
+        Template = "{id} = {\n\tname = \"New Post\"\n\tstat = charisma\n\tper_point = { stability_target = 0.5 }\n}\n",
+    };
+
     public static readonly BlockSpec Modifiers = new()
     {
         Title = "Modifiers",

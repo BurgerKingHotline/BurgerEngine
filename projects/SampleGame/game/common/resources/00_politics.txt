@@ -1,0 +1,26 @@
+# Resources of the politics feature (a game's own file with the same keys replaces these).
+political_power = {
+	name = "Political Power"
+	desc = "Spent on laws, ministers and suppressing political movements. Modifier: political_power_gain."
+	start = 50
+	min = 0
+	max = 1000
+	monthly = { value = 15 add = modifier:political_power_gain }
+	color = { 210 180 90 }
+	decimals = 0
+}
+stability = {
+	name = "Stability"
+	desc = "How content the country is. Moves 10% per month towards 60 plus the modifier stability_target; wars lower it. Low stability helps extremists and political movements."
+	start = 60
+	min = 0
+	max = 100
+	monthly = {
+		value = 60
+		add = modifier:stability_target
+		subtract = stability
+		multiply = 0.1
+		if = { limit = { is_at_war = yes } subtract = 0.5 }
+	}
+	color = { 120 200 255 }
+}

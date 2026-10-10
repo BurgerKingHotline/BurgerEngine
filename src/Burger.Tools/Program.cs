@@ -248,6 +248,14 @@ public static class Program
             Console.WriteLine($"  battle plans: {game.World.Armies.Count(x => x.Objective != null)} armies with an offensive arrow, {game.World.Armies.Count(x => x.Fallback.Count > 0)} with a fallback line");
         if (game.Features.Has(FeatureSet.LendLease))
             Console.WriteLine($"  lend-lease: {game.Support.Deals.Count} deals, {game.Support.EquipmentSent:0} equipment sent; volunteers: {game.Support.VolunteersSent} sent, {game.World.Divisions.Count(d => d.VolunteerFrom != null)} abroad now");
+        if (game.Politics.Enabled)
+        {
+            var P = game.Politics;
+            var alive = game.World.Countries.Where(c => c.Exists).ToList();
+            Console.WriteLine($"  politics: rulers {string.Join(", ", alive.GroupBy(c => P.Of(c).Ruling).OrderByDescending(g => g.Count()).Select(g => $"{g.Key} {g.Count()}"))}; " +
+                              $"{alive.Count(P.HoldsElections)} hold elections, {P.ElectionsHeld} elections, {P.GovernmentChanges} government changes, {P.LawsChanged} laws changed" +
+                              (P.CivilWarsEnabled ? $", {P.Movements.Count} movements, {P.CivilWarsStarted} civil wars ({P.CivilWars.Count} active), {P.Revolutions} revolutions/coups" : ""));
+        }
     }
 
     private static void SetGameName(string gameTxt, string name)
@@ -420,6 +428,7 @@ public static class Program
                 Check(fought > 0, $"combat model '{model}': {fought} battles fought, war score {g3.World.WarBetween(a, b)?.WarScore ?? 0:0}");
             }
             if (game.Features.Has(FeatureSet.Military) && game.Features.Has(FeatureSet.Diplomacy)) MilitaryFeatureTests(project);
+            if (game.Features.Has(FeatureSet.Politics)) PoliticsFeatureTests(project);
         }
         int simErrors = Log.ErrorCount - errorsBefore;
         if (simErrors > 0)
@@ -491,6 +500,80 @@ public static class Program
             if (war != null) g.Diplomacy.EndWar(war);
             for (int h = 0; h < 24 * 2; h++) g.Tick();
             Check(!g.World.Divisions.Any(d => d.VolunteerFrom != null) && g.World.Divisions.Count(d => d.Owner == helper) >= 2, "volunteers come home at peace");
+        }
+    }
+
+    /// <summary>Elections, laws, movements and civil wars (when installed).</summary>
+    private static void PoliticsFeatureTests(string project)
+    {
+        var g = Game.Load(GameDir(project), compileScripts: true, seed: 11);
+        g.StartNewGame(null);
+        g.Ai.Enabled = false;
+        var P = g.Politics;
+        if (!P.Enabled) { Check(false, "politics: no ideologies defined (common/ideologies)"); return; }
+        var alive = g.World.Countries.Where(c => c.Exists).ToList();
+        Check(alive.All(c => P.Ideology(P.Of(c).Ruling) != null && Math.Abs(P.Of(c).Popularity.Values.Sum() - 1) < 1e-6), "politics: every country has a ruling party and popularity adds up to 100%");
+        // an election that the opposition wins
+        var demo = alive.FirstOrDefault(P.HoldsElections);
+        if (demo != null)
+        {
+            var other = P.Ideologies.FirstOrDefault(i => i.Key != P.Of(demo).Ruling && !P.IsBanned(demo, i.Key));
+            if (other != null)
+            {
+                P.AddPopularity(demo, other.Key, 0.9);
+                P.HoldElection(demo);
+                Check(P.InGovernment(demo, other.Key), $"politics: an election puts the most popular party in government ({demo.Tag}: {string.Join(", ", P.Of(demo).Government)})");
+            }
+        }
+        var c = alive.OrderByDescending(x => x.OwnedStates.Count).First();
+        if (P.LawsEnabled)
+        {
+            var law = P.Laws.Values.FirstOrDefault(l => l.Modifier.Count > 0 && !P.HasLaw(c, l.Key));
+            if (law != null)
+            {
+                var key = law.Modifier.Keys.First();
+                double before = g.Modifiers.Sum(c, key);
+                double oldValue = P.LawOf(c, law.Group)?.Modifier.GetValueOrDefault(key) ?? 0;
+                P.Enact(c, law, free: true);
+                double expected = before - oldValue + law.Modifier[key];
+                Check(P.HasLaw(c, law.Key) && Math.Abs(g.Modifiers.Sum(c, key) - expected) < 1e-6,
+                      $"laws: {law.Name} is in force and its modifier applies ({key} {before:0.##} -> {g.Modifiers.Sum(c, key):0.##})");
+            }
+        }
+        if (P.CivilWarsEnabled)
+        {
+            // a banned, popular ideology forms a movement
+            var ban = P.Laws.Values.FirstOrDefault(l => l.Bans.Count > 0);
+            var target = alive.FirstOrDefault(x => x != c && x.OwnedStates.Count >= 2);
+            if (ban != null && target != null)
+            {
+                P.SetRulingParty(target, P.Ideologies.First(i => !ban.Bans.Contains(i.Key)).Key);
+                P.Enact(target, ban, free: true);
+                P.AddPopularity(target, ban.Bans.First(), 0.45);
+                g.Politics.MonthlyTick();
+                Check(P.MovementsOf(target).Any(), $"movements: a banned party with {P.PopularityOf(target, ban.Bans.First()):P0} support forms a movement");
+            }
+            if (g.Features.Has(FeatureSet.Military) && g.Features.Has(FeatureSet.Diplomacy))
+            {
+                var ide = P.Ideologies.First(i => i.Key != P.Of(c).Ruling).Key;
+                int statesBefore = c.OwnedStates.Count;
+                var rebel = P.StartCivilWar(c, ide, 0.4);
+                Check(rebel != null && rebel.Exists && c.OwnedStates.Count < statesBefore && g.World.AtWar(rebel, c), $"civil war: {rebel?.Name} split from {c.Name} ({rebel?.OwnedStates.Count} of {statesBefore} states)");
+                if (rebel != null)
+                {
+                    string tmp = Path.Combine(Path.GetTempPath(), "burger_politics.sav");
+                    SaveGame.Save(g, tmp);
+                    var g2 = Game.Load(GameDir(project), compileScripts: true, seed: 11);
+                    SaveGame.Load(g2, tmp);
+                    var r2 = g2.World.GetCountry(rebel.Tag);
+                    Check(r2 != null && r2.Exists && g2.Politics.InCivilWar(r2) && g2.Politics.Of(r2).Ruling == ide, "civil war: the rebel country and the civil war are saved");
+                    // the revolution wins: the loyal army is gone and the rebels hold all of the country's land
+                    foreach (var d in g.World.Divisions.Where(d => d.Owner == c).ToList()) g.Warfare.DestroyDivision(d);
+                    foreach (var l in c.OwnedStates.SelectMany(s => s.Locations)) g.Warfare.SetController(l, rebel, silent: true);
+                    for (int h = 0; h < 24 * 2; h++) g.Tick();
+                    Check(!rebel.Exists && c.Exists && P.Of(c).Ruling == ide && !P.InCivilWar(c), $"civil war: the revolution won and {c.Name} is now ruled by {P.Of(c).Ruling}");
+                }
+            }
         }
     }
 

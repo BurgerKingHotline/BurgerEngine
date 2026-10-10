@@ -32,6 +32,7 @@ public sealed class Catalog
         Specs.Countries, Specs.Characters, Specs.Resources, Specs.Modifiers, Specs.Decisions, Specs.ScriptValues, Specs.Interface,
         Specs.Events, Specs.DiplomaticActions, Specs.CharacterInteractions, Specs.CasusBelli, Specs.SubjectTypes, Specs.Traits,
         Specs.Terrain, Specs.UnitTypes, Specs.DivisionTemplates, Specs.Equipment, Specs.ShipTypes, Specs.PlaneTypes, Specs.Buildings, Specs.OnActions,
+        Specs.Ideologies, Specs.Governments, Specs.LawGroups, Specs.CabinetPosts,
     };
 
     public Catalog(ProjectStore store, ProjectIndex index)

@@ -1,0 +1,31 @@
+# Starting politics by government type (the 'government' word of each country). A country listed in
+# history/politics/*.txt uses that instead; any other government word uses 'default'.
+#   ruling_party   ideology of the ruling party
+#   popularity     starting support of each ideology (any numbers - they are scaled to 100%)
+#   laws           starting law per law group (laws feature)
+#   seats          seats in parliament (default: define parliament_seats, 100)
+#
+# history/politics/countries.txt example:
+#   GER = {
+#       ruling_party = democratic
+#       popularity = { democratic = 40 fascist = 18 communist = 13 neutrality = 29 }
+#       parties = { fascist = "NSDAP" democratic = "SPD" }
+#       seats = 491
+#       last_election = 1928.5.20
+#       laws = { conscription = volunteer_only }
+#   }
+
+default = { ruling_party = neutrality popularity = { neutrality = 50 democratic = 30 communist = 10 fascist = 10 } laws = { political_parties = restricted_parties } }
+republic = { ruling_party = democratic popularity = { democratic = 55 neutrality = 20 communist = 13 fascist = 12 } laws = { political_parties = multi_party press = free_press } }
+constitutional_monarchy = { ruling_party = democratic popularity = { democratic = 50 neutrality = 30 communist = 10 fascist = 10 } laws = { political_parties = multi_party press = free_press } }
+dominion = { ruling_party = democratic popularity = { democratic = 60 neutrality = 25 communist = 7 fascist = 8 } laws = { political_parties = multi_party press = free_press conscription = volunteer_only } }
+free_city = { ruling_party = democratic popularity = { democratic = 45 fascist = 30 neutrality = 15 communist = 10 } laws = { political_parties = multi_party } }
+kingdom = { ruling_party = neutrality popularity = { neutrality = 55 democratic = 25 fascist = 12 communist = 8 } laws = { political_parties = restricted_parties } }
+monarchy = { ruling_party = neutrality popularity = { neutrality = 55 democratic = 25 fascist = 12 communist = 8 } laws = { political_parties = restricted_parties } }
+empire = { ruling_party = neutrality popularity = { neutrality = 60 democratic = 18 fascist = 12 communist = 10 } laws = { political_parties = restricted_parties } }
+grand_duchy = { ruling_party = neutrality popularity = { neutrality = 55 democratic = 35 fascist = 5 communist = 5 } laws = { political_parties = multi_party } }
+sultanate = { ruling_party = neutrality popularity = { neutrality = 70 democratic = 12 fascist = 10 communist = 8 } laws = { political_parties = restricted_parties press = state_press } }
+theocracy = { ruling_party = neutrality popularity = { neutrality = 75 democratic = 10 fascist = 8 communist = 7 } laws = { political_parties = restricted_parties press = state_press } }
+warlord_state = { ruling_party = neutrality popularity = { neutrality = 60 communist = 15 fascist = 13 democratic = 12 } laws = { political_parties = restricted_parties press = state_press } }
+colonial_government = { ruling_party = neutrality popularity = { neutrality = 70 democratic = 20 communist = 5 fascist = 5 } laws = { political_parties = restricted_parties } }
+socialist_republic = { ruling_party = communist popularity = { communist = 80 neutrality = 10 democratic = 5 fascist = 5 } laws = { political_parties = single_party press = propaganda_ministry economy = partial_mobilisation } }

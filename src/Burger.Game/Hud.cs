@@ -54,6 +54,7 @@ public sealed partial class Hud
             if (Raylib.IsKeyPressed(KeyboardKey.F3) && Has(FeatureSet.Characters)) ToggleLeft(LeftPanel.Characters);
             if (Raylib.IsKeyPressed(KeyboardKey.P) && Has(FeatureSet.Production)) ToggleLeft(LeftPanel.Production);
             if (Raylib.IsKeyPressed(KeyboardKey.N) && Has(FeatureSet.Navy)) ToggleLeft(LeftPanel.Navy);
+            if (Raylib.IsKeyPressed(KeyboardKey.O) && G.Politics.Enabled) ToggleLeft(LeftPanel.Politics);
         }
         if (Raylib.IsKeyPressed(KeyboardKey.F2)) Ui.ErrorsOpen = !Ui.ErrorsOpen;
         if (Raylib.IsKeyPressed(KeyboardKey.F4) && Has(FeatureSet.Diplomacy)) ToggleRight(RightPanel.Wars);
@@ -106,7 +107,8 @@ public sealed partial class Hud
         Map.Mode = (MapMode)(((int)Map.Mode + 1) % Enum.GetValues<MapMode>().Length);
         if (Map.Mode == MapMode.Diplomacy && !Has(FeatureSet.Diplomacy)) Map.Mode = (MapMode)(((int)Map.Mode + 1) % Enum.GetValues<MapMode>().Length);
         if (Map.Mode == MapMode.Supply && !G.Features.HasSupply) Map.Mode = (MapMode)(((int)Map.Mode + 1) % Enum.GetValues<MapMode>().Length);
-        if (Map.Mode == MapMode.Air && !Has(FeatureSet.Air)) Map.Mode = MapMode.Political;
+        if (Map.Mode == MapMode.Air && !Has(FeatureSet.Air)) Map.Mode = (MapMode)(((int)Map.Mode + 1) % Enum.GetValues<MapMode>().Length);
+        if (Map.Mode == MapMode.Ideology && !G.Politics.Enabled) Map.Mode = MapMode.Political;
         Map.Dirty = true;
     }
 
@@ -266,6 +268,7 @@ public sealed partial class Hud
                 case LeftPanel.Designer: DrawDesignerPanel(); break;
                 case LeftPanel.Navy: DrawNavyPanel(); break;
                 case LeftPanel.Air: DrawAirPanel(); break;
+                case LeftPanel.Politics: DrawPoliticsPanel(); break;
             }
             DrawSupportDialog();
         }
@@ -422,6 +425,7 @@ public sealed partial class Hud
         if (Has(FeatureSet.Diplomacy)) modes.Add(("Diplomacy", MapMode.Diplomacy));
         if (G.Features.HasSupply && Has(FeatureSet.Military)) modes.Add(("Supply", MapMode.Supply));
         if (Has(FeatureSet.Air)) modes.Add(("Air", MapMode.Air));
+        if (G.Politics.Enabled) modes.Add(("Ideology", MapMode.Ideology));
         modes.Add(("Locations", MapMode.Locations));
         var custom = G.Interface.MapModes;
         int total = modes.Count + custom.Count;

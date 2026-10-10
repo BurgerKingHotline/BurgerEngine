@@ -41,6 +41,16 @@ public static class SaveGame
         foreach (var c in w.Countries)
         {
             var n = countries.AddBlock(c.Tag);
+            if (c.Dynamic)
+            {
+                n.Add("dynamic", "yes");
+                if (c.Origin != null) n.Add("origin", c.Origin);
+                n.Add("playable", c.Playable ? "yes" : "no");
+                var nl = n.AddBlock("names");
+                var male = nl.AddBlock("male"); foreach (var x in c.Names.Male) male.AddItem(x);
+                var female = nl.AddBlock("female"); foreach (var x in c.Names.Female) female.AddItem(x);
+                var family = nl.AddBlock("family"); foreach (var x in c.Names.Family) family.AddItem(x);
+            }
             n.Add("name", c.RawName, true);
             n.Add(c.Color.ToNode("color"));
             n.Add("flag", c.FlagPath, true);
@@ -315,6 +325,23 @@ public static class SaveGame
         foreach (var f in meta.GetList("fired_once")) w.FiredOnceEvents.Add(f);
         var cds = meta.Get("cooldowns");
         if (cds != null) foreach (var c in cds.All) if (c.Value != null) w.ActionCooldowns[c.Key] = (int)c.AsDouble();
+
+        // ---- countries made during the game (civil war rebels...) must exist before anything refers to them
+        foreach (var n in root.Get("countries")?.All ?? Enumerable.Empty<Node>())
+        {
+            if (!n.GetBool("dynamic") || w.GetCountry(n.Key) != null || !Country.IsValidTag(n.Key)) continue;
+            Rgb.TryParse(n.Get("color"), out var dcol);
+            var dc = w.CreateCountry(n.Key.ToUpperInvariant(), n.GetString("name", n.Key)!, dcol, n.GetString("flag", "")!, n.GetString("government", "")!);
+            dc.Origin = n.GetString("origin");
+            dc.Playable = n.GetBool("playable", false);
+            var names = n.Get("names");
+            if (names != null)
+            {
+                dc.Names.Male.AddRange(names.GetList("male"));
+                dc.Names.Female.AddRange(names.GetList("female"));
+                dc.Names.Family.AddRange(names.GetList("family"));
+            }
+        }
 
         ReadSections(early: true);
 

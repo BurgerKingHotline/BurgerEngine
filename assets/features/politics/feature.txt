@@ -1,0 +1,5 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Politics (ideologies & elections)"
+category = "Politics"
+order = 60
+description = "HOI4-style politics: every country has a popularity for each ideology and a ruling party. Democracies hold elections that fill a parliament; the biggest party that can find a majority governs, alone or in a coalition. Popularity drifts with propaganda, lost wars, low stability and the neighbours. Ideologies change opinions between countries. Adds political power and stability, a Politics menu and an Ideology map mode."

@@ -49,6 +49,9 @@ public sealed class ModifierSystem
 
     public ModifierSystem(Game game) { _game = game; }
 
+    /// <summary>Extra modifier values computed by systems (politics: ruling ideology, laws, ministers).</summary>
+    public Func<IScope, string, double>? Extra;
+
     public void Load(GameData data)
     {
         foreach (var root in DataLoader.ParseFileOrFolder(data, "common/modifiers"))
@@ -120,6 +123,7 @@ public sealed class ModifierSystem
             foreach (var m in list)
                 if (m.Def.Values.TryGetValue(key, out var x)) v += x;
         if (scope is Character ch) v += ch.TraitModifier(key);
+        if (Extra != null) v += Extra(scope, key);
         return v;
     }
 

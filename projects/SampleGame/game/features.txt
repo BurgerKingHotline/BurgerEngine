@@ -18,4 +18,8 @@ features = {
 	air
 	battle_plans
 	lend_lease
+	politics
+	laws
+	cabinet
+	civil_wars
 }

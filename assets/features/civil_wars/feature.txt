@@ -1,0 +1,6 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Political movements & civil wars"
+category = "Politics"
+order = 63
+description = "Ideologies shut out of power gather in movements with a demand (legalise their party or put them in power) that grow until they revolt unless you give in or suppress them (Victoria 3 style). A shut-out ideology with majority support can also start a civil war at any time (HOI4 style). Civil wars split the country: the rebels get part of the land and army, and if they win they take over the country. Without armies and wars, revolts are coups."
+requires = { politics }

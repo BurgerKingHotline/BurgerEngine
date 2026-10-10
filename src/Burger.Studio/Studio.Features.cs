@@ -43,6 +43,9 @@ public sealed partial class Studio
          : k == Specs.Equipment ? FeatureSet.Production
          : k == Specs.ShipTypes ? FeatureSet.Navy
          : k == Specs.PlaneTypes ? FeatureSet.Air
+         : k == Specs.Ideologies || k == Specs.Governments ? FeatureSet.Politics
+         : k == Specs.LawGroups ? FeatureSet.Laws
+         : k == Specs.CabinetPosts ? FeatureSet.Cabinet
          : null;
 
     public bool KindAvailable(BlockSpec k)

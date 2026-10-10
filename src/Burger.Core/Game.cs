@@ -57,6 +57,8 @@ public sealed class GameRules
     public Burger.Core.Air.AirRules Air = new();
     /// <summary>Lend-lease and volunteers (lend_lease feature).</summary>
     public Burger.Core.Warfare.SupportRules Support = new();
+    /// <summary>Popularity drift, coalitions, movements and civil wars (politics features).</summary>
+    public Burger.Core.Politics.PoliticsRules Politics = new();
 }
 
 /// <summary>
@@ -93,6 +95,8 @@ public sealed class Game
     public Burger.Core.Air.AirSystem Air { get; }
     /// <summary>Lend-lease and volunteers (lend_lease feature).</summary>
     public Burger.Core.Warfare.SupportSystem Support { get; }
+    /// <summary>Ideologies, elections, laws, ministers, movements and civil wars (politics features).</summary>
+    public Burger.Core.Politics.PoliticsSystem Politics { get; }
     /// <summary>Named formulas from common/script_values (some replace engine formulas).</summary>
     public ScriptValueSystem ScriptValues { get; }
     /// <summary>Modifiers from common/modifiers (timed, permanent and conditional).</summary>
@@ -138,6 +142,7 @@ public sealed class Game
         Navy = new Burger.Core.Navy.NavySystem(this);
         Air = new Burger.Core.Air.AirSystem(this);
         Support = new Burger.Core.Warfare.SupportSystem(this);
+        Politics = new Burger.Core.Politics.PoliticsSystem(this);
         ScriptValues = new ScriptValueSystem(this);
         Modifiers = new ModifierSystem(this);
         Resources = new ResourceSystem(this);
@@ -148,6 +153,8 @@ public sealed class Game
         Commands = new ConsoleCommands(this);
         Builtins.RegisterAll(this);
         Modifiers.Register();
+        Modifiers.Extra = (scope, key) => Politics.ModifierValue(scope, key);
+        Politics.RegisterCommands(Commands);
     }
 
     /// <summary>Loads a game folder (the one containing game.txt, common/, map/ ...).</summary>
@@ -276,6 +283,7 @@ public sealed class Game
         P("Modifiers.DailyTick", () => Modifiers.DailyTick());
         if (Features.Has(F.Military)) P("Economy.DailyTick", () => Economy.DailyTick()); // training and reinforcing divisions
         if (Features.Has(F.Diplomacy)) P("Diplomacy.DailyTick", () => Diplomacy.DailyTick());
+        if (Features.Has(F.Politics)) P("Politics.DailyTick", () => Politics.DailyTick());
         if (Features.Has(F.Ai)) P("Ai.DailyTick", () => Ai.DailyTick());
         P("Events.DailyTick", () => Events.DailyTick());
         Mods.Invoke(m => m.OnDailyTick());
@@ -290,6 +298,7 @@ public sealed class Game
         P("Modifiers.MonthlyTick", () => Modifiers.MonthlyTick());
         if (Features.Has(F.Diplomacy)) P("Diplomacy.MonthlyTick", () => Diplomacy.MonthlyTick());
         if (Features.Has(F.Characters)) P("Characters.MonthlyTick", () => Characters.MonthlyTick());
+        if (Features.Has(F.Politics)) P("Politics.MonthlyTick", () => Politics.MonthlyTick());
         P("Events.MonthlyTick", () => Events.MonthlyTick());
         if (Features.Has(F.Ai)) P("Ai.MonthlyTick", () => Ai.MonthlyTick());
         Mods.Invoke(m => m.OnMonthlyTick());

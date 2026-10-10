@@ -3,7 +3,7 @@ using Burger.Core.Model;
 namespace Burger.Runtime;
 
 /// <summary>Panels on the left: your own country's menus (left menu bar) and the location/country you clicked.</summary>
-public enum LeftPanel { None, Location, Country, Military, Recruit, Characters, Decisions, Custom, Production, Designer, Navy, Air }
+public enum LeftPanel { None, Location, Country, Military, Recruit, Characters, Decisions, Custom, Production, Designer, Navy, Air, Politics }
 /// <summary>Panels on the right: world-wide overviews opened from the top right.</summary>
 public enum RightPanel { None, Wars, Peace, World }
 /// <summary>Battle plan drawing tools: front segment, offensive arrow, fallback line.</summary>

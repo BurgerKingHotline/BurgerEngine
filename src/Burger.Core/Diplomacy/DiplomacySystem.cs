@@ -22,7 +22,7 @@ public sealed class DiplomacySystem
     public double Opinion(Country from, Country to)
     {
         if (from == to) return 200;
-        return Math.Clamp(Rules.BaseOpinion(_game, from, to) + R.ModifierSum(from, to), -200, 200);
+        return Math.Clamp(Rules.BaseOpinion(_game, from, to) + R.ModifierSum(from, to) + _game.Politics.IdeologyOpinion(from, to), -200, 200);
     }
 
     public void AddOpinion(Country from, Country to, string name, double value, double decayPerMonth = -1, int? durationDays = null)
@@ -415,6 +415,7 @@ public sealed class DiplomacySystem
     {
         var war = o.War;
         if (!_game.World.Wars.Contains(war)) return "The war is over";
+        if (war.Vars.HasFlag("civil_war")) return "A civil war ends only when one side is defeated";
         if (!war.Involves(o.From) || !war.Involves(o.To) || war.IsAttacker(o.From) == war.IsAttacker(o.To)) return "Not enemies in this war";
         bool fromLeader = war.LeaderOf(o.From) == o.From, toLeader = war.LeaderOf(o.To) == o.To;
         if (!toLeader) return "Peace must be offered to the enemy war leader";

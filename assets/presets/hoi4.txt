@@ -1,6 +1,6 @@
 # Preset: the features (and rules) a new project starts with.
 name = "Hearts of Iron IV style"
 order = 2
-description = "Armies with HOI4 combat, factories and equipment, supply hubs and railways, a division designer, fleets and transports, air wings, battle plans, lend-lease and volunteers, fog of war, wars and diplomacy, AI. Locations are taken as soon as they are entered."
-features = { military combat_hoi4 production supply_hubs division_designer navy air battle_plans lend_lease fog_of_war diplomacy ai }
+description = "Armies with HOI4 combat, factories and equipment, supply hubs and railways, a division designer, fleets and transports, air wings, battle plans, lend-lease and volunteers, fog of war, wars and diplomacy, ideologies with elections, laws and civil wars, AI. Locations are taken as soon as they are entered."
+features = { military combat_hoi4 production supply_hubs division_designer navy air battle_plans lend_lease fog_of_war diplomacy politics laws civil_wars ai }
 defines = { combat_model = hoi4 occupation_hours = 0 }

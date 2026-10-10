@@ -1,0 +1,6 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Laws"
+category = "Politics"
+order = 61
+description = "Groups of laws (conscription, economy, press, political parties) of which a country has one each. Changing a law costs political power and may need requirements; laws give modifiers, can ban parties or suspend elections. The AI picks laws that suit its ideology and wars."
+requires = { politics }

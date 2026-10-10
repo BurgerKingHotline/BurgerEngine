@@ -43,6 +43,7 @@ global using Burger.Core.Production;
 global using Burger.Core.Supply;
 global using Burger.Core.Navy;
 global using Burger.Core.Air;
+global using Burger.Core.Politics;
 ";
 
     /// <summary>Adds a script instance written in normal (pre-compiled) C# code.</summary>

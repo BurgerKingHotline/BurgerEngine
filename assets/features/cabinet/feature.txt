@@ -1,0 +1,6 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Cabinet (ministers)"
+category = "Politics"
+order = 62
+description = "Ministers from the governing parties fill cabinet posts (head of government, foreign, economy, security, army); each gives bonuses from its stat. Appointing costs political power; ministers leave when their party leaves the government."
+requires = { politics characters }

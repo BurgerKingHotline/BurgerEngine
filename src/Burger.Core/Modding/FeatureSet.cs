@@ -31,6 +31,11 @@ public sealed class FeatureSet
     public const string BattlePlans = "battle_plans";
     public const string LendLease = "lend_lease";
 
+    public const string Politics = "politics";
+    public const string Laws = "laws";
+    public const string Cabinet = "cabinet";
+    public const string CivilWars = "civil_wars";
+
     /// <summary>The features games had before features existed (all on for a game without features.txt).</summary>
     public static readonly string[] BuiltIn = { Military, Diplomacy, Characters, CharacterInteractions, Economy, FogOfWar, Ai };
 

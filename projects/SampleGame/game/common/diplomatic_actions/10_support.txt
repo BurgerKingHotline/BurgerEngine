@@ -1,0 +1,22 @@
+# Support actions (lend_lease feature). 'dialog' opens a window in the game where the details are chosen:
+#   dialog = volunteers   how many volunteer divisions to send (they fight for the recipient until it is at peace)
+#   dialog = lend_lease   which equipment, a one-time shipment of an amount, or a share of the stockpile every month
+send_volunteers = {
+	name = "Send Volunteers"
+	desc = "Send divisions to fight in their war without joining it. They come home when the war ends."
+	dialog = volunteers
+	potential = {
+		scope:recipient = { is_at_war = yes }
+		NOT = { is_at_war_with = scope:recipient }
+	}
+	allow = { num_of_divisions >= 1 }
+}
+send_equipment = {
+	name = "Send Equipment"
+	desc = "Ship equipment from our stockpile: once, or a share of it every month (lend-lease)."
+	dialog = lend_lease
+	potential = {
+		has_feature = production
+		NOT = { is_at_war_with = scope:recipient }
+	}
+}

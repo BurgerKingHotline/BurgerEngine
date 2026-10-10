@@ -20,6 +20,7 @@ public static class WorldLoader
         LoadCharacters(game);
         LoadUnits(game);
         LoadDiplomacy(game);
+        game.Politics.LoadHistory();
         game.Warfare.RebuildIndex();
     }
 

@@ -17,7 +17,7 @@ public class GameAi : AiSystem
         {
             if (!c.Exists || c.IsPlayer) continue;
             if ((day + c.Index) % 2 == 0 && Game.Features.Has(FeatureSet.Military)) Game.P("Ai.Military", () => ManageMilitary(c));
-            if (Game.Features.Has(FeatureSet.Navy)) Game.P("Ai.Fleets", () => MoveFleets(c));
+            if ((day + c.Index) % 2 == 1 && Game.Features.Has(FeatureSet.Navy)) Game.P("Ai.Fleets", () => MoveFleets(c));
             if ((day + c.Index) % 7 == 0 && Game.Features.Has(FeatureSet.Air)) Game.P("Ai.Air", () => AssignAirWings(c));
         }
     }
@@ -34,6 +34,7 @@ public class GameAi : AiSystem
             if (Game.Features.Has(FeatureSet.Production)) ManageProduction(c);
             if (Game.Features.Has(FeatureSet.Navy)) ManageNavy(c);
             Game.Decisions.AiMonthly(c);
+            if (Game.Features.Has(FeatureSet.Politics)) ManagePolitics(c);
             if (Game.Features.Has(FeatureSet.Diplomacy))
             {
                 Diplomacy(c);
@@ -85,13 +86,16 @@ public class GameAi : AiSystem
         if (bordering.Count == 0) return;
 
         double ownPower = Game.Rules.Diplomacy.MilitaryStrength(Game, c);
+        var strength = new Dictionary<Country, double>();
+        double StrengthOf(Country e) => strength.TryGetValue(e, out var v) ? v : strength[e] = Game.Rules.Diplomacy.MilitaryStrength(Game, e);
         for (int i = 0; i < armies.Count; i++)
         {
             var army = armies[i];
             var enemy = army.FrontEnemy != null && bordering.Contains(army.FrontEnemy) ? army.FrontEnemy : bordering[i % bordering.Count];
-            double enemyPower = Game.Rules.Diplomacy.MilitaryStrength(Game, enemy) / Math.Max(1, armies.Count);
+            double enemyTotal = StrengthOf(enemy);
+            double enemyPower = enemyTotal / Math.Max(1, armies.Count);
             double armyPower = army.Divisions.Sum(Game.Warfare.DivisionPower);
-            var mode = armyPower > enemyPower * 0.9 || ownPower > Game.Rules.Diplomacy.MilitaryStrength(Game, enemy) * 1.3 ? ArmyMode.Offensive : ArmyMode.Hold;
+            var mode = armyPower > enemyPower * 0.9 || ownPower > enemyTotal * 1.3 ? ArmyMode.Offensive : ArmyMode.Hold;
             if (army.FrontEnemy != enemy || army.Mode != mode) Game.Warfare.SetFront(army, enemy, mode);
             // battle plans: offensives aim at the enemy capital
             if (Game.Features.Has(FeatureSet.BattlePlans))
@@ -164,6 +168,9 @@ public class GameAi : AiSystem
 
     /// <summary>Production lines for the equipment its divisions need, and new factories.</summary>
     public override void ManageProduction(Country c) => Game.Production.AiMonthly(c);
+
+    /// <summary>Laws, ministers and political movements (politics features).</summary>
+    public override void ManagePolitics(Country c) => Game.Politics.AiMonthly(c);
 
     // ------------------------------------------------------------------------------------------- diplomacy
     public override void Diplomacy(Country c)

@@ -64,6 +64,10 @@ public sealed class Country : IScope
     public double Gold;
     public double Manpower;
     public bool Playable = true;
+    /// <summary>Created during the game (civil war rebels...), not in common/countries. Saved in full.</summary>
+    public bool Dynamic;
+    /// <summary>For dynamic countries: the tag of the country they came from.</summary>
+    public string? Origin;
     public string Government = "";
     public NameList Names = new();
     public Character? Ruler;

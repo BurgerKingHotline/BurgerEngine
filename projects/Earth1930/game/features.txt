@@ -13,4 +13,7 @@ features = {
 	lend_lease
 	fog_of_war
 	ai
+	politics
+	laws
+	civil_wars
 }

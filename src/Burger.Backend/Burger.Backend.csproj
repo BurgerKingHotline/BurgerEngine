@@ -34,5 +34,6 @@
     <Using Include="Burger.Core.Supply" />
     <Using Include="Burger.Core.Navy" />
     <Using Include="Burger.Core.Air" />
+    <Using Include="Burger.Core.Politics" />
   </ItemGroup>
 </Project>

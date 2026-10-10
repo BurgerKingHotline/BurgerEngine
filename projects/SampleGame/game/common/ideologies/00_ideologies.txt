@@ -1,0 +1,52 @@
+# Ideologies (politics feature). Every country has a popularity for each of them; the ruling party has one ideology.
+#   color          map color (Ideology map mode) and party color
+#   adjective      used for rebel countries ("Nationalist Spain") and texts
+#   party_name     default party name (countries can rename it: history/politics or set_party_name)
+#   elections      countries ruled by this ideology hold elections
+#   extremist      gains popularity when stability is low or a war goes badly
+#   coalition      parties it will govern with (both sides must list each other)
+#   opinion        opinion its rulers have of countries ruled by each ideology
+#   modifier       modifiers for countries ruled by it (any modifier key: manpower, production, political_power_gain...)
+#   government     optional: the country's government word when this ideology takes power
+# Scripts: ruling_ideology = fascist, in_government = democratic, popularity_communist >= 0.3, seats_democratic > 50,
+#          add_popularity = { ideology = fascist value = 0.05 }, set_ruling_party = communist
+
+democratic = {
+	name = "Democratic"
+	adjective = "Democratic"
+	party_name = "Democratic Party"
+	color = { 70 115 205 }
+	elections = yes
+	coalition = { neutrality }
+	opinion = { democratic = 15 communist = -20 fascist = -20 }
+	modifier = { stability_target = 5 opinion = 5 }
+}
+communist = {
+	name = "Communist"
+	adjective = "Communist"
+	party_name = "Communist Party"
+	color = { 190 30 35 }
+	extremist = yes
+	opinion = { communist = 20 democratic = -15 fascist = -40 neutrality = -10 }
+	modifier = { political_power_gain = 3 manpower = 0.1 }
+	government = socialist_republic
+}
+fascist = {
+	name = "Fascist"
+	adjective = "Nationalist"
+	party_name = "National Party"
+	color = { 120 80 45 }
+	extremist = yes
+	coalition = { neutrality }
+	opinion = { fascist = 20 democratic = -20 communist = -40 neutrality = -5 }
+	modifier = { political_power_gain = 3 manpower = 0.15 }
+}
+neutrality = {
+	name = "Non-aligned"
+	adjective = "Loyalist"
+	party_name = "Independents"
+	color = { 150 150 125 }
+	coalition = { democratic fascist }
+	opinion = { neutrality = 5 communist = -10 }
+	modifier = { stability_target = 5 }
+}

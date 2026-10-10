@@ -6,7 +6,7 @@ using Raylib_cs;
 
 namespace Burger.Runtime;
 
-public enum MapMode { Political, Terrain, States, Diplomacy, Locations, Supply, Air }
+public enum MapMode { Political, Terrain, States, Diplomacy, Locations, Supply, Air, Ideology }
 
 /// <summary>
 /// Builds and draws the 3D map from the province map, heightmap, terrain, tree and river inputs.
@@ -435,6 +435,9 @@ public sealed unsafe class MapRenderer : IDisposable
                 case MapMode.Diplomacy:
                     if (owner != null && l.IsLand && player != null) col = DiplomacyColor(player, owner);
                     break;
+                case MapMode.Ideology:
+                    if (owner != null && l.IsLand && _game.Politics.RulingIdeology(owner) is { } ide) col = C(ide.Color, 225);
+                    break;
                 case MapMode.Terrain:
                     break;
                 case MapMode.Supply:
@@ -494,14 +497,16 @@ public sealed unsafe class MapRenderer : IDisposable
     {
         var w = _game.World;
         var R = w.Relations;
-        if (other == me) return new Color(60, 170, 60, 200);
+        if (other == me) return new Color(70, 200, 70, 225);
         if (w.AtWar(me, other)) return new Color(200, 40, 40, 210);
         if (R.AreAllied(me, other)) return new Color(50, 110, 220, 200);
         if (R.OverlordOf(other) == me || R.OverlordOf(me) == other) return new Color(110, 190, 230, 200);
         if (R.HasTruce(me, other, w.Date)) return new Color(150, 150, 150, 200);
         double op = _game.Diplomacy.Opinion(other, me);
+        // neutrals stay muted so the viewed country (green), allies (blue) and enemies (red) stand out;
+        // a faint tint still shows opinion (brownish = dislikes, grey-green = likes)
         float t = (float)Math.Clamp((op + 100) / 200, 0, 1);
-        return new Color((int)(220 - 120 * t), (int)(120 + 80 * t), 90, 170);
+        return new Color((int)(150 - 50 * t), (int)(112 + 30 * t), (int)(100 + 12 * t), 120);
     }
 
     // ===============================================================================================

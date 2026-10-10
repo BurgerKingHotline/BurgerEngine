@@ -420,7 +420,8 @@ public sealed partial class Studio
             ImGui.TextDisabled("Content");
             if (ImGui.MenuItem("Event file")) CreateEventFile();
             Ui.Tip("A new file of events. Add events to it (or any event file) by right-clicking the file > New event.");
-            foreach (var k in new[] { Specs.DiplomaticActions, Specs.CharacterInteractions, Specs.CasusBelli, Specs.SubjectTypes, Specs.Traits }.Where(KindAvailable))
+            foreach (var k in new[] { Specs.DiplomaticActions, Specs.CharacterInteractions, Specs.CasusBelli, Specs.SubjectTypes, Specs.Traits,
+                                      Specs.Ideologies, Specs.Governments, Specs.LawGroups, Specs.CabinetPosts }.Where(KindAvailable))
                 if (ImGui.MenuItem(Cap(Singular(k)))) CreateBlockAsset(k);
             if (ImGui.MenuItem("More: add a feature...")) ShowFeatures = true;
             Ui.Tip("Units, characters, diplomatic actions and more appear here when their feature is installed (Project > Features).");

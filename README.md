@@ -121,7 +121,11 @@ characters or money until you add them).
 | `navy` | ship types, fleets, naval battles (screens protect capital ships), repairs in naval bases, transports that carry divisions over sea, naval invasions (`backend/Navy.cs`, `common/ships/`, starting fleets) |
 | `air` | air regions (`map/air_regions.txt`), air wings at air bases flying air superiority, close air support or strategic bombing (`backend/Air.cs`, `common/planes/`, Air map mode) |
 | `battle_plans` | draw an army's front segment, an offensive arrow and a fallback line (Military menu) |
-| `lend_lease` | send volunteer divisions and monthly equipment to countries at war (country window > Support; `backend/Support.cs`) |
+| `lend_lease` | send volunteer divisions and equipment (once or monthly) to countries at war (diplomatic actions; `backend/Support.cs`) |
+| `politics` | ideologies with a popularity in every country, a ruling party, elections with parliament seats and coalitions, ideology opinions, political power and stability, Politics menu (O) and Ideology map mode (`common/ideologies/`, `common/governments/`, `history/politics/`, `backend/Politics.cs`) |
+| `laws` | law groups (conscription, economy, press, political parties) that cost political power and give modifiers; laws can ban parties or suspend elections (`common/laws/`) |
+| `cabinet` | ministers from the governing parties in cabinet posts, bonuses from their stats (`common/cabinet/`; needs `characters`) |
+| `civil_wars` | political movements with demands that revolt unless you give in or suppress them, and HOI4-style civil wars that split the country |
 | `fog_of_war` | hidden enemy armies and greyed-out land you cannot see (`backend/Vision.cs`) |
 | `diplomacy` | wars, casus belli, war score, peace deals, opinion, alliances, access, guarantees, subjects, diplomatic actions |
 | `characters` | rulers, heirs, families, births, deaths, succession, traits (rulers are created for every country) |

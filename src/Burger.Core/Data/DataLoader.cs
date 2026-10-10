@@ -84,6 +84,7 @@ public static class DataLoader
         game.ScriptValues.Load(data);
         game.Modifiers.Load(data);
         game.Resources.Load(data);
+        game.Politics.Load(data);
         game.Decisions.Load(data);
         game.Interface.Load(data);
     }

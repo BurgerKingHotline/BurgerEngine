@@ -1,0 +1,31 @@
+# Cabinet posts (cabinet feature). Ministers are characters of a governing party (missing ones are generated).
+#   stat        character stat that makes a minister good at the post
+#   per_point   modifiers per point of that stat      modifier   modifiers while the post is filled
+#   cost        political power to appoint (default: define minister_cost, 50)
+
+head_of_government = {
+	name = "Head of Government"
+	stat = charisma
+	per_point = { political_power_gain = 0.5 stability_target = 0.5 }
+}
+foreign_minister = {
+	name = "Foreign Minister"
+	stat = finesse
+	per_point = { opinion = 1 }
+}
+economy_minister = {
+	name = "Economy Minister"
+	stat = finesse
+	per_point = { production = 0.01 construction_speed = 0.01 income = 0.01 }
+}
+security_minister = {
+	name = "Security Minister"
+	stat = zeal
+	per_point = { stability_target = 0.5 }
+	modifier = { ruling_party_drift = 0.1 }
+}
+army_chief = {
+	name = "Chief of the Army"
+	stat = martial
+	per_point = { attack = 0.005 defense = 0.005 org_recovery = 0.01 }
+}

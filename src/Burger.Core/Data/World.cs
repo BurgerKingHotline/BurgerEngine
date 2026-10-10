@@ -38,6 +38,20 @@ public sealed class World
     public Country? Player;
 
     public Country? GetCountry(string? tag) => tag != null && CountryByTag.TryGetValue(tag, out var c) ? c : null;
+
+    /// <summary>Creates a country during the game (it has no land until states are transferred to it).</summary>
+    public Country CreateCountry(string tag, string name, Rgb color, string flagPath, string government)
+    {
+        if (CountryByTag.ContainsKey(tag)) throw new InvalidOperationException($"Tag {tag} already exists");
+        var c = new Country { Tag = tag, Index = Countries.Count, Government = government, Dynamic = true, Gold = 0, Manpower = 0 };
+        c.DefaultName = name;
+        c.Name = name;
+        c.Color = c.DefaultColor = color;
+        c.DefaultFlagPath = c.FlagPath = flagPath;
+        Countries.Add(c);
+        CountryByTag[tag] = c;
+        return c;
+    }
     public State? GetState(string? key) => key != null && StateByKey.TryGetValue(key, out var s) ? s : null;
     public Location? GetLocation(string? key) => key != null && LocationByKey.TryGetValue(key, out var l) ? l : null;
     public Character? GetCharacter(string? key) => key != null && CharacterByKey.TryGetValue(key, out var c) ? c : null;

@@ -10,7 +10,7 @@ namespace Burger.Runtime;
 /// <summary>The left menu bar (military, recruit, characters, decisions, custom panels), the recruit menu and the world overview.</summary>
 public sealed partial class Hud
 {
-    private enum MenuIcon { Military, Recruit, Characters, Decisions, Production, Designer, Navy, Air }
+    private enum MenuIcon { Military, Recruit, Characters, Decisions, Production, Designer, Navy, Air, Politics }
 
     private float LeftMenuW => 66 * S;
 
@@ -39,6 +39,8 @@ public sealed partial class Hud
         }
         if (Has(FeatureSet.Production))
             items.Add(("Production", "Factories, production lines, construction and the equipment stockpile (P)", Ui.Left == LeftPanel.Production, () => ToggleLeft(LeftPanel.Production), MenuIcon.Production, null, player.Construction.Count));
+        if (G.Politics.Enabled)
+            items.Add(("Politics", "Government, parliament, laws, cabinet and political movements (O)", Ui.Left == LeftPanel.Politics, () => ToggleLeft(LeftPanel.Politics), MenuIcon.Politics, null, G.Politics.MovementsOf(player).Count()));
         if (Has(FeatureSet.Characters))
             items.Add(("Characters", "Ruler, heir, family and interactions (F3)", Ui.Left == LeftPanel.Characters, () => ToggleLeft(LeftPanel.Characters), MenuIcon.Characters, null, 0));
         if (G.Decisions.Defs.Count > 0)
@@ -158,6 +160,13 @@ public sealed partial class Hud
                 Raylib.DrawLineEx(c + new Vector2(0, -h * 0.95f), c + new Vector2(0, h * 0.85f), t * 1.6f, col);
                 Raylib.DrawTriangle(c + new Vector2(0, -h * 0.35f), c + new Vector2(-h, h * 0.15f), c + new Vector2(h, h * 0.15f), col);
                 Raylib.DrawTriangle(c + new Vector2(0, h * 0.5f), c + new Vector2(-h * 0.45f, h * 0.85f), c + new Vector2(h * 0.45f, h * 0.85f), col);
+                break;
+            case MenuIcon.Politics:
+                // a parliament building: pediment, columns and steps
+                Raylib.DrawTriangle(c + new Vector2(0, -h * 0.95f), c + new Vector2(-h, -h * 0.45f), c + new Vector2(h, -h * 0.45f), col);
+                for (int i = 0; i < 4; i++)
+                    Raylib.DrawRectangleRec(new Rectangle(c.X - h * 0.8f + i * h * 0.48f, c.Y - h * 0.38f, h * 0.2f, h * 0.95f), col);
+                Raylib.DrawRectangleRec(new Rectangle(c.X - h, c.Y + h * 0.62f, 2 * h, h * 0.3f), col);
                 break;
             case MenuIcon.Decisions:
                 // a scroll with lines

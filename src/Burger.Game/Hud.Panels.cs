@@ -178,6 +178,7 @@ public sealed partial class Hud
             if (subjects.Count > 0) { Gui.Label("Subjects: " + string.Join(", ", subjects.Select(a => a.Tag)), x, y, 15); y += lh; }
         }
 
+        if (G.Politics.Enabled) y = DrawCountryPolitics(c, x, y + 6 * S, r.Width - 24 * S);
         if (Has(FeatureSet.Diplomacy)) y = DrawCountryRelations(c, x, y + 6 * S, r.Width - 24 * S);
         if (player != null && player != c && Has(FeatureSet.LendLease) && Has(FeatureSet.Military)) y = DrawSupportSummary(player, c, x, y, r.Width - 24 * S);
         if (player == null || player == c || !Has(FeatureSet.Diplomacy)) return;

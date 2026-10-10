@@ -1,0 +1,128 @@
+# Laws (laws feature). Each top-level block is a law group; a country has exactly one law of every group.
+#   default          the law countries start with (else the first) - governments can set others
+#   cost             political power to enact (default: define law_cost, 100)
+#   potential        shown only while true      allow   can be enacted only while true
+#   modifier         modifiers while in force   on_enact effects when enacted
+#   bans             parties of these ideologies get no seats and cannot govern
+#   single_party     only the ruling party is allowed (and there are no elections)
+#   suspends_elections  no elections while in force
+#   ai_will_do       how much the AI wants it (it changes when another law is clearly better)
+# Scripts: has_law = war_economy, set_law = war_economy (free, ignores requirements)
+
+conscription = {
+	name = "Conscription"
+	default = limited_conscription
+	volunteer_only = {
+		name = "Volunteer Only"
+		desc = "Only volunteers serve."
+		cost = 50
+		modifier = { manpower = -0.5 stability_target = 3 }
+		ai_will_do = { base = 0.5 modifier = { add = 1 ruling_ideology = democratic NOT = { is_at_war = yes } } }
+	}
+	limited_conscription = {
+		name = "Limited Conscription"
+		desc = "A small share of the young men serve."
+		modifier = { }
+		ai_will_do = { base = 1 }
+	}
+	extensive_conscription = {
+		name = "Extensive Conscription"
+		desc = "Most young men serve for two years."
+		allow = { OR = { is_at_war = yes ruling_ideology = fascist ruling_ideology = communist } }
+		modifier = { manpower = 0.5 production = -0.03 stability_target = -3 }
+		ai_will_do = { base = 0 modifier = { add = 2 is_at_war = yes } modifier = { add = 1.5 OR = { ruling_ideology = fascist ruling_ideology = communist } } }
+	}
+	service_by_requirement = {
+		name = "Service by Requirement"
+		desc = "Everyone who can fight serves."
+		cost = 150
+		allow = { is_at_war = yes }
+		modifier = { manpower = 1.0 production = -0.1 stability_target = -8 }
+		ai_will_do = { base = 0 modifier = { add = 2.6 is_at_war = yes manpower < 2000 } }
+	}
+}
+
+economy = {
+	name = "Economy"
+	default = partial_mobilisation
+	civilian_economy = {
+		name = "Civilian Economy"
+		desc = "Factories make consumer goods."
+		modifier = { consumer_goods = 0.2 construction_speed = 0.1 stability_target = 5 }
+		ai_will_do = { base = 0.5 modifier = { add = 1 ruling_ideology = democratic NOT = { is_at_war = yes } } }
+	}
+	partial_mobilisation = {
+		name = "Partial Mobilisation"
+		desc = "Industry prepares for war."
+		modifier = { }
+		ai_will_do = { base = 1 }
+	}
+	war_economy = {
+		name = "War Economy"
+		desc = "Industry serves the army first."
+		allow = { OR = { is_at_war = yes ruling_ideology = fascist ruling_ideology = communist } }
+		modifier = { consumer_goods = -0.3 production = 0.1 stability_target = -5 }
+		ai_will_do = { base = 0 modifier = { add = 2 is_at_war = yes } modifier = { add = 1.4 ruling_ideology = fascist } }
+	}
+	total_mobilisation = {
+		name = "Total Mobilisation"
+		desc = "Everything for the war."
+		cost = 150
+		allow = { is_at_war = yes }
+		modifier = { consumer_goods = -0.5 production = 0.2 stability_target = -12 }
+		ai_will_do = { base = 0 modifier = { add = 2.7 is_at_war = yes stability > 40 } }
+	}
+}
+
+press = {
+	name = "Press"
+	default = state_press
+	free_press = {
+		name = "Free Press"
+		desc = "Newspapers print what they want."
+		allow = { NOT = { ruling_ideology = fascist ruling_ideology = communist } }
+		modifier = { democratic_drift = 0.3 stability_target = 3 }
+		ai_will_do = { base = 0 modifier = { add = 2 ruling_ideology = democratic } }
+	}
+	state_press = {
+		name = "Guided Press"
+		desc = "The government keeps an eye on the newspapers."
+		modifier = { ruling_party_drift = 0.15 }
+		ai_will_do = { base = 1 }
+	}
+	propaganda_ministry = {
+		name = "Propaganda Ministry"
+		desc = "The state tells the people what to think."
+		allow = { NOT = { ruling_ideology = democratic } }
+		modifier = { ruling_party_drift = 0.5 political_power_gain = -3 }
+		ai_will_do = { base = 0 modifier = { add = 2 OR = { ruling_ideology = fascist ruling_ideology = communist } } }
+	}
+}
+
+political_parties = {
+	name = "Political Parties"
+	default = multi_party
+	multi_party = {
+		name = "Free Parties"
+		desc = "Every party may stand in elections."
+		modifier = { }
+		ai_will_do = { base = 1 modifier = { add = 1 ruling_ideology = democratic } }
+	}
+	restricted_parties = {
+		name = "Extremists Banned"
+		desc = "Communist and fascist parties are banned."
+		allow = { NOT = { ruling_ideology = fascist ruling_ideology = communist } }
+		bans = { communist fascist }
+		modifier = { stability_target = -2 }
+		ai_will_do = { base = 0 modifier = { add = 1.5 ruling_ideology = neutrality } modifier = { add = 1 ruling_ideology = democratic OR = { popularity_communist > 0.3 popularity_fascist > 0.3 } } }
+	}
+	single_party = {
+		name = "One-Party State"
+		desc = "Only the ruling party is allowed. There are no elections."
+		cost = 150
+		allow = { NOT = { ruling_ideology = democratic } }
+		single_party = yes
+		modifier = { political_power_gain = 5 ruling_party_drift = 0.3 stability_target = -3 }
+		ai_will_do = { base = 0 modifier = { add = 2.5 OR = { ruling_ideology = fascist ruling_ideology = communist } } }
+	}
+}

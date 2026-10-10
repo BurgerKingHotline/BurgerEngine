@@ -62,6 +62,7 @@ public static class ScriptValidator
             Weight(game, dec.AiWillDo);
         }
         foreach (var m in game.Modifiers.Defs.Values) Trigger(game, m.Trigger);
+        game.Politics.Validate();
         foreach (var p in game.Interface.Panels)
         {
             Trigger(game, p.Potential);
@@ -84,7 +85,7 @@ public static class ScriptValidator
         }
     }
 
-    private static void Weight(Game game, Node? block)
+    public static void Weight(Game game, Node? block)
     {
         if (block?.Children == null) return;
         foreach (var m in block.GetAll("modifier")) Trigger(game, m, WeightKeys);

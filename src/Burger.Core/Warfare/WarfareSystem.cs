@@ -225,15 +225,77 @@ public sealed class WarfareSystem
     private int[] _pfCame = Array.Empty<int>(), _pfGen = Array.Empty<int>(), _pfEnterGen = Array.Empty<int>();
     private bool[] _pfEnter = Array.Empty<bool>();
     private int _pfGeneration;
-    private readonly PriorityQueue<Location, double> _pfOpen = new();
+    private readonly PriorityQueue<(Location Loc, double Cost), double> _pfOpen = new();
+
+    // per country: connected regions of the land it may enter, rebuilt daily or when wars change.
+    // Lets FindPath reject unreachable targets at once instead of searching the whole continent.
+    private readonly Dictionary<Country, (int Day, int Wars, int[] Region)> _reach = new();
+
+    private bool Reachable(Country c, Location from, Location to)
+    {
+        int day = _game.World.Date.TotalDays, wars = _game.World.Wars.Count;
+        int n = _game.World.Locations.Count;
+        if (!_reach.TryGetValue(c, out var r) || r.Day != day || r.Wars != wars || r.Region.Length != n)
+        {
+            var region = r.Region != null && r.Region.Length == n ? r.Region : new int[n];
+            Array.Fill(region, -1);
+            var locs = _game.World.Locations;
+            var enter = new bool[n];
+            for (int i = 0; i < n; i++) enter[i] = locs[i].IsPassable && CanEnter(c, locs[i]);
+            var q = new Queue<Location>();
+            int next = 0;
+            foreach (var start in locs)
+            {
+                if (region[start.Index] != -1 || !enter[start.Index]) continue;
+                int id = next++;
+                region[start.Index] = id;
+                q.Enqueue(start);
+                while (q.Count > 0)
+                {
+                    var l = q.Dequeue();
+                    foreach (var adj in l.Neighbors)
+                    {
+                        var m = adj.To;
+                        if (adj.Kind == AdjacencyKind.Sea || region[m.Index] != -1 || !enter[m.Index]) continue;
+                        region[m.Index] = id;
+                        q.Enqueue(m);
+                    }
+                }
+            }
+            r = (day, wars, region);
+            _reach[c] = r;
+        }
+        int a = r.Region[from.Index], b = r.Region[to.Index];
+        if (a < 0 || b < 0) return true; // standing on (or going to) land outside the regions: let the full search decide
+        return a == b;
+    }
 
     /// <summary>A* path through locations the country may enter. Null if unreachable.</summary>
     public List<Location>? FindPath(Country c, Location from, Location to, double speed = 4)
+    {
+        if (!_game.Profiling) return FindPathCore(c, from, to, speed);
+        long t0 = System.Diagnostics.Stopwatch.GetTimestamp();
+        var path = FindPathCore(c, from, to, speed);
+        double ms = (System.Diagnostics.Stopwatch.GetTimestamp() - t0) * 1000.0 / System.Diagnostics.Stopwatch.Frequency;
+        var pm = _game.ProfileMs;
+        string k = path != null ? "Path.Found" : "Path.Failed";
+        pm[k] = pm.GetValueOrDefault(k) + ms;
+        pm[k + "#"] = pm.GetValueOrDefault(k + "#") + 1;
+        return path;
+    }
+
+    private List<Location>? FindPathCore(Country c, Location from, Location to, double speed)
     {
         if (from == to) return new List<Location>();
         if (!CanEnter(c, to)) return null;
         bool sea = _game.Navy.CanUseSea(c) || (_game.Navy.Enabled && from.IsWater); // transports: armies may cross the sea (and always get off it)
         if (!sea && from.IsLand && LandComponent(from) != LandComponent(to)) return null; // other continent/island without transports
+        if (!sea && from.IsLand)
+        {
+            bool reach = true;
+            _game.P("Path.Reach", () => reach = Reachable(c, from, to));
+            if (!reach) { if (_game.Profiling) _game.ProfileMs["Path.Rejected#"] = _game.ProfileMs.GetValueOrDefault("Path.Rejected#") + 1; return null; } // walled off by land we may not enter
+        }
         int n0 = _game.World.Locations.Count;
         if (_pfCost.Length != n0)
         {
@@ -247,17 +309,20 @@ public sealed class WarfareSystem
             return _pfEnter[l.Index];
         }
         double kmPerPx = _game.Data.Defines.KmPerPixel;
-        double heuristic = sea ? 0.3 : 0.9; // A* guidance: land steps cost at least distance/speed (sea steps are faster)
+        // A* guidance: land steps cost about distance/speed (sea steps are faster). Weighted above 1 on land:
+        // paths can be slightly longer than the very best one, but far fewer locations are searched.
+        double heuristic = sea ? 0.3 : 1.5;
         var open = _pfOpen;
         open.Clear();
         _pfGen[from.Index] = gen; _pfCost[from.Index] = 0; _pfCame[from.Index] = -1;
-        open.Enqueue(from, 0);
+        open.Enqueue((from, 0), 0);
         int expanded = 0;
         bool found = false;
         while (open.Count > 0 && expanded < 30000)
         {
-            var cur = open.Dequeue();
+            var (cur, queuedCost) = open.Dequeue();
             if (cur == to) { found = true; break; }
+            if (queuedCost > _pfCost[cur.Index]) continue; // stale entry: a cheaper way here was found later
             expanded++;
             double cc = _pfCost[cur.Index];
             foreach (var adj in cur.Neighbors)
@@ -285,7 +350,7 @@ public sealed class WarfareSystem
                 _pfCost[n.Index] = nc;
                 _pfCame[n.Index] = cur.Index;
                 double hx = (n.CenterX - to.CenterX) * kmPerPx, hy = (n.CenterY - to.CenterY) * kmPerPx;
-                open.Enqueue(n, nc + Math.Sqrt(hx * hx + hy * hy) / speed * heuristic);
+                open.Enqueue((n, nc), nc + Math.Sqrt(hx * hx + hy * hy) / speed * heuristic);
             }
         }
         if (!found && _pfGen[to.Index] != gen) return null;
@@ -735,7 +800,8 @@ public sealed class WarfareSystem
     private List<(Location Own, Location Enemy)> BorderPairs(War war, Country owner)
     {
         long stamp = (long)_game.World.Date.TotalDays * 24 + _game.World.Date.Hour;
-        if (_borderCache.TryGetValue((war, owner), out var c) && c.Stamp == stamp) return c.Pairs;
+        var key = war.SideOf(owner).FirstOrDefault() ?? owner; // one list per war side, shared by all its members
+        if (_borderCache.TryGetValue((war, key), out var c) && c.Stamp == stamp) return c.Pairs;
         if (_borderCache.Count > 256) _borderCache.Clear();
         var ownSide = war.SideOf(owner).ToHashSet();
         var enemySide = war.EnemiesOf(owner).ToHashSet();
@@ -750,7 +816,7 @@ public sealed class WarfareSystem
                 if (ec != null && enemySide.Contains(ec)) pairs.Add((l, adj.To));
             }
         }
-        _borderCache[(war, owner)] = (stamp, pairs);
+        _borderCache[(war, key)] = (stamp, pairs);
         return pairs;
     }
 
@@ -809,6 +875,7 @@ public sealed class WarfareSystem
             .Select(g => (Loc: g.Key, Weight: g.Select(p => p.Enemy).Distinct().Count()))
             .OrderBy(p => Math.Atan2(p.Loc.CenterY, p.Loc.CenterX)).ThenBy(p => p.Loc.CenterY).ToList();
         var divs = army.Divisions.OrderBy(d => d.Id).ToList();
+        var previous = divs.ToDictionary(d => d, d => d.FrontPost);
         foreach (var d in divs) d.FrontPost = null;
         if (posts.Count == 0 || divs.Count == 0) return;
         var counts = new int[posts.Count];
@@ -827,10 +894,36 @@ public sealed class WarfareSystem
             // fewer divisions than posts: spread them evenly along the front
             for (int k = 0; k < divs.Count; k++) counts[(int)((k + 0.5) * posts.Count / divs.Count)]++;
         }
-        int di = 0;
-        for (int i = 0; i < posts.Count; i++)
-            for (int k = 0; k < counts[i] && di < divs.Count; k++)
-                divs[di++].FrontPost = posts[i].Loc;
+        // stable assignment: a division keeps its post (or the post it stands on) while that post still needs it,
+        // so a small change of the front does not send the whole army walking (and path finding) again
+        var index = new Dictionary<Location, int>(posts.Count);
+        for (int i = 0; i < posts.Count; i++) index[posts[i].Loc] = i;
+        var free = new List<Division>();
+        foreach (var d in divs)
+        {
+            var keep = previous[d];
+            if (keep != null && index.TryGetValue(keep, out int pi) && counts[pi] > 0) { counts[pi]--; d.FrontPost = keep; continue; }
+            if (index.TryGetValue(d.Location, out int li) && counts[li] > 0) { counts[li]--; d.FrontPost = d.Location; continue; }
+            free.Add(d);
+        }
+        if (free.Count == 0) return;
+        // the rest go to the nearest open post
+        for (int i = 0; i < posts.Count && free.Count > 0; i++)
+        {
+            while (counts[i] > 0 && free.Count > 0)
+            {
+                int best = 0;
+                double bestD = double.MaxValue;
+                for (int k = 0; k < free.Count; k++)
+                {
+                    double dd = Dist(free[k].Location, posts[i].Loc);
+                    if (dd < bestD) { bestD = dd; best = k; }
+                }
+                free[best].FrontPost = posts[i].Loc;
+                free.RemoveAt(best);
+                counts[i]--;
+            }
+        }
     }
 
     private void Offensive(Army army)

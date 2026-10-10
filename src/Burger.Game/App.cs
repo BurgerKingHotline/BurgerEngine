@@ -94,6 +94,15 @@ public sealed class App
         if (_perfTime < 3) return;
         int day = Game?.World.Date.TotalDays ?? 0;
         Log.Info($"PERF fps {_perfFrames / _perfTime:0.0}, frame {_perfTime * 1000 / _perfFrames:0.0} ms, simulation {_perfSim / _perfFrames:0.0} ms/frame, {(day - _perfDay) / _perfTime:0.0} days/s");
+        if (Game != null)
+        {
+            int days = Math.Max(1, day - _perfDay);
+            Log.Info("PERF systems (ms/day): " + string.Join(", ", Game.ProfileMs.Where(kv => !kv.Key.StartsWith("Path.")).OrderByDescending(kv => kv.Value).Take(12).Select(kv => $"{kv.Key} {kv.Value / days:0.00}")));
+            Log.Info("PERF paths (per day): " + string.Join(", ", Game.ProfileMs.Where(kv => kv.Key.StartsWith("Path.")).OrderBy(kv => kv.Key).Select(kv => kv.Key.EndsWith("#") ? $"{kv.Key} {kv.Value / days:0.0}" : $"{kv.Key} {kv.Value / days:0.00}ms")));
+            Log.Info($"PERF world: {Game.World.Divisions.Count} divisions, {Game.World.Armies.Count} armies, {Game.World.Wars.Count} wars, {Game.World.Battles.Count} battles");
+            Game.ProfileMs.Clear();
+            Game.Profiling = true;
+        }
         _perfDay = day;
         _perfTime = _perfFrames = _perfSim = 0;
     }
@@ -205,6 +214,7 @@ public sealed class App
                 case "production": Ui.Left = LeftPanel.Production; Ui.ProductionTab = int.TryParse(parts.ElementAtOrDefault(1), out var pt) ? pt : 0; break;
                 case "designer": Ui.Left = LeftPanel.Designer; break;
                 case "air": Ui.Left = LeftPanel.Air; _hud!.AirTab = int.TryParse(parts.ElementAtOrDefault(1), out var at) ? at : 0; break;
+                case "politics": Ui.Left = LeftPanel.Politics; _hud!.PoliticsTab = int.TryParse(parts.ElementAtOrDefault(1), out var pt2) ? pt2 : 0; break;
                 case "navy": Ui.Left = LeftPanel.Navy; _hud!.NavyTab = int.TryParse(parts.ElementAtOrDefault(1), out var nt) ? nt : 0; break;
                 case "wars": Ui.Right = RightPanel.Wars; break;
                 case "world": Ui.Right = RightPanel.World; break;

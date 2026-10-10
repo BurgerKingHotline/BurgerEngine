@@ -249,6 +249,71 @@ of your equipment stockpile every month. Rules: `backend/Support.cs`.
 
 ---------------------------------------------------------------------------------------------------
 
+## 4b. Politics (Hearts of Iron IV style)
+
+Four features: `politics` (ideologies, elections, parliament), `laws`, `cabinet` (needs `characters`) and `civil_wars`.
+In the game: the Politics menu (O) and the Ideology map mode; another country's window shows its government.
+
+**Ideologies** - `common/ideologies/*.txt`. Every country has a popularity for each ideology (adding up to 100%) and a
+ruling party of one ideology. Keys: `name`, `adjective` (rebel names: "Nationalist Spain"), `party_name`, `color`,
+`elections = yes` (countries it rules hold elections), `extremist = yes` (gains support from low stability and lost
+wars), `coalition = { ... }` (parties it governs with - both must list each other), `opinion = { fascist = -20 }`
+(how its rulers see countries ruled by each ideology), `modifier = { ... }` (for countries it rules), `government`
+(optional government word set when it takes power).
+
+**Starting politics** - `history/politics/*.txt` per country, else `common/governments/*.txt` by the country's
+`government` word (`default` for any other word):
+```
+GER = {
+    ruling_party = democratic
+    popularity = { democratic = 40 fascist = 18 communist = 13 neutrality = 29 }   # any numbers, scaled to 100%
+    parties = { fascist = "NSDAP" democratic = "SPD" }
+    seats = 491                    # parliament size (define parliament_seats, 100)
+    last_election = 1928.5.20      # elections then follow every election_frequency_months (48)
+    laws = { conscription = volunteer_only }
+}
+```
+
+**Popularity drift** (monthly, `backend/Politics.cs` `MonthlyDrift`): modifiers named `IDEOLOGY_drift` and
+`ruling_party_drift` (points per month), propaganda of rulers without elections (`ruling_party_drift` define), lost
+wars, low or high stability, ideologies ruling the neighbours, and chance.
+
+**Elections**: votes = popularity with a little chance; seats by D'Hondt among parties that are not banned and pass
+`election_threshold` (0.05). The biggest party that can form a majority with willing partners governs (coalition);
+otherwise the biggest party governs alone. When an ideology without elections wins, elections stop.
+
+**Political power and stability** are resources (`common/resources/00_politics.txt`; your own file with the same
+keys replaces them). Modifier keys: `political_power_gain` (per month), `stability_target`.
+
+**Laws** - `common/laws/*.txt`: each block is a law group whose blocks are its laws. Law keys: `cost` (political
+power, define `law_cost`), `potential`, `allow`, `modifier`, `bans = { communist fascist }`, `single_party = yes`,
+`suspends_elections = yes`, `on_enact`, `ai_will_do`. A group changes at most every `law_change_cooldown_days` (180).
+
+**Cabinet** - `common/cabinet/*.txt`: posts with `stat`, `per_point = { ... }` (times the minister's stat),
+`modifier`, `cost` (define `minister_cost`). Ministers are characters of a governing party (flag `party_IDEOLOGY`);
+missing candidates are generated. They step down when their party leaves the government.
+
+**Movements and civil wars** (`civil_wars`): an ideology shut out of power (banned, or no elections it could win) with
+at least `movement_threshold` (0.25) support forms a movement demanding to legalise its party or to take power. It
+grows each month (faster with low stability, `movement_speed`) and revolts at 100%: give in (its demand happens) or
+suppress it (`suppress_movement_cost` political power, some stability). A shut-out ideology above
+`civil_war_threshold` (0.5) may also start a civil war at any time (`civil_war_chance` per month). A civil war splits
+off part of the country's home states and army as a new country ruled by that ideology (tags R00, R01...). It ends
+when one side has lost its capital and most of its land (`civil_war_defeat_share`, 0.3): if the rebels win, the
+country keeps its name and tag but takes their government, laws and army. Civil wars cannot end with a peace deal.
+Without armies and wars (no `military`/`diplomacy`), revolts are coups.
+
+**Scripts**: triggers `ruling_ideology = X` (or `has_government`), `in_government = X`, `same_ideology = scope:recipient`,
+`holds_elections = yes`, `party_banned = X`, `has_law = L`, `has_movement = yes|X`, `in_civil_war = yes`,
+`has_minister = post`; values `popularity_X`, `seats_X`, `ruling_popularity`, `months_to_election`,
+`movement_progress`; effects `add_popularity = { ideology = X value = 0.05 }`, `set_ruling_party = X`,
+`set_law = L`, `hold_election = yes`, `start_civil_war = { ideology = X size = 0.4 }`,
+`set_party_name = { ideology = X name = "..." }`. On actions: `on_election`, `on_ruling_party_changed`,
+`on_law_changed`, `on_movement_formed`, `on_civil_war_started` (scope:rebel), `on_civil_war_ended`.
+Console: `politics [TAG]`, `popularity X 0.1`, `ideology X`, `election [TAG]`, `law L`, `civilwar X [share] [TAG]`.
+
+---------------------------------------------------------------------------------------------------
+
 ## 5. Diplomacy (Imperator style)
 
 - **Opinion**: modifiers that decay (`add_opinion`, `reverse_add_opinion`) plus a base from the relationship.
