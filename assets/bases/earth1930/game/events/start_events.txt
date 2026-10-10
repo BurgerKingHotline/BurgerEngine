@@ -1,0 +1,11 @@
+# Events. Add more: right-click this file in the Content Browser > New country/character event.
+namespace = start
+
+country_event = {
+	id = start.1
+	title = "Welcome to [ROOT]"
+	desc = "This game starts as a blank slate. Add mechanics in Burger Studio with Project > Features."
+	is_triggered_only = yes
+	trigger = { is_player = yes }
+	option = { name = "Let us begin!" }
+}

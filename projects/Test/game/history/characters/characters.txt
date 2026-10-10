@@ -1,0 +1,2 @@
+aaa_king = { first_name = Arthur family = "West" age = 40 country = AAA ruler = yes martial = 6 traits = { brave } }
+bbb_queen = { first_name = Eleanor family = "East" female = yes age = 35 country = BBB ruler = yes }

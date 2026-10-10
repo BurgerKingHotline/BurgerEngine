@@ -1,0 +1,6 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Gold & manpower economy"
+category = "Economy"
+order = 50
+description = "Monthly tax income, army upkeep and manpower from states. Training and reinforcing divisions costs gold and manpower."
+generate = { starting_treasury }

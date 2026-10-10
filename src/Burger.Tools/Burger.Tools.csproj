@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>burger</AssemblyName>
+    <RootNamespace>Burger.Tools</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Burger.Core\Burger.Core.csproj" />
+  </ItemGroup>
+</Project>

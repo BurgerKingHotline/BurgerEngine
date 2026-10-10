@@ -1,0 +1,11 @@
+# Countries. The three letter tag is used everywhere to refer to the country.
+AAA = {
+	name = "Westland"
+	color = { 180 60 60 }
+	capital = first_town
+}
+BBB = {
+	name = "Eastland"
+	color = { 60 90 180 }
+	capital = third_town
+}

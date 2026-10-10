@@ -1,0 +1,5 @@
+name = "Earth 1930"
+version = "0.1"
+author = ""
+description = "The world in 1930."
+default_country = GER

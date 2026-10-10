@@ -1,0 +1,69 @@
+# Character interactions - shown in the Characters panel for the selected character.
+# Scopes: ROOT / scope:actor = our country, scope:target = the character, scope:recipient = the character's country.
+
+appoint_heir = {
+	name = "Appoint as Heir"
+	desc = "Make this character the heir to the throne."
+	potential = {
+		scope:target = { employer = ROOT is_ruler = no is_heir = no }
+	}
+	allow = {
+		scope:target = { is_adult = yes }
+	}
+	on_accept = { set_heir = scope:target }
+}
+
+make_general = {
+	name = "Make General"
+	desc = "Allow this character to lead armies."
+	potential = {
+		scope:target = { employer = ROOT is_general = no is_ruler = no }
+	}
+	allow = {
+		scope:target = { is_adult = yes }
+	}
+	on_accept = { scope:target = { make_general = yes } }
+}
+
+grant_gift = {
+	name = "Grant Gift"
+	desc = "Give 25 gold to raise their loyalty."
+	cost = 25
+	cooldown_days = 365
+	potential = { scope:target = { employer = ROOT is_ruler = no } }
+	allow = { gold >= 25 }
+	on_accept = { scope:target = { add_loyalty = 15 } }
+}
+
+arrange_marriage = {
+	name = "Arrange Marriage"
+	desc = "Find a suitable spouse for this character."
+	cost = 20
+	potential = {
+		scope:target = { employer = ROOT is_married = no }
+	}
+	allow = {
+		gold >= 20
+		scope:target = { is_adult = yes }
+	}
+	on_accept = {
+		if = {
+			limit = { scope:target = { is_female = no } }
+			create_character = { female = yes age = 20 save_scope_as = new_spouse }
+		}
+		else = {
+			create_character = { age = 24 save_scope_as = new_spouse }
+		}
+		scope:target = { marry = scope:new_spouse }
+	}
+}
+
+execute = {
+	name = "Execute"
+	desc = "Have this character executed. Everyone else at court will fear us."
+	potential = { scope:target = { employer = ROOT is_ruler = no } }
+	on_accept = {
+		scope:target = { kill_character = { reason = "execution" } }
+		every_character = { limit = { employer = ROOT } add_loyalty = -5 }
+	}
+}

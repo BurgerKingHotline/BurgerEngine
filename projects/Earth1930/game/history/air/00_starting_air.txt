@@ -1,0 +1,270 @@
+# Starting air wings, created when the air feature was added. Edit freely.
+# TAG = { wing = { type = plane_type base = state_with_air_base planes = 50 name = "..." } }
+
+ENG = {
+	wing = { type = fighter base = oxfordshire_state planes = 50 }
+	wing = { type = close_air_support base = oxfordshire_state planes = 50 }
+}
+FRA = {
+	wing = { type = fighter base = ile_de_france_state planes = 50 }
+	wing = { type = close_air_support base = ile_de_france_state planes = 50 }
+}
+SOV = {
+	wing = { type = fighter base = kaluga_state planes = 50 }
+	wing = { type = close_air_support base = kaluga_state planes = 50 }
+}
+CHI = {
+	wing = { type = fighter base = southeast_jiangsu_state planes = 50 }
+	wing = { type = close_air_support base = southeast_jiangsu_state planes = 50 }
+}
+USA = {
+	wing = { type = fighter base = south_2_state planes = 50 }
+	wing = { type = close_air_support base = south_2_state planes = 50 }
+}
+RAJ = {
+	wing = { type = fighter base = haryana_state planes = 50 }
+	wing = { type = close_air_support base = haryana_state planes = 50 }
+}
+TUR = {
+	wing = { type = fighter base = ankara_state planes = 50 }
+	wing = { type = close_air_support base = ankara_state planes = 50 }
+}
+BRA = {
+	wing = { type = fighter base = rio_de_janeiro_state planes = 50 }
+	wing = { type = close_air_support base = rio_de_janeiro_state planes = 50 }
+}
+POR = {
+	wing = { type = fighter base = evora_state planes = 50 }
+	wing = { type = close_air_support base = evora_state planes = 50 }
+}
+SPA = {
+	wing = { type = fighter base = community_of_madrid_state planes = 50 }
+	wing = { type = close_air_support base = community_of_madrid_state planes = 50 }
+}
+ITA = {
+	wing = { type = fighter base = lazio_state planes = 50 }
+	wing = { type = close_air_support base = lazio_state planes = 50 }
+}
+JAP = {
+	wing = { type = fighter base = kanto_state planes = 50 }
+	wing = { type = close_air_support base = kanto_state planes = 50 }
+}
+HOL = {
+	wing = { type = fighter base = north_brabant_state planes = 50 }
+	wing = { type = close_air_support base = north_brabant_state planes = 50 }
+}
+PER = {
+	wing = { type = fighter base = tehran_state planes = 50 }
+	wing = { type = close_air_support base = tehran_state planes = 50 }
+}
+GER = {
+	wing = { type = fighter base = brandenburg_state planes = 50 }
+	wing = { type = close_air_support base = brandenburg_state planes = 50 }
+}
+MEX = {
+	wing = { type = fighter base = state_of_mexico_state planes = 50 }
+	wing = { type = close_air_support base = state_of_mexico_state planes = 50 }
+}
+AST = {
+	wing = { type = fighter base = australian_capital_territory_state planes = 50 }
+	wing = { type = close_air_support base = australian_capital_territory_state planes = 50 }
+}
+ARG = {
+	wing = { type = fighter base = buenos_aires_state planes = 50 }
+	wing = { type = close_air_support base = buenos_aires_state planes = 50 }
+}
+ROM = {
+	wing = { type = fighter base = prahova_state planes = 50 }
+	wing = { type = close_air_support base = prahova_state planes = 50 }
+}
+BEL = {
+	wing = { type = fighter base = flemish_state planes = 50 }
+	wing = { type = close_air_support base = flemish_state planes = 50 }
+}
+POL = {
+	wing = { type = fighter base = masovian_voivodeship_state planes = 50 }
+	wing = { type = close_air_support base = masovian_voivodeship_state planes = 50 }
+}
+CAN = {
+	wing = { type = fighter base = southeast_ontario_state planes = 50 }
+	wing = { type = close_air_support base = southeast_ontario_state planes = 50 }
+}
+YUG = {
+	wing = { type = fighter base = belgrade_state planes = 50 }
+	wing = { type = close_air_support base = belgrade_state planes = 50 }
+}
+COL = {
+	wing = { type = fighter base = casanare_state planes = 50 }
+	wing = { type = close_air_support base = casanare_state planes = 50 }
+}
+SAU = {
+	wing = { type = fighter base = north_riyadh_state planes = 50 }
+	wing = { type = close_air_support base = north_riyadh_state planes = 50 }
+}
+FIN = {
+	wing = { type = fighter base = uusimaa_state planes = 50 }
+	wing = { type = close_air_support base = uusimaa_state planes = 50 }
+}
+VEN = {
+	wing = { type = fighter base = cojedes_state planes = 50 }
+	wing = { type = close_air_support base = cojedes_state planes = 50 }
+}
+PRU = {
+	wing = { type = fighter base = lima_state planes = 50 }
+	wing = { type = close_air_support base = lima_state planes = 50 }
+}
+SAF = {
+	wing = { type = fighter base = mpumalanga_state planes = 50 }
+	wing = { type = close_air_support base = mpumalanga_state planes = 50 }
+}
+CZE = {
+	wing = { type = fighter base = central_bohemian_state planes = 50 }
+	wing = { type = close_air_support base = central_bohemian_state planes = 50 }
+}
+GRE = {
+	wing = { type = fighter base = peloponnese_state planes = 50 }
+	wing = { type = close_air_support base = peloponnese_state planes = 50 }
+}
+SWE = {
+	wing = { type = fighter base = gavleborg_state planes = 50 }
+	wing = { type = close_air_support base = gavleborg_state planes = 50 }
+}
+BUL = {
+	wing = { type = fighter base = sofia_state planes = 50 }
+	wing = { type = close_air_support base = sofia_state planes = 50 }
+}
+SIA = {
+	wing = { type = fighter base = central_4_state planes = 50 }
+	wing = { type = close_air_support base = central_4_state planes = 50 }
+}
+ETH = {
+	wing = { type = fighter base = addis_ababa_state planes = 50 }
+	wing = { type = close_air_support base = addis_ababa_state planes = 50 }
+}
+NZL = {
+	wing = { type = fighter base = north_island_state planes = 50 }
+	wing = { type = close_air_support base = north_island_state planes = 50 }
+}
+NOR = {
+	wing = { type = fighter base = telemark_state planes = 50 }
+	wing = { type = close_air_support base = telemark_state planes = 50 }
+}
+AFG = {
+	wing = { type = fighter base = badakhshan_state planes = 50 }
+	wing = { type = close_air_support base = badakhshan_state planes = 50 }
+}
+BOL = {
+	wing = { type = fighter base = la_paz_state planes = 50 }
+	wing = { type = close_air_support base = la_paz_state planes = 50 }
+}
+HUN = {
+	wing = { type = fighter base = pest_state planes = 50 }
+	wing = { type = close_air_support base = pest_state planes = 50 }
+}
+ECU = {
+	wing = { type = fighter base = orellana_state planes = 50 }
+	wing = { type = close_air_support base = orellana_state planes = 50 }
+}
+DEN = {
+	wing = { type = fighter base = zealand_state planes = 50 }
+	wing = { type = close_air_support base = zealand_state planes = 50 }
+}
+SIK = {
+	wing = { type = fighter base = north_xinjiang_state planes = 50 }
+	wing = { type = close_air_support base = north_xinjiang_state planes = 50 }
+}
+MON = {
+	wing = { type = fighter base = tov_state planes = 50 }
+	wing = { type = close_air_support base = tov_state planes = 50 }
+}
+AUS = {
+	wing = { type = fighter base = lower_austria_state planes = 50 }
+	wing = { type = close_air_support base = lower_austria_state planes = 50 }
+}
+CHL = {
+	wing = { type = fighter base = maule_state planes = 50 }
+}
+PAR = {
+	wing = { type = fighter base = san_pedro_state planes = 50 }
+}
+TIB = {
+	wing = { type = fighter base = east_tibet_state planes = 50 }
+}
+OMA = {
+	wing = { type = fighter base = ad_dhahirah_state planes = 50 }
+}
+LIT = {
+	wing = { type = fighter base = kaunas_state planes = 50 }
+}
+SWI = {
+	wing = { type = fighter base = bern_state planes = 50 }
+}
+HON = {
+	wing = { type = fighter base = francisco_morazan_state planes = 50 }
+}
+URU = {
+	wing = { type = fighter base = soriano_state planes = 50 }
+}
+CUB = {
+	wing = { type = fighter base = matanzas_state planes = 50 }
+}
+NEP = {
+	wing = { type = fighter base = gandaki_zone_state planes = 50 }
+}
+GUA = {
+	wing = { type = fighter base = peten_state planes = 50 }
+}
+YEM = {
+	wing = { type = fighter base = al_hudaydah_state planes = 50 }
+}
+IRE = {
+	wing = { type = fighter base = cork_state planes = 50 }
+}
+EST = {
+	wing = { type = fighter base = harju_state planes = 50 }
+}
+LAT = {
+	wing = { type = fighter base = ventspils_state planes = 50 }
+}
+LUX = {
+	wing = { type = fighter base = luxembourg_2_state planes = 50 }
+}
+ALB = {
+	wing = { type = fighter base = elbasan_state planes = 50 }
+}
+TAN = {
+	wing = { type = fighter base = tannu_tuva_state planes = 50 }
+}
+LIB = {
+	wing = { type = fighter base = grand_gedeh_state planes = 50 }
+}
+COS = {
+	wing = { type = fighter base = puntarenas_state planes = 50 }
+}
+BHU = {
+	wing = { type = fighter base = gasa_state planes = 50 }
+}
+PAN = {
+	wing = { type = fighter base = darien_state planes = 50 }
+}
+NIC = {
+	wing = { type = fighter base = south_caribbean_coast_state planes = 50 }
+}
+ELS = {
+	wing = { type = fighter base = usulutan_state planes = 50 }
+}
+NFL = {
+	wing = { type = fighter base = newfoundland_and_labrador_state planes = 50 }
+}
+ICE = {
+	wing = { type = fighter base = southern_4_state planes = 50 }
+}
+HAI = {
+	wing = { type = fighter base = artibonite_state planes = 50 }
+}
+DOM = {
+	wing = { type = fighter base = san_juan_2_state planes = 50 }
+}
+DNZ = {
+	wing = { type = fighter base = danzig_state planes = 50 }
+}

@@ -1,0 +1,8 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Combat: Imperator style"
+category = "Military"
+order = 13
+description = "Daily d6 rolls modified by the generals, offense against defense, morale and strength damage."
+requires = { military }
+group = combat
+defines = { combat_model = imperator }

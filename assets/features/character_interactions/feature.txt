@@ -1,0 +1,6 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Character interactions"
+category = "Characters"
+order = 41
+description = "Actions on characters: appoint an heir, make a general, gifts, arranged marriages, execution."
+requires = { characters }

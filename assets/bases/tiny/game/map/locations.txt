@@ -1,0 +1,9 @@
+# HEX = location_name
+C82828 = first_town
+28C828 = second_town
+2828C8 = third_town
+C8C828 = fourth_town
+C828C8 = fifth_town
+28C8C8 = sixth_town
+0A0A78 = { name = west_sea type = sea }
+0A0AA0 = { name = east_sea type = sea }

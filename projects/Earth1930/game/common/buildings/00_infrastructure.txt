@@ -1,0 +1,8 @@
+# Infrastructure: carries supply further and speeds up construction in the state.
+infrastructure = {
+	name = "Infrastructure"
+	desc = "Roads: supply reaches further, construction in the state is faster."
+	cost = 3000
+	max_level = 5
+	category = infrastructure
+}

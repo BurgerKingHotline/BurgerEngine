@@ -1,0 +1,14 @@
+# Resource 'my_resource' - created in Burger Studio.
+# A new number for every country (or character): prestige, stability, piety... Each one automatically gets a value for triggers (prestige >= 20), effects add_<id> / set_<id>, a top bar display and the monthly change formula.
+
+my_resource = {
+	name = "New Resource"
+	desc = ""
+	start = 0
+	min = 0
+	max = 100
+	monthly = {
+		value = 0.1          # change per month (a script value: can use if/add/multiply...)
+	}
+	color = { 200 200 120 }
+}

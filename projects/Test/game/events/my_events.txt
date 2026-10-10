@@ -1,0 +1,8 @@
+country_event = {
+	id = my_mod.1
+	title = "Hello [ROOT]"
+	desc = "This is your first event. Edit events/my_events.txt to change it."
+	is_triggered_only = yes
+	trigger = { is_player = yes }
+	option = { name = "OK" add_gold = 10 }
+}

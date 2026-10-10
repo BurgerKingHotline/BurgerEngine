@@ -1,0 +1,18 @@
+# Reasons for war. allow: ROOT = the attacker, scope:recipient = the target.
+# The engine picks the valid casus belli with the highest ai_weight when war is declared.
+claim = {
+	name = "Press Claims"
+	allow = {
+		scope:recipient = { any_owned_state = { is_claimed_by = ROOT } }
+	}
+	peace_cost_multiplier = 0.75   # demands are cheaper
+	others_opinion = -5            # everyone else dislikes the aggressor a little
+	ai_weight = 10
+}
+conquest = {
+	name = "Conquest"
+	allow = { always = yes }
+	peace_cost_multiplier = 1.0
+	others_opinion = -25
+	ai_weight = 1
+}

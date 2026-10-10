@@ -1,0 +1,18 @@
+# Map inputs. All images can have any size; they are resampled to the province map.
+provinces = "provinces.png"     # one unique color per location
+heightmap = "heightmap.png"     # greyscale elevation (values below sea_level are water)
+terrain = "terrain.png"         # colors from common/terrain.txt
+trees = "trees.png"             # greyscale tree density
+rivers = "rivers.png"           # every non-white pixel is a river
+locations = "locations.txt"     # HEX = name for every province color
+adjacencies = "adjacencies.txt" # straits and blocked borders
+states = "states"               # folder with the state files
+
+sea_level = 20
+height_scale = 5
+pixels_per_unit = 10
+tree_density = 1.0
+tree_spacing = 5
+river_background = { 255 255 255 }
+water_color = { 30 66 112 }
+river_color = { 46 96 158 }

@@ -1,0 +1,16 @@
+# Game rules. Every value has a default in the engine; delete a line to use the default.
+# Features add their own rules here when they are installed (combat_model, fog_of_war...).
+start_date = 1930.1.1
+end_date = 1950.1.1
+pause_on_event = yes            # events can override this with pause = yes/no/{ trigger }
+# in-game days per real second for speeds 1-5 (0 = as fast as the computer can go)
+game_speeds = { 0.5 1.5 4 10 0 }
+km_per_pixel = 5.0
+
+combat_model = hoi4
+
+recruit_gold_cost = no
+
+fog_of_war = yes
+
+occupation_hours = 0

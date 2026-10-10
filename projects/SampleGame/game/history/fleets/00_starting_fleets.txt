@@ -1,0 +1,74 @@
+# Starting fleets, created when the navy feature was added. Edit freely.
+# TAG = { fleet = { name location ships = { ship_type = count } } }
+# 'location' must be a coastal land location (a port) or a sea location.
+
+VAL = {
+	fleet = {
+		name = "Home Fleet"
+		location = peliaholm
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+KES = {
+	fleet = {
+		name = "Home Fleet"
+		location = peleford
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}
+DRV = {
+	fleet = {
+		name = "Home Fleet"
+		location = yrennar
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}
+OST = {
+	fleet = {
+		name = "Home Fleet"
+		location = osiaford
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}
+SUN = {
+	fleet = {
+		name = "Home Fleet"
+		location = wesewyn
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}
+THA = {
+	fleet = {
+		name = "Home Fleet"
+		location = noruros
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+ZEM = {
+	fleet = {
+		name = "Home Fleet"
+		location = areholm
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+MAR = {
+	fleet = {
+		name = "Home Fleet"
+		location = elaburg
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+BRE = {
+	fleet = {
+		name = "Home Fleet"
+		location = falosted
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+ULM = {
+	fleet = {
+		name = "Home Fleet"
+		location = breosted
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}

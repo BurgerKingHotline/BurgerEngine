@@ -1,0 +1,65 @@
+# Ship types (navy feature).
+#   category       screen (shields capital ships in battle), capital, transport, or your own
+#   hp             hit points; a side retreats when its ships fall below naval_retreat (defines) of their hit points
+#   speed          km per hour (a fleet moves at the speed of its slowest ship)
+#   light_attack   damage against screens and transports
+#   heavy_attack   damage against capital ships (and less against screens)
+#   armor          reduces damage taken
+#   transport      divisions this ship can carry over the sea
+#   cost           gold, when bought without the production feature (with economy)
+#   production_cost  dockyard production cost, with the production feature
+#   manpower, build_days   crew and building time when bought with gold
+# Any other number is kept as a stat, readable from C# (ship.Type.Stat("my_stat")).
+
+ship_types = {
+	destroyer = {
+		name = "Destroyer"
+		category = screen
+		hp = 20
+		speed = 32
+		light_attack = 4
+		heavy_attack = 0.5
+		armor = 1
+		cost = 40
+		production_cost = 1200
+		manpower = 200
+		build_days = 120
+	}
+	light_cruiser = {
+		name = "Light Cruiser"
+		category = screen
+		hp = 40
+		speed = 30
+		light_attack = 7
+		heavy_attack = 1
+		armor = 3
+		cost = 80
+		production_cost = 2600
+		manpower = 500
+		build_days = 200
+	}
+	battleship = {
+		name = "Battleship"
+		category = capital
+		hp = 120
+		speed = 22
+		light_attack = 3
+		heavy_attack = 14
+		armor = 12
+		cost = 250
+		production_cost = 9000
+		manpower = 1500
+		build_days = 540
+	}
+	transport = {
+		name = "Transport"
+		category = transport
+		hp = 15
+		speed = 20
+		transport = 2
+		cost = 30
+		production_cost = 600
+		manpower = 100
+		build_days = 90
+	}
+}

@@ -1,0 +1,169 @@
+# Events. country_event: ROOT = a country.  character_event: ROOT = a character.
+#   is_triggered_only = yes     only fired by script/on_actions (otherwise mean_time_to_happen is used)
+#   trigger                     must be true for the event to fire
+#   mean_time_to_happen         average time until it fires while the trigger is true
+#   immediate                   effects run when the event fires (before the player chooses)
+#   option                      name, optional trigger, ai_chance, effects
+#   pause                       yes/no, or a trigger: does the game pause when the player gets it? (default: pause_on_event in defines)
+# Text can be written directly or as localisation keys. [ROOT], [scope:x], [ROOT.ruler] are replaced by names.
+namespace = sample
+
+country_event = {
+	id = sample.1
+	title = "Welcome to [ROOT]"
+	desc = "You rule [ROOT]. Your ruler is [ROOT.ruler].\n\nControls: WASD / middle mouse to move, mouse wheel to zoom, Space to pause, 1-5 for speed. Click a location for details, right-click a country to open diplomacy. Click or drag a box around your units to select them, right-click to move or attack.\n\nLeft menu: F1 military, R recruit, F3 characters, F6 decisions. Top right: F4 wars, F8 world. F2 error log, F10 map editor, ` console."
+	is_triggered_only = yes
+	trigger = { is_player = yes }
+	option = { name = "Let us begin!" }
+}
+
+# A country can change its name, flag and color during the game.
+country_event = {
+	id = sample.2
+	title = "The Republican Movement"
+	desc = "Pamphlets calling for a republic are everywhere in the capital. The crowds demand that [ROOT.ruler] gives up the crown."
+	trigger = {
+		tag = VAL
+		NOT = { has_flag = val_republic }
+		year >= 1837
+	}
+	mean_time_to_happen = { years = 4 }
+	option = {
+		name = "Proclaim the Valorian Republic"
+		set_country_name = "Valorian Republic"
+		set_flag_image = "gfx/flags/VAL_republic.png"
+		set_country_color = { 40 140 200 }
+		set_government = republic
+		set_flag = val_republic
+		add_manpower = 2000
+		ai_chance = { factor = 1 }
+	}
+	option = {
+		name = "Crush the movement"
+		add_gold = -50
+		add_manpower = -1500
+		ruler = { add_loyalty = 10 }
+		ai_chance = { factor = 2 }
+	}
+}
+
+character_event = {
+	id = sample.10
+	title = "[ROOT] Falls Ill"
+	desc = "[ROOT], ruler of [ROOT.employer], has fallen gravely ill. The doctors are not optimistic."
+	trigger = {
+		is_ruler = yes
+		age >= 50
+		NOT = { has_trait = sickly }
+	}
+	mean_time_to_happen = {
+		years = 12
+		modifier = { factor = 0.5 age >= 65 }
+	}
+	option = {
+		name = "Summon the best physicians (50 gold)"
+		trigger = { employer = { gold >= 50 } }
+		employer = { add_gold = -50 }
+		random = { chance = 30 add_trait = sickly }
+	}
+	option = {
+		name = "Pray"
+		random_list = {
+			50 = { add_trait = sickly }
+			30 = { add_health = -20 }
+			20 = { add_zeal = 1 }
+		}
+	}
+}
+
+character_event = {
+	id = sample.11
+	title = "A Brilliant Commander"
+	desc = "[ROOT] has shown remarkable talent in the field."
+	trigger = {
+		is_commanding = yes
+		NOT = { has_trait = tactician }
+		martial >= 6
+	}
+	mean_time_to_happen = { years = 5 }
+	option = {
+		name = "Excellent"
+		add_trait = tactician
+		add_loyalty = 10
+	}
+}
+
+country_event = {
+	id = sample.20
+	title = "A New Ruler"
+	desc = "[scope:new_ruler] now rules [ROOT]."
+	is_triggered_only = yes
+	trigger = { is_player = yes }
+	option = {
+		name = "Long live [scope:new_ruler]!"
+		scope:new_ruler = { add_loyalty = 10 }
+	}
+}
+
+country_event = {
+	id = sample.30
+	title = "War Fever"
+	desc = "We have declared war on [scope:defender]. Volunteers flock to our banners."
+	is_triggered_only = yes
+	option = {
+		name = "To arms!"
+		add_manpower = 1500
+		add_prestige = 2
+	}
+}
+
+country_event = {
+	id = sample.31
+	title = "We Are Attacked!"
+	desc = "[scope:attacker] has declared war on us! The nation must rally."
+	is_triggered_only = yes
+	pause = { is_at_war = yes }  # a trigger works too (ROOT = the country)
+	option = {
+		name = "Call up the reserves"
+		add_manpower = 3000
+	}
+	option = {
+		name = "Raise war taxes"
+		add_gold = 75
+		add_manpower = 1000
+	}
+}
+
+country_event = {
+	id = sample.40
+	title = "Bountiful Harvest"
+	desc = "The harvest in [ROOT.capital] was excellent this year."
+	is_triggered_only = yes
+	pause = no                  # good news: don't stop the game for it
+	option = {
+		name = "Good news"
+		add_gold = 30
+	}
+}
+
+country_event = {
+	id = sample.41
+	title = "Border Incident"
+	desc = "Soldiers of [scope:rival] crossed our border and clashed with a patrol."
+	is_triggered_only = yes
+	trigger = { any_neighbor_country = { exists = yes } }
+	immediate = {
+		random_neighbor_country = { save_scope_as = rival }
+	}
+	option = {
+		name = "Demand an apology"
+		add_opinion = { target = scope:rival value = -20 name = "Border incident" }
+		scope:rival = { add_opinion = { target = ROOT value = -20 name = "Border incident" } }
+		ai_chance = { factor = 1 }
+	}
+	option = {
+		name = "Let it go"
+		add_prestige = -1
+		ai_chance = { factor = 1 }
+	}
+}

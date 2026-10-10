@@ -1,0 +1,38 @@
+<!--
+  Compiles a project's backend folder (projects/<Name>/backend/*.cs) into the exported game EXE.
+  Only used by 'burger export' (it passes -p:BackendDir=...); while developing, the backend is compiled at load time.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Burger.Backend</AssemblyName>
+    <RootNamespace>Burger.Backend</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <Nullable>annotations</Nullable>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591;CS8618;CS0162;CS0219;CS0414;CS0169</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(BackendDir)/**/*.cs" Exclude="$(BackendDir)/**/bin/**;$(BackendDir)/**/obj/**" Condition="'$(BackendDir)' != ''" />
+    <ProjectReference Include="..\Burger.Core\Burger.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Burger.Core" />
+    <Using Include="Burger.Core.AI" />
+    <Using Include="Burger.Core.Characters" />
+    <Using Include="Burger.Core.Data" />
+    <Using Include="Burger.Core.Diplomacy" />
+    <Using Include="Burger.Core.Economy" />
+    <Using Include="Burger.Core.Events" />
+    <Using Include="Burger.Core.Map" />
+    <Using Include="Burger.Core.Mechanics" />
+    <Using Include="Burger.Core.Model" />
+    <Using Include="Burger.Core.Modding" />
+    <Using Include="Burger.Core.Script" />
+    <Using Include="Burger.Core.Scripting" />
+    <Using Include="Burger.Core.Warfare" />
+    <Using Include="Burger.Core.Production" />
+    <Using Include="Burger.Core.Supply" />
+    <Using Include="Burger.Core.Navy" />
+    <Using Include="Burger.Core.Air" />
+  </ItemGroup>
+</Project>

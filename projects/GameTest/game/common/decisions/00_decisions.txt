@@ -1,0 +1,46 @@
+# Decisions: buttons in the Decisions panel (F6). ROOT = the country.
+# repeatable = no  → disappears after being taken once.   cooldown_days / cost (gold) are optional.
+proclaim_empire = {
+	name = "Proclaim an Empire"
+	desc = "Our realm has grown great enough to call itself an empire."
+	potential = { NOT = { government = empire } }
+	allow = {
+		num_of_states >= 8
+		prestige >= 30
+		gold >= 200
+	}
+	effect = {
+		add_gold = -200
+		set_government = empire
+		add_prestige = 25
+		add_modifier = { name = drilled_troops years = 10 }
+	}
+	ai_will_do = { base = 1 }
+}
+
+raise_war_taxes = {
+	name = "Raise War Taxes"
+	desc = "Squeeze the population to pay for the war. Lowers stability."
+	potential = { is_at_war = yes NOT = { has_modifier = war_taxes } }
+	allow = { stability >= 20 }
+	effect = {
+		add_modifier = { name = war_taxes years = 1 }
+		add_stability = -10
+	}
+	repeatable = yes
+	cooldown_days = 365
+	ai_will_do = { base = 1 modifier = { factor = 0 gold > 300 } }
+}
+
+build_workshops = {
+	name = "Build Workshops in the Capital"
+	desc = "Invest in the capital's workshops (+30% tax in that state)."
+	cost = 100
+	allow = { gold >= 100 }
+	effect = {
+		capital = { state = { add_modifier = new_workshops add_building = workshop } }
+	}
+	repeatable = yes
+	cooldown_days = 730
+	ai_will_do = { base = 1 modifier = { factor = 0 gold < 250 } }
+}

@@ -1,0 +1,7 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Navy (fleets & transports)"
+category = "Military"
+order = 19
+description = "Ship types, fleets that sail through sea locations and ports, naval battles where screens protect capital ships, repairs in naval bases, and transport ships that carry divisions over the sea (naval invasions fight at a penalty, unescorted armies at sea can be sunk). With the production feature, dockyards build the ships."
+requires = { military }
+generate = { starting_naval_bases starting_fleets }

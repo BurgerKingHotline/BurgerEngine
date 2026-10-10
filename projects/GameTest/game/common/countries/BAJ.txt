@@ -1,0 +1,9 @@
+# Country 'BAJ' - created in Burger Studio.
+# Countries are identified by a three letter tag (GER, FRA, A01). Give a new country land on the Map page (set a state's owner). Name, color and flag can also change during the game.
+
+BAJ = {
+	name = "Bajookiestan"
+	color = { 47 212 17 }
+	flag = "gfx/flags/BAJ.png"
+	government = monarchy
+}

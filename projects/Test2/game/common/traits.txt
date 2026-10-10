@@ -1,0 +1,25 @@
+# Character traits. Any number modifies the stat or modifier with that name:
+#   martial / finesse / charisma / zeal       character stats (see character_stats in defines)
+#   general_attack / general_defense          combat bonus when leading an army (0.1 = +10%)
+#   health                                    percent less (or more, if negative) chance to die each year
+#   fertility                                 extra chance to have children
+# random_weight: chance to be given to generated characters. inherit_chance: chance a child inherits it.
+brave = { category = personality martial = 1 general_attack = 0.05 opposites = { craven } random_weight = 10 }
+craven = { category = personality martial = -1 general_defense = 0.05 opposites = { brave } random_weight = 6 }
+just = { category = personality charisma = 1 zeal = 1 opposites = { cruel } random_weight = 8 }
+cruel = { category = personality charisma = -1 martial = 1 opposites = { just } random_weight = 6 }
+ambitious = { category = personality finesse = 1 charisma = 1 opposites = { lazy } random_weight = 8 }
+lazy = { category = personality finesse = -1 opposites = { ambitious diligent } random_weight = 6 }
+diligent = { category = personality finesse = 2 opposites = { lazy } random_weight = 7 }
+charismatic = { category = personality charisma = 2 random_weight = 6 inherit_chance = 0.1 }
+honest = { category = personality zeal = 1 finesse = -1 opposites = { paranoid } random_weight = 6 }
+paranoid = { category = personality finesse = 1 charisma = -1 opposites = { honest } random_weight = 5 }
+wrathful = { category = personality martial = 1 charisma = -1 random_weight = 5 }
+drunkard = { category = health finesse = -1 health = -20 random_weight = 3 }
+zealous = { category = personality zeal = 2 random_weight = 5 }
+tactician = { category = military martial = 2 general_attack = 0.1 general_defense = 0.1 random_weight = 2 }
+reckless = { category = military general_attack = 0.15 general_defense = -0.1 random_weight = 2 }
+cautious = { category = military general_defense = 0.15 general_attack = -0.05 random_weight = 2 }
+sickly = { category = health health = -60 random_weight = 1 inherit_chance = 0.2 }
+robust = { category = health health = 40 random_weight = 2 inherit_chance = 0.3 }
+fertile = { category = health fertility = 0.5 random_weight = 2 inherit_chance = 0.25 }

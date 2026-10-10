@@ -1,0 +1,47 @@
+# Game rules. Every value has a default in the engine; delete a line to use the default.
+start_date = 1836.1.1
+end_date = 1936.1.1
+pause_on_event = yes            # events can override this with pause = yes/no/{ trigger }
+fog_of_war = yes                # hide enemy armies and grey out land you cannot see (C#: Game.Rules.Vision)
+# in-game days per real second for speeds 1-5 (0 = as fast as the computer can go)
+game_speeds = { 0.5 1.5 4 10 0 }
+event_timeout_days = 30
+
+# ---------------------------------------------------------------- warfare
+# Which combat resolver to use: hoi4, eu4, imperator - or the id of one registered from a C# script
+# (scripts/ExampleMod.cs registers "lanchester"). You can also switch in-game with the console: combat eu4
+combat_model = hoi4
+# 0 = locations are taken as soon as you enter them (HOI4). >0 = hours of siege per (fort level + 1) (EU4/Imperator)
+occupation_hours = 0
+km_per_pixel = 2.0
+river_attack_penalty = 0.3
+extra_width_per_direction = 0.5
+reinforce_rate = 0.03
+org_recovery_rate = 0.08
+general_stat = martial
+general_bonus_per_point = 0.03
+fort_defense_bonus = 0.15
+min_org_to_attack = 0.6
+
+# ---------------------------------------------------------------- economy
+income_multiplier = 1.0
+manpower_multiplier = 1.0
+division_upkeep_factor = 0.02
+
+# ---------------------------------------------------------------- diplomacy
+base_diplomatic_relations = 3
+relations_stat = charisma
+relations_per_stat_point = 0.25
+opinion_decay_per_month = 1
+ai_diplomacy_chance = 0.35
+truce_years = 5
+war_score_battle_cap = 30
+subjugate_cost = 60
+annex_cost = 100
+
+# ---------------------------------------------------------------- characters
+character_stats = { martial finesse charisma zeal }
+adult_age = 16
+death_chance_base = 0.004
+death_chance_per_year_over_50 = 0.006
+birth_chance_per_year = 0.2

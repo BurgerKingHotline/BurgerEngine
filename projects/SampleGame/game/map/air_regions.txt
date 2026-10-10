@@ -1,0 +1,56 @@
+# Air regions (air feature): air wings are assigned to regions, and air superiority is fought per region.
+# region_key = { name = "Shown name" states = { state_keys } }
+# States that are in no region are grouped automatically when the game loads.
+
+air_region_1 = {
+	name = "Dunasted Plains Region"
+	states = { noroburg_state pelastad_state dunasted_state salimar_state }
+}
+air_region_2 = {
+	name = "Corested Highlands Region"
+	states = { elovik_state valugrad_state belarburg_state corested_state }
+}
+air_region_3 = {
+	name = "Osenwyn Coast Region"
+	states = { osenwyn_state brearford_state breosted_state zananton_state }
+}
+air_region_4 = {
+	name = "Goriaros March Region"
+	states = { istipolis_state cororgard_state draistad_state goriaros_state }
+}
+air_region_5 = {
+	name = "Valomar Vale Region"
+	states = { valomar_state calovik_state }
+}
+air_region_6 = {
+	name = "Quinenwick Vale Region"
+	states = { quinenwick_state rosomont_state elorburg_state elarburg_state }
+}
+air_region_7 = {
+	name = "Yrevik Highlands Region"
+	states = { areheim_state yrevik_state toreburg_state draanmar_state }
+}
+air_region_8 = {
+	name = "Quineton Highlands Region"
+	states = { quineton_state draennar_state ulorholm_state falosted_state }
+}
+air_region_9 = {
+	name = "Noruros Vale Region"
+	states = { yrinar_state noruros_state gorimar_state draiawick_state }
+}
+air_region_10 = {
+	name = "Wesewynshire Region"
+	states = { wesewyn_state }
+}
+air_region_11 = {
+	name = "Marestad March Region"
+	states = { marestad_state wesengrad_state breiheim_state belargard_state peleford_state }
+}
+air_region_12 = {
+	name = "Lorimont Highlands Region"
+	states = { karuvik_state lorimont_state eryorwyn_state yrennar_state }
+}
+air_region_13 = {
+	name = "Noriagrad Highlands Region"
+	states = { harianar_state breiawyn_state quinanstad_state noriagrad_state }
+}

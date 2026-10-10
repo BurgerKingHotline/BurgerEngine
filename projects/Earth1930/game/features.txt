@@ -1,0 +1,16 @@
+# Features (mechanics) this game uses. Manage them in Burger Studio: Project > Features,
+# or with: burger features <project> add|remove <id>
+features = {
+	military
+	combat_hoi4
+	production
+	supply_hubs
+	division_designer
+	navy
+	air
+	battle_plans
+	diplomacy
+	lend_lease
+	fog_of_war
+	ai
+}

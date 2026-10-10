@@ -1,0 +1,36 @@
+# The look of the in-game interface. Delete any line to use the engine default.
+# Colors are { red green blue } or { red green blue alpha } (0-255).
+# Panels and buttons can also use images: panel_texture / button_texture / top_bar_texture are
+# 9-slice images (the outer texture_border pixels are kept, the middle is stretched).
+# C# scripts can change all of this at runtime: Game.Interface.Theme.SetColor("panel", 20, 20, 30, 240)
+theme = {
+	font = "gfx/fonts/PTSans-Regular.ttf"          # body text
+	bold_font = "gfx/fonts/PTSans-Bold.ttf"        # buttons and numbers
+	header_font = "gfx/fonts/AlegreyaSC-Bold.ttf"  # panel titles and country names on the map
+	font_scale = 1.0
+	ui_scale = 1.0
+	ornate = yes                                   # gradients, double borders and corner studs; no = flat panels
+	# panel_texture = "gfx/interface/panel.png"
+	# button_texture = "gfx/interface/button.png"
+	# texture_border = 12
+
+	colors = {
+		panel = { 26 28 32 246 }
+		panel_border = { 168 136 72 }
+		panel_inner_border = { 92 78 50 }
+		panel_header = { 58 46 30 }
+		top_bar = { 40 34 26 250 }
+		text = { 236 230 214 }
+		text_dim = { 168 162 150 }
+		title = { 236 200 100 }
+		good = { 126 214 120 }
+		bad = { 236 104 92 }
+		button = { 56 58 64 }
+		button_hover = { 84 74 52 }
+		button_selected = { 150 112 46 }
+		button_disabled = { 40 41 45 }
+		button_border = { 96 86 66 }
+		tooltip = { 16 16 20 248 }
+		menu_bar = { 22 22 26 236 }
+	}
+}

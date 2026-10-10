@@ -1,0 +1,9 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Supply: range"
+category = "Military"
+order = 16
+description = "Supply spreads from the capital and from your own land, weaker with every step (rough terrain makes steps longer). It only travels through friendly land, so encircled armies starve. Too many divisions in one place also run short."
+requires = { military }
+group = supply
+conflicts = { supply_hubs }
+generate = { starting_infrastructure }

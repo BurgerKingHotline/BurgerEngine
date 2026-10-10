@@ -1,0 +1,53 @@
+# Plane types (air feature). A wing has air_wing_size planes (defines).
+#   category          fighter, cas, bomber (or your own; only shown in the UI)
+#   range             km a wing can fly from its air base to the center of a region
+#   air_attack        air superiority: shoots down enemy planes (needed for the superiority mission)
+#   air_defense       fewer losses
+#   agility           a little extra air superiority
+#   ground_attack     close air support damage to enemy divisions in battles (needed for the CAS mission)
+#   strategic_attack  strategic bombing damage to buildings (needed for the bombing mission, production feature)
+#   cost              gold for a full wing (without the production feature, with economy)
+#   production_cost   production cost of ONE plane (with the production feature)
+#   manpower, build_days   crew and building time of a wing bought with gold
+# Any other number is kept as a stat, readable from C# (wing.Type.Stat("my_stat")).
+
+plane_types = {
+	fighter = {
+		name = "Fighter"
+		category = fighter
+		range = 700
+		air_attack = 12
+		air_defense = 10
+		agility = 40
+		cost = 60
+		production_cost = 22
+		manpower = 100
+		build_days = 90
+	}
+	close_air_support = {
+		name = "Close Air Support"
+		category = cas
+		range = 500
+		air_attack = 2
+		air_defense = 8
+		agility = 20
+		ground_attack = 20
+		cost = 70
+		production_cost = 24
+		manpower = 120
+		build_days = 100
+	}
+	bomber = {
+		name = "Strategic Bomber"
+		category = bomber
+		range = 1400
+		air_defense = 14
+		agility = 10
+		strategic_attack = 12
+		ground_attack = 2
+		cost = 110
+		production_cost = 45
+		manpower = 200
+		build_days = 150
+	}
+}

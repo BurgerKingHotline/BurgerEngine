@@ -1,0 +1,255 @@
+# Every color of provinces.png is a location.
+# Format:  HEX = location_name     (or HEX = { name = x terrain = forest type = sea fort = 1 })
+# Display names come from localisation (or the key with _ replaced by spaces).
+
+E41CC2 = noruros
+A07B81 = belargard
+3BDF66 = karagard
+356877 = salanpolis
+6183AE = dunanmar
+8CC86F = falorford
+C7723E = draawick
+A53819 = zananton
+A458B2 = breosted
+6BBD68 = drauvik
+D7B25C = coranburg
+3122C5 = galiagrad
+639259 = cororgard
+BC2BDC = karewyn
+A61D82 = draiawick
+DA9A9A = eryanton
+CF9090 = faloros
+39D37D = karomont
+C34885 = galormar
+E79918 = galuford
+792067 = corostad
+6EB19A = dunanwick
+95D063 = istanmar
+D2A16A = duniagard
+872B2C = elanmont
+E0B478 = breenmar
+7FB7DC = dunimar
+64D628 = yrennar
+2CE84D = aroton
+77AA3B = valugrad
+3FA5C6 = breisted
+16A549 = lorawick
+E1175F = haranmont
+D3A8A7 = marewick
+964DA7 = fenendale
+8AE070 = pelenton
+602645 = dunasted
+56C1AE = torodale
+34208B = noroburg
+90DC96 = torivik
+CA56A9 = breiawyn
+E8171B = wesenburg
+E73075 = harianar
+EA52CD = { name = faliheim fort = 1 }
+22BE33 = rosaburg
+9C1DE5 = elorburg
+8C8666 = rosomont
+E553E0 = falanmont
+C42625 = zaniaheim
+996F60 = yredale
+C160C7 = yriagard
+2CAD87 = quinestad
+85D936 = { name = osiaford fort = 1 }
+166994 = corustad
+B16BBC = salorstad
+839737 = torenton
+D61F8D = eryuwick
+37CB22 = corengrad
+D75938 = karenar
+243340 = yrarford
+E95553 = pelawyn
+AB74CE = noriagrad
+6F9BCB = calovik
+D51680 = dunuwyn
+7D6877 = elarburg
+7F299A = faliaholm
+7416D0 = beliton
+DB1FAF = isteton
+4A3597 = yrinar
+78899E = rosiamar
+B89E5D = fenusted
+7F2E77 = areheim
+6316C7 = peluwick
+5A7297 = lorimont
+6923BC = yrevik
+E492DB = corawyn
+312566 = eryorwyn
+BBD8DD = ararsted
+1A2DB8 = brearford
+DC56C1 = calestad
+B5A137 = istiaheim
+60A16E = brearburg
+CDD722 = falianar
+A2E2DD = dunuholm
+2ACC16 = coraburg
+52C518 = breewyn
+82851B = breiheim
+88A17E = pelastad
+812DEA = { name = corested fort = 1 }
+D9E6B6 = harowyn
+D17A84 = elaburg
+7EC41D = cororvik
+B34A4E = ulomar
+B3B5A5 = zanevik
+53B36E = istorgard
+C42574 = pelorvik
+31D280 = draiaholm
+36C869 = brearvik
+BF8335 = quinenton
+7C899B = loriaros
+563140 = istaros
+6963D9 = areholm
+A6EBDB = caligard
+212921 = norianar
+535EB5 = valomar
+347FC0 = weseheim
+6772C1 = breanmar
+B01749 = beleton
+E0694E = istinar
+66CAC5 = ulorholm
+C8DCC8 = fenanton
+5D9968 = nororgard
+A03D1E = wesorford
+4B70D6 = quinangrad
+9BDF4E = yrarros
+A7A77E = elovik
+8B63A4 = maromar
+D7CC6F = ulimar
+5C179A = toreburg
+581E59 = gorarnar
+C0C4C4 = draennar
+85A829 = cororpolis
+A9A68D = goriaros
+D15A4B = { name = draistad fort = 1 }
+C01E30 = { name = ularmont fort = 1 }
+3E914E = quineton
+2B57B5 = uleburg
+9C804A = quinenwick
+9C9738 = marestad
+646D4C = valenar
+A2C673 = dunargard
+BCB038 = karuvik
+26AE61 = calengard
+1E2B36 = pelumont
+B39F69 = norodale
+3EB587 = aroburg
+B76F1C = gorugrad
+B19A3E = gororstad
+C18AD9 = valestad
+80276B = zanudale
+279A73 = corormar
+DAB6B6 = valarros
+2C49EB = galorwick
+74ADC4 = zanegard
+174CB4 = { name = draipolis fort = 1 }
+27706A = rosansted
+39AFA3 = falosted
+32AEB6 = rosumont
+9A594A = rosiheim
+893B5B = draanmar
+201438 = pelowyn
+C0612B = salunar
+5C9C23 = wesewyn
+49CA41 = osenwyn
+3C6025 = calimar
+424146 = salimar
+73B79A = gorarvik
+CF2547 = ulanmont
+343119 = osiamar
+146AC6 = wesengrad
+EB37BC = breegrad
+60CCE4 = gorimar
+D9B143 = coremont
+309FD0 = aroford
+6EDB62 = galarsted
+87B721 = peliaholm
+8D5D9A = beliros
+A34ED9 = lorenar
+DF1AA1 = wesorgard
+C89C64 = draarburg
+B82DD9 = istipolis
+2539AD = coranheim
+4DC7E6 = elengrad
+22A51B = salanstad
+D33D5B = yrewick
+ACE98F = toraford
+711BC1 = goroburg
+B1D833 = belarburg
+83186E = eryiawick
+797F63 = fenorwick
+2F2723 = lorarwick
+50E074 = quinoton
+A0D026 = dunaheim
+A393C5 = falaford
+4982C9 = zanarmar
+2B6119 = zanengard
+1720A3 = quinanstad
+5DEA5E = { name = karuford fort = 1 }
+B38CE3 = { name = draiasted fort = 1 }
+8C2A58 = feniaheim
+529DBB = roseholm
+2577D2 = eliawyn
+3A8F5E = calenburg
+7851D6 = toriamar
+AB94BA = rosamar
+8DB2D2 = galiwick
+A41DB5 = lorianar
+3DDB5D = elupolis
+4CDE50 = gorarton
+E3E8C1 = goroholm
+D2CDA3 = loragrad
+D2BF19 = rosanheim
+9EE956 = { name = yruton fort = 1 }
+E38EB4 = peleford
+487629 = karargard
+975D80 = toriawyn
+C2B432 = zanormar
+841D85 = dunangrad
+4675BD = { name = sea_1 type = sea }
+4BD225 = { name = sea_2 type = sea }
+4FB2E3 = { name = sea_3 type = sea }
+457B2B = { name = sea_4 type = sea }
+A81AA4 = { name = sea_5 type = sea }
+C974A5 = { name = sea_6 type = sea }
+C937D5 = { name = sea_7 type = sea }
+CB7923 = { name = sea_8 type = sea }
+54CDDE = { name = sea_9 type = sea }
+E5AB31 = { name = sea_10 type = sea }
+622C37 = { name = sea_11 type = sea }
+946926 = { name = sea_12 type = sea }
+7357C3 = { name = sea_13 type = sea }
+9AABA1 = { name = sea_14 type = sea }
+82ADD8 = { name = sea_15 type = sea }
+679281 = { name = sea_16 type = sea }
+CE8B21 = { name = sea_17 type = sea }
+352575 = { name = sea_18 type = sea }
+CD91B2 = { name = sea_19 type = sea }
+224B35 = { name = sea_20 type = sea }
+2EB723 = { name = sea_21 type = sea }
+61599E = { name = sea_22 type = sea }
+D3313D = { name = sea_23 type = sea }
+984940 = { name = sea_24 type = sea }
+C78D3B = { name = sea_25 type = sea }
+254754 = { name = sea_26 type = sea }
+B5A5CC = { name = sea_27 type = sea }
+8FDFB9 = { name = sea_28 type = sea }
+1D2F5B = { name = sea_29 type = sea }
+1D9770 = { name = sea_30 type = sea }
+5BA5B4 = { name = sea_31 type = sea }
+49444C = { name = sea_32 type = sea }
+964637 = { name = sea_33 type = sea }
+653442 = { name = sea_34 type = sea }
+C0BC9B = { name = sea_35 type = sea }
+698EA7 = { name = sea_36 type = sea }
+652EA5 = { name = sea_37 type = sea }
+DBE161 = { name = sea_38 type = sea }
+64601E = { name = sea_39 type = sea }
+5A4B8D = { name = sea_40 type = sea }
+BC1754 = { name = sea_41 type = sea }
+30B652 = { name = sea_42 type = sea }
+40CA94 = { name = sea_43 type = sea }

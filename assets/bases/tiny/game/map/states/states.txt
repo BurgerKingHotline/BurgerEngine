@@ -1,0 +1,14 @@
+west_state = {
+	owner = AAA
+	cores = { AAA }
+	manpower = 150
+	tax = 3
+	locations = { first_town second_town fourth_town }
+}
+east_state = {
+	owner = BBB
+	cores = { BBB }
+	manpower = 150
+	tax = 3
+	locations = { third_town fifth_town sixth_town }
+}

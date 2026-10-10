@@ -1,0 +1,5 @@
+name = "My Game"
+version = "0.1"
+author = ""
+description = "A new BurgerEngine game."
+default_country = AAA

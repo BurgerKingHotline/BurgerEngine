@@ -1,0 +1,417 @@
+# Starting fleets, created when the navy feature was added. Edit freely.
+# TAG = { fleet = { name location ships = { ship_type = count } } }
+# 'location' must be a coastal land location (a port) or a sea location.
+
+ENG = {
+	fleet = {
+		name = "Home Fleet"
+		location = southend_on_sea
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+FRA = {
+	fleet = {
+		name = "Home Fleet"
+		location = amiens
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+SOV = {
+	fleet = {
+		name = "Home Fleet"
+		location = st_petersburg
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+CHI = {
+	fleet = {
+		name = "Home Fleet"
+		location = yancheng
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+USA = {
+	fleet = {
+		name = "Home Fleet"
+		location = washington_d_c
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+RAJ = {
+	fleet = {
+		name = "Home Fleet"
+		location = northwest_east_gujarat
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+TUR = {
+	fleet = {
+		name = "Home Fleet"
+		location = west_kastamonu
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+BRA = {
+	fleet = {
+		name = "Home Fleet"
+		location = rio_de_janeiro
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+POR = {
+	fleet = {
+		name = "Home Fleet"
+		location = lisbon
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+SPA = {
+	fleet = {
+		name = "Home Fleet"
+		location = castello
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+ITA = {
+	fleet = {
+		name = "Home Fleet"
+		location = rome
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+JAP = {
+	fleet = {
+		name = "Home Fleet"
+		location = yokohama
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+HOL = {
+	fleet = {
+		name = "Home Fleet"
+		location = amsterdam
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+PER = {
+	fleet = {
+		name = "Home Fleet"
+		location = west_mazandaran
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+GER = {
+	fleet = {
+		name = "Home Fleet"
+		location = east_mecklenburg_western_pomerania
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+MEX = {
+	fleet = {
+		name = "Home Fleet"
+		location = ciudad_altamirano
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+AST = {
+	fleet = {
+		name = "Home Fleet"
+		location = batemans_bay
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+ARG = {
+	fleet = {
+		name = "Home Fleet"
+		location = buenos_aires
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+ROM = {
+	fleet = {
+		name = "Home Fleet"
+		location = dobrich
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+BEL = {
+	fleet = {
+		name = "Home Fleet"
+		location = brugge
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+POL = {
+	fleet = {
+		name = "Home Fleet"
+		location = gdynia
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+CAN = {
+	fleet = {
+		name = "Home Fleet"
+		location = montreal
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+YUG = {
+	fleet = {
+		name = "Home Fleet"
+		location = mostar
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+COL = {
+	fleet = {
+		name = "Home Fleet"
+		location = cali
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+SAU = {
+	fleet = {
+		name = "Home Fleet"
+		location = al_hufuf
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+FIN = {
+	fleet = {
+		name = "Home Fleet"
+		location = helsinki
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+VEN = {
+	fleet = {
+		name = "Home Fleet"
+		location = caracas
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+PRU = {
+	fleet = {
+		name = "Home Fleet"
+		location = lima
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+SAF = {
+	fleet = {
+		name = "Home Fleet"
+		location = ulundi
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+GRE = {
+	fleet = {
+		name = "Home Fleet"
+		location = athens_peloponnese
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+SWE = {
+	fleet = {
+		name = "Home Fleet"
+		location = stockholm
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+BUL = {
+	fleet = {
+		name = "Home Fleet"
+		location = burgas
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+SIA = {
+	fleet = {
+		name = "Home Fleet"
+		location = bangkok
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+NZL = {
+	fleet = {
+		name = "Home Fleet"
+		location = wellington
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+NOR = {
+	fleet = {
+		name = "Home Fleet"
+		location = oslo
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+ECU = {
+	fleet = {
+		name = "Home Fleet"
+		location = esmeraldas
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+DEN = {
+	fleet = {
+		name = "Home Fleet"
+		location = kobenhavn
+		ships = { destroyer = 4 light_cruiser = 1 battleship = 1 transport = 2 }
+	}
+}
+CHL = {
+	fleet = {
+		name = "Home Fleet"
+		location = santiago
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}
+OMA = {
+	fleet = {
+		name = "Home Fleet"
+		location = muscat
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}
+LIT = {
+	fleet = {
+		name = "Home Fleet"
+		location = memel
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}
+HON = {
+	fleet = {
+		name = "Home Fleet"
+		location = tegucigalpa
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}
+URU = {
+	fleet = {
+		name = "Home Fleet"
+		location = montevideo
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}
+CUB = {
+	fleet = {
+		name = "Home Fleet"
+		location = havana
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}
+GUA = {
+	fleet = {
+		name = "Home Fleet"
+		location = el_progreso
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}
+YEM = {
+	fleet = {
+		name = "Home Fleet"
+		location = sanaa
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}
+IRE = {
+	fleet = {
+		name = "Home Fleet"
+		location = dublin
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}
+EST = {
+	fleet = {
+		name = "Home Fleet"
+		location = tallinn
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}
+LAT = {
+	fleet = {
+		name = "Home Fleet"
+		location = riga
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}
+ALB = {
+	fleet = {
+		name = "Home Fleet"
+		location = tirana
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}
+LIB = {
+	fleet = {
+		name = "Home Fleet"
+		location = monrovia
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}
+COS = {
+	fleet = {
+		name = "Home Fleet"
+		location = san_jose_puntarenas
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}
+PAN = {
+	fleet = {
+		name = "Home Fleet"
+		location = panama_city
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}
+NIC = {
+	fleet = {
+		name = "Home Fleet"
+		location = managua
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}
+ELS = {
+	fleet = {
+		name = "Home Fleet"
+		location = san_salvador
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}
+NFL = {
+	fleet = {
+		name = "Home Fleet"
+		location = st_john_s
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}
+ICE = {
+	fleet = {
+		name = "Home Fleet"
+		location = reykjavik
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}
+HAI = {
+	fleet = {
+		name = "Home Fleet"
+		location = port_au_prince
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}
+DOM = {
+	fleet = {
+		name = "Home Fleet"
+		location = santo_domingo
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}
+DNZ = {
+	fleet = {
+		name = "Home Fleet"
+		location = danzig
+		ships = { destroyer = 2 light_cruiser = 1 transport = 1 }
+	}
+}

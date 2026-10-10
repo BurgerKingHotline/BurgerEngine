@@ -1,0 +1,5 @@
+# Preset: the features (and rules) a new project starts with.
+name = "Blank slate"
+order = 1
+description = "Only the core: map, countries, time, events, decisions, resources, windows and C# scripting. Add features one by one."
+features = {  }

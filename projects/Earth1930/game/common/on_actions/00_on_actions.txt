@@ -1,0 +1,4 @@
+# On actions: run events or effects when something happens.
+on_game_start = {
+	events = { start.1 }
+}

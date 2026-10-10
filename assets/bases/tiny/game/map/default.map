@@ -1,0 +1,7 @@
+provinces = "provinces.png"
+heightmap = "heightmap.png"
+terrain = "terrain.png"
+locations = "locations.txt"
+sea_level = 20
+height_scale = 4
+pixels_per_unit = 5

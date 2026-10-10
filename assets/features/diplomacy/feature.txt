@@ -1,0 +1,5 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Diplomacy & war"
+category = "Diplomacy"
+order = 30
+description = "Wars with casus belli, war score and peace deals; opinion, alliances, military access, guarantees and subjects; data-driven diplomatic actions."

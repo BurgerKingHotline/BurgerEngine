@@ -1,0 +1,6 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Lend-lease & volunteers"
+category = "Military"
+order = 23
+description = "Help countries at war without joining: send volunteer divisions that fight for them until they are at peace, and (with production) send a share of your equipment stockpile every month. Both improve their opinion of you. The AI helps friends too."
+requires = { military diplomacy }

@@ -1,0 +1,41 @@
+# Hooks the engine calls. Each can run effects, fire events (if their trigger passes) and pick one random event.
+# random_events: weight = event id  (0 = nothing happens)
+#
+# Available hooks and their scopes:
+#   on_game_start          ROOT = every country                      on_game_start_global   no scope
+#   on_monthly_pulse       ROOT = every country, monthly              on_yearly_pulse        ROOT = every country
+#   on_war_declared        ROOT = attacker, scope:defender, scope:war
+#   on_war_declared_on_us  ROOT = defender, scope:attacker, scope:war
+#   on_peace               ROOT = winner, scope:loser, scope:war
+#   on_battle_won / on_battle_lost   ROOT = country, scope:location, scope:winner, scope:loser
+#   on_location_occupied   ROOT = new controller, scope:location, scope:old_controller
+#   on_state_transferred   ROOT = new owner, scope:state, scope:old_owner
+#   on_new_ruler           ROOT = country, scope:new_ruler, scope:old_ruler
+#   on_character_death     ROOT = character, scope:country
+#   on_character_born      ROOT = child, scope:mother, scope:father
+#   on_country_eliminated  ROOT = country
+#   on_decision_taken      ROOT = country
+
+on_game_start = {
+	events = { sample.1 }
+}
+
+on_new_ruler = {
+	events = { sample.20 }
+}
+
+on_war_declared = {
+	events = { sample.30 }
+}
+
+on_war_declared_on_us = {
+	events = { sample.31 }
+}
+
+on_monthly_pulse = {
+	random_events = {
+		940 = 0
+		30 = sample.40
+		30 = sample.41
+	}
+}

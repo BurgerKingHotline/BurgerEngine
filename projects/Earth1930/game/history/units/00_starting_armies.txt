@@ -1,0 +1,447 @@
+# Starting armies, created when the military feature was added. Edit freely.
+# TAG = { army = { name general division = { template location count } } }
+
+ENG = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = london count = 24 }
+	}
+}
+FRA = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = paris count = 24 }
+	}
+}
+SOV = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = moscow count = 24 }
+	}
+}
+CHI = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = nanjing count = 24 }
+	}
+}
+USA = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = washington_d_c count = 24 }
+	}
+}
+RAJ = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = delhi count = 21 }
+	}
+}
+TUR = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = ankara count = 17 }
+	}
+}
+BRA = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = rio_de_janeiro count = 15 }
+	}
+}
+POR = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = lisbon count = 13 }
+	}
+}
+SPA = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = madrid count = 13 }
+	}
+}
+ITA = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = rome count = 12 }
+	}
+}
+JAP = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = yokohama count = 11 }
+	}
+}
+HOL = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = amsterdam count = 10 }
+	}
+}
+PER = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = tehran count = 8 }
+	}
+}
+GER = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = berlin count = 7 }
+	}
+}
+MEX = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = mexico_city count = 7 }
+	}
+}
+AST = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = canberra count = 7 }
+	}
+}
+ARG = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = buenos_aires count = 7 }
+	}
+}
+ROM = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = bucharest count = 6 }
+	}
+}
+BEL = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = antwerpen count = 5 }
+	}
+}
+POL = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = warsaw count = 5 }
+	}
+}
+CAN = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = ottawa count = 5 }
+	}
+}
+YUG = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = belgrade count = 5 }
+	}
+}
+COL = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = bogota count = 5 }
+	}
+}
+SAU = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = riyadh count = 4 }
+	}
+}
+FIN = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = helsinki count = 4 }
+	}
+}
+VEN = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = caracas count = 4 }
+	}
+}
+PRU = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = lima count = 4 }
+	}
+}
+SAF = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = pretoria count = 3 }
+	}
+}
+CZE = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = prague count = 3 }
+	}
+}
+GRE = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = athens_peloponnese count = 3 }
+	}
+}
+SWE = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = stockholm count = 3 }
+	}
+}
+BUL = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = sofia count = 3 }
+	}
+}
+SIA = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = bangkok count = 3 }
+	}
+}
+ETH = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = addis_ababa count = 2 }
+	}
+}
+NZL = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = wellington count = 2 }
+	}
+}
+NOR = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = oslo count = 2 }
+	}
+}
+AFG = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = kabul count = 2 }
+	}
+}
+BOL = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = la_paz count = 2 }
+	}
+}
+HUN = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = budapest count = 2 }
+	}
+}
+ECU = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = quito count = 2 }
+	}
+}
+DEN = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = kobenhavn count = 2 }
+	}
+}
+SIK = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = urumqi count = 2 }
+	}
+}
+MON = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = ulaanbaatar count = 2 }
+	}
+}
+AUS = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = vienna count = 2 }
+	}
+}
+CHL = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = santiago count = 2 }
+	}
+}
+PAR = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = asuncion count = 2 }
+	}
+}
+TIB = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = lhasa count = 2 }
+	}
+}
+OMA = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = muscat count = 2 }
+	}
+}
+LIT = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = kaunas count = 2 }
+	}
+}
+SWI = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = bern count = 2 }
+	}
+}
+HON = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = tegucigalpa count = 2 }
+	}
+}
+URU = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = montevideo count = 2 }
+	}
+}
+CUB = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = havana count = 2 }
+	}
+}
+NEP = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = kathmandu count = 2 }
+	}
+}
+GUA = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = guatemala count = 2 }
+	}
+}
+YEM = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = sanaa count = 2 }
+	}
+}
+IRE = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = dublin count = 2 }
+	}
+}
+EST = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = tallinn count = 2 }
+	}
+}
+LAT = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = riga count = 2 }
+	}
+}
+LUX = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = luxembourg count = 2 }
+	}
+}
+ALB = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = tirana count = 2 }
+	}
+}
+TAN = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = kyzyl count = 2 }
+	}
+}
+LIB = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = monrovia count = 2 }
+	}
+}
+COS = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = san_jose_puntarenas count = 2 }
+	}
+}
+BHU = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = thimphu count = 2 }
+	}
+}
+PAN = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = panama_city count = 2 }
+	}
+}
+NIC = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = managua count = 2 }
+	}
+}
+ELS = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = san_salvador count = 2 }
+	}
+}
+NFL = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = st_john_s count = 2 }
+	}
+}
+ICE = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = reykjavik count = 2 }
+	}
+}
+HAI = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = port_au_prince count = 2 }
+	}
+}
+DOM = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = santo_domingo count = 2 }
+	}
+}
+DNZ = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = danzig count = 2 }
+	}
+}

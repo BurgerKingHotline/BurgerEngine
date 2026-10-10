@@ -1,0 +1,49 @@
+# Modifiers: bundles of bonuses/penalties.
+#   add_modifier = { name = war_taxes years = 1 }     remove_modifier = war_taxes     has_modifier = war_taxes
+# Keys the engine uses: income upkeep manpower tax(state) attack defense org_recovery speed opinion relations
+# Any other key works in script values as modifier:key
+war_taxes = {
+	name = "War Taxes"
+	desc = "Extra taxes to pay for the war."
+	income = 0.25
+}
+royal_feast = {
+	name = "Royal Feast"
+	desc = "The court still talks about the feast."
+	opinion = 10
+	relations = 1
+}
+drilled_troops = {
+	name = "Drilled Troops"
+	attack = 0.10
+	defense = 0.10
+	org_recovery = 0.25
+}
+new_workshops = {
+	name = "New Workshops"
+	tax = 0.3
+}
+
+# Conditional modifiers are applied automatically while their trigger is true (checked monthly).
+low_stability = {
+	name = "Unrest"
+	desc = "Low stability hurts tax collection and recruitment."
+	scope = country
+	trigger = { stability < 25 }
+	income = -0.2
+	manpower = -0.3
+}
+high_stability = {
+	name = "Golden Age"
+	scope = country
+	trigger = { stability >= 80 }
+	income = 0.1
+	manpower = 0.1
+}
+mountain_fortress = {
+	name = "Mountain Fortress"
+	scope = location
+	trigger = { terrain = mountains }
+	hidden = yes
+	defense = 0.1
+}

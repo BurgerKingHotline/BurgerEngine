@@ -1,0 +1,5 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "AI"
+category = "AI"
+order = 90
+description = "Computer-controlled countries: manage armies and fronts, recruit, use diplomacy and make peace (each part only with its feature)."

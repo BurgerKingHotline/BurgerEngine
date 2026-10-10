@@ -1,0 +1,10 @@
+Earth 1930 map - data sources (all free to use)
+
+* Natural Earth 1:10m vectors (public domain, naturalearthdata.com): coastlines and provinces (admin-1),
+  lakes, rivers, deserts and other regions, marine area names, populated places, glaciers.
+* Elevation: AWS Terrain Tiles (Mapzen terrarium tiles; sources include SRTM, GMTED, ETOPO1 and others).
+  Attribution: "Terrain Tiles - Mapzen / Amazon Web Services, data from SRTM, GMTED2010, ETOPO1 and others".
+* 1930 borders, capitals, populations and names: written for BurgerEngine (tools/earth/earth1930_data.py),
+  approximated at the level of modern provinces with a few line splits.
+
+Regenerate: see tools/earth/README.txt.

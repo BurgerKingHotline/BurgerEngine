@@ -1,0 +1,15 @@
+# Relations at the start of 1930 (used with the diplomacy feature).
+subject = { overlord = ENG subject = CAN type = client_state }
+subject = { overlord = ENG subject = NFL type = client_state }
+subject = { overlord = ENG subject = AST type = client_state }
+subject = { overlord = ENG subject = NZL type = client_state }
+subject = { overlord = ENG subject = SAF type = client_state }
+subject = { overlord = ENG subject = IRE type = client_state }
+subject = { overlord = ENG subject = RAJ type = client_state }
+subject = { overlord = SOV subject = MON type = client_state }
+subject = { overlord = SOV subject = TAN type = client_state }
+alliance = { first = FRA second = POL }
+alliance = { first = CZE second = YUG }
+alliance = { first = CZE second = ROM }
+alliance = { first = ROM second = YUG }
+alliance = { first = FRA second = CZE }

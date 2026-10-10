@@ -1,0 +1,6 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Battle plans (fronts, arrows, fallback lines)"
+category = "Military"
+order = 22
+description = "HOI4 battle plans for armies: draw the part of the border a front covers, an offensive arrow towards an objective and a fallback line to hold, then switch the army between Hold, Attack and Fallback. The AI aims its offensives at enemy capitals."
+requires = { military }

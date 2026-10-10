@@ -1,0 +1,13 @@
+# Terrain types. 'color' is the color used in map/terrain.png.
+# texture: tiled image drawn on the map. movement_cost multiplies travel time.
+# combat_width / attack_modifier / defense_modifier are used by the combat models.
+plains = { color = { 86 124 27 } display_color = { 128 150 78 } texture = "gfx/terrain/plains.png" movement_cost = 1.0 combat_width = 90 }
+forest = { color = { 0 86 6 } display_color = { 60 100 50 } texture = "gfx/terrain/forest.png" movement_cost = 1.3 combat_width = 70 attack_modifier = -0.1 defense_modifier = 0.15 }
+hills = { color = { 112 74 31 } display_color = { 130 112 80 } texture = "gfx/terrain/hills.png" movement_cost = 1.4 combat_width = 70 attack_modifier = -0.15 defense_modifier = 0.25 }
+mountains = { color = { 65 42 17 } display_color = { 110 100 92 } texture = "gfx/terrain/mountains.png" movement_cost = 2.0 combat_width = 50 attack_modifier = -0.3 defense_modifier = 0.5 }
+desert = { color = { 206 169 99 } display_color = { 200 178 120 } texture = "gfx/terrain/desert.png" movement_cost = 1.2 combat_width = 90 }
+marsh = { color = { 75 147 174 } display_color = { 90 112 82 } texture = "gfx/terrain/marsh.png" movement_cost = 1.8 combat_width = 60 attack_modifier = -0.2 defense_modifier = 0.2 }
+ocean = { color = { 8 31 130 } display_color = { 30 60 120 } texture = "gfx/terrain/ocean.png" is_water = yes }
+jungle = { color = { 20 110 60 } display_color = { 40 90 45 } texture = "gfx/terrain/jungle.png" movement_cost = 1.6 combat_width = 60 attack_modifier = -0.2 defense_modifier = 0.25 }
+tundra = { color = { 150 160 140 } display_color = { 150 152 138 } texture = "gfx/terrain/tundra.png" movement_cost = 1.3 combat_width = 80 }
+glacier = { color = { 235 240 245 } display_color = { 230 235 240 } texture = "gfx/terrain/glacier.png" movement_cost = 3.0 impassable = yes }

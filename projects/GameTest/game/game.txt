@@ -1,0 +1,7 @@
+# Basic information about your game. Shown in the main menu and used as the window title.
+name = "GameTest"
+version = "1.0"
+author = "BurgerEngine sample"
+description = "A sample grand strategy game made with BurgerEngine. Ten realms share one island - forge alliances, press your claims and lead your armies."
+default_country = VAL
+# icon = "gfx/icon.png"

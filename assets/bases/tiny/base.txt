@@ -1,0 +1,2 @@
+name = "Tiny test map (2 countries)"
+description = "Six locations in two states on a small island: the smallest valid map, good for testing mechanics."

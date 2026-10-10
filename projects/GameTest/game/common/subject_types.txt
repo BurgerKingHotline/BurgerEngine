@@ -1,0 +1,3 @@
+# Subject relationships (Imperator style). income_share: part of the subject's income paid to the overlord.
+client_state = { name = "Client State" income_share = 0.10 joins_overlord_wars = yes }
+tributary = { name = "Tributary" income_share = 0.25 joins_overlord_wars = no }

@@ -1,0 +1,181 @@
+# Starting armies. TAG = { army = { name general division = { template location count } } }
+
+VAL = {
+	army = {
+		name = "1st Army"
+		general = val_general_1
+		division = { template = infantry_division location = pelastad }
+		division = { template = infantry_division location = dunuwyn }
+		division = { template = artillery_division location = zananton }
+		division = { template = infantry_division location = areheim }
+		division = { template = infantry_division location = coraburg }
+		division = { template = artillery_division location = norianar }
+		division = { template = infantry_division location = norodale }
+		division = { template = infantry_division location = noroburg }
+	}
+	army = {
+		name = "2nd Army"
+		general = val_general_2
+		division = { template = cavalry_division location = rosamar count = 2 }
+	}
+}
+
+KES = {
+	army = {
+		name = "1st Army"
+		general = kes_general_1
+		division = { template = infantry_division location = belargard }
+		division = { template = infantry_division location = marestad }
+		division = { template = artillery_division location = rosiamar }
+		division = { template = infantry_division location = torenton }
+		division = { template = infantry_division location = pelorvik }
+	}
+	army = {
+		name = "2nd Army"
+		general = kes_general_2
+		division = { template = cavalry_division location = pelawyn count = 2 }
+	}
+}
+
+DRV = {
+	army = {
+		name = "1st Army"
+		general = drv_general_1
+		division = { template = infantry_division location = yrennar }
+		division = { template = infantry_division location = eryorwyn }
+		division = { template = artillery_division location = karuvik }
+		division = { template = infantry_division location = calestad }
+		division = { template = infantry_division location = ulanmont }
+	}
+	army = {
+		name = "2nd Army"
+		general = drv_general_2
+		division = { template = cavalry_division location = lorianar count = 2 }
+	}
+}
+
+OST = {
+	army = {
+		name = "1st Army"
+		general = ost_general_1
+		division = { template = infantry_division location = dunasted }
+		division = { template = infantry_division location = valugrad }
+		division = { template = artillery_division location = istipolis }
+		division = { template = infantry_division location = brearburg }
+		division = { template = infantry_division location = gorarnar }
+		division = { template = artillery_division location = elovik }
+		division = { template = infantry_division location = rosansted }
+	}
+	army = {
+		name = "2nd Army"
+		general = ost_general_2
+		division = { template = cavalry_division location = eliawyn count = 2 }
+	}
+}
+
+SUN = {
+	army = {
+		name = "1st Army"
+		general = sun_general_1
+		division = { template = infantry_division location = wesewyn }
+		division = { template = infantry_division location = wesewyn }
+	}
+}
+
+THA = {
+	army = {
+		name = "1st Army"
+		general = tha_general_1
+		division = { template = infantry_division location = noruros }
+		division = { template = infantry_division location = draistad }
+		division = { template = artillery_division location = breanmar }
+		division = { template = infantry_division location = yrinar }
+		division = { template = infantry_division location = istorgard }
+		division = { template = artillery_division location = falorford }
+		division = { template = infantry_division location = toreburg }
+		division = { template = infantry_division location = gorimar }
+	}
+	army = {
+		name = "2nd Army"
+		general = tha_general_2
+		division = { template = cavalry_division location = coremont count = 2 }
+	}
+}
+
+ZEM = {
+	army = {
+		name = "1st Army"
+		general = zem_general_1
+		division = { template = infantry_division location = breiheim }
+		division = { template = infantry_division location = breenmar }
+		division = { template = artillery_division location = areholm }
+		division = { template = infantry_division location = wesengrad }
+		division = { template = infantry_division location = breiawyn }
+		division = { template = artillery_division location = noriagrad }
+		division = { template = infantry_division location = harianar }
+		division = { template = infantry_division location = istaros }
+	}
+	army = {
+		name = "2nd Army"
+		general = zem_general_2
+		division = { template = cavalry_division location = elupolis count = 2 }
+	}
+}
+
+MAR = {
+	army = {
+		name = "1st Army"
+		general = mar_general_1
+		division = { template = infantry_division location = calovik }
+		division = { template = infantry_division location = goriaros }
+		division = { template = artillery_division location = corested }
+		division = { template = infantry_division location = zanudale }
+		division = { template = infantry_division location = corostad }
+		division = { template = artillery_division location = valomar }
+		division = { template = infantry_division location = belarburg }
+		division = { template = infantry_division location = yrewick }
+	}
+	army = {
+		name = "2nd Army"
+		general = mar_general_2
+		division = { template = cavalry_division location = fenorwick count = 2 }
+	}
+}
+
+BRE = {
+	army = {
+		name = "1st Army"
+		general = bre_general_1
+		division = { template = infantry_division location = falosted }
+		division = { template = infantry_division location = elarburg }
+		division = { template = artillery_division location = ulorholm }
+		division = { template = infantry_division location = breewyn }
+		division = { template = infantry_division location = karewyn }
+		division = { template = artillery_division location = draennar }
+	}
+	army = {
+		name = "2nd Army"
+		general = bre_general_2
+		division = { template = cavalry_division location = quinoton count = 2 }
+	}
+}
+
+ULM = {
+	army = {
+		name = "1st Army"
+		general = ulm_general_1
+		division = { template = infantry_division location = quinenwick }
+		division = { template = infantry_division location = rosomont }
+		division = { template = artillery_division location = elorburg }
+		division = { template = infantry_division location = brearford }
+		division = { template = infantry_division location = breosted }
+		division = { template = artillery_division location = yrevik }
+		division = { template = infantry_division location = eryiawick }
+	}
+	army = {
+		name = "2nd Army"
+		general = ulm_general_2
+		division = { template = cavalry_division location = gorugrad count = 2 }
+	}
+}
+

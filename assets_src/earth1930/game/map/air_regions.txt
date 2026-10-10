@@ -1,0 +1,682 @@
+# Air regions (air feature): air wings are assigned to regions, and air superiority is fought per region.
+# region_key = { name = "Shown name" states = { state_keys } }
+air_region_1 = {
+	name = "Sistan and Baluchestan"
+	states = { herat_state south_khorasan_state sistan_and_baluchestan_state northeast_balochistan_state southwest_balochistan_state southeast_balochistan_state helmand_state kandahar_state ghor_state }
+}
+air_region_2 = {
+	name = "Northwest Territories"
+	states = { northwest_territories_state }
+}
+air_region_3 = {
+	name = "Northeastern"
+	states = { nam_trung_bo_state koh_kong_state eastern_2_state western_state tanintharyi_state savannakhet_state nghe_an_state quang_binh_state southern_3_state kien_giang_state ak_lak_state nakhon_ratchasima_state northeastern_state northeastern_2_state central_4_state kampong_thom_state kam_state }
+}
+air_region_4 = {
+	name = "Sverdlovsk"
+	states = { chelyabinsk_state orenburg_state bashkortostan_state sverdlovsk_state republic_of_tatarstan_state perm_krai_state }
+}
+air_region_5 = {
+	name = "Tombouctou"
+	states = { guelmim_es_semara_state tombouctou_state adrar_state tindouf_state bechar_state meknes_tafilalet_state suss_massa_draa_state marrakesh_tensift_el_haouz_state }
+}
+air_region_6 = {
+	name = "Manica"
+	states = { kwazulu_natal_state limpopo_state manica_state gaza_state mpumalanga_state manzini_state }
+}
+air_region_7 = {
+	name = "Karelia"
+	states = { karelia_state north_karelia_state uusimaa_state southern_savonia_state northern_ostrobothnia_state pirkanmaa_state viipuri_state }
+}
+air_region_8 = {
+	name = "Hawaii"
+	states = { tuamotu_archipelago_state windward_islands_state leeward_islands_state hawaii_state marquesas_islands_state }
+}
+air_region_9 = {
+	name = "South Australia"
+	states = { south_australia_state }
+}
+air_region_10 = {
+	name = "Puerto Rico"
+	states = { saint_martin_state sint_maarten_state tobago_state saint_john_state saint_david_state dennery_quarter_state martinique_state saint_andrew_state guadeloupe_state saint_mary_state saint_john_capisterre_state barbuda_state saint_croix_state puerto_rico_state blowing_point_state saint_thomas_state british_virgin_islands_state saint_thomas_2_state }
+}
+air_region_11 = {
+	name = "Newfoundland and Labrador"
+	states = { newfoundland_and_labrador_state }
+}
+air_region_12 = {
+	name = "South Shaanxi"
+	states = { southwest_zhejiang_state northeast_zhejiang_state shanghai_state southeast_jiangsu_state northwest_jiangsu_state south_shandong_state west_shandong_state northwest_hunan_state northeast_hunan_state south_shaanxi_state south_shanxi_state northeast_jiangxi_state northeast_henan_state west_henan_state southeast_henan_state west_hubei_state east_hubei_state southeast_hubei_state north_hubei_state southeast_anhui_state north_anhui_state southwest_anhui_state }
+}
+air_region_13 = {
+	name = "East Qinghai"
+	states = { northwest_gansu_state northwest_sichuan_state east_qinghai_state west_qinghai_state }
+}
+air_region_14 = {
+	name = "Salta"
+	states = { antofagasta_state salta_state catamarca_state atacama_state la_rioja_state san_juan_state santiago_del_estero_state }
+}
+air_region_15 = {
+	name = "Khabarovsk Krai"
+	states = { khabarovsk_krai_state sakhalin_state karafuto_state }
+}
+air_region_16 = {
+	name = "Leningrad"
+	states = { vitebsk_state pskov_state siauliai_state leningrad_state smolensk_state harju_state saare_state rezekne_state ventspils_state novgorod_state southwest_tver_state northeast_tver_state }
+}
+air_region_17 = {
+	name = "East Kazakhstan"
+	states = { east_kazakhstan_state altai_republic_state novosibirsk_state altai_republic_2_state kemerovo_state }
+}
+air_region_18 = {
+	name = "North Bandundu"
+	states = { plateaux_state south_bandundu_state north_bandundu_state kongo_central_state cabinda_state uige_state kasai_occidental_state lunda_norte_state malanje_state cuanza_sul_state zaire_state saint_helena_state bie_state }
+}
+air_region_19 = {
+	name = "Darfur"
+	states = { darfur_state salamat_state batha_state }
+}
+air_region_20 = {
+	name = "Alaska"
+	states = { alaska_state }
+}
+air_region_21 = {
+	name = "of Bougainville"
+	states = { rennell_and_bellona_state makira_ulawa_state temotu_state malaita_state guadalcanal_state central_3_state western_4_state isabel_state of_bougainville_state northern_5_state choiseul_state }
+}
+air_region_22 = {
+	name = "Minsk"
+	states = { chernihiv_state gomel_state rowne_state zhytomyr_state kyiv_state vinnytsia_state mahiliou_state bryansk_state sumy_state mykolaiv_state poltava_state khmelnytskyi_state cherkasy_state kirovohrad_state minsk_state }
+}
+air_region_23 = {
+	name = "Montana"
+	states = { idaho_state montana_state wyoming_state }
+}
+air_region_24 = {
+	name = "West Sakha Republic"
+	states = { west_sakha_republic_state }
+}
+air_region_25 = {
+	name = "Northeast Goias"
+	states = { southeast_bahia_state espirito_santo_state rio_de_janeiro_state northwest_sao_paulo_state east_sao_paulo_state southeast_sao_paulo_state northeast_goias_state southwest_goias_state federal_state east_minas_gerais_state north_minas_gerais_state northwest_minas_gerais_state south_minas_gerais_state west_minas_gerais_state }
+}
+air_region_26 = {
+	name = "Chubut"
+	states = { magellan_and_the_chilean_antarctic_state chubut_state tierra_del_fuego_state falkland_islands_state }
+}
+air_region_27 = {
+	name = "Central Kalimantan"
+	states = { west_kalimantan_state east_java_state west_nusa_tenggara_state central_java_state west_java_state central_kalimantan_state christmas_island_state }
+}
+air_region_28 = {
+	name = "Rift Valley"
+	states = { rift_valley_state eastern_4_state north_eastern_state lower_juba_state coast_state pwani_state unguja_south_state north_pemba_state morogoro_state manyara_state singida_state }
+}
+air_region_29 = {
+	name = "Republic of Kalmykia"
+	states = { south_krasnodar_krai_state north_krasnodar_krai_state kharkiv_state luhansk_state southwest_rostov_state northeast_rostov_state donetsk_state volgograd_state autonomous_republic_of_crimea_state kherson_state zaporizhzhia_state republic_of_kalmykia_state dnipropetrovsk_state stavropol_krai_state republic_of_adygea_state }
+}
+air_region_30 = {
+	name = "West Ontario"
+	states = { north_ontario_state west_ontario_state }
+}
+air_region_31 = {
+	name = "Northeast Greenland National Park"
+	states = { northeast_greenland_national_park_state }
+}
+air_region_32 = {
+	name = "Northeast Nunavut"
+	states = { northeast_nunavut_state }
+}
+air_region_33 = {
+	name = "Turkistan"
+	states = { turkistan_state jalal_abad_state districts_of_republican_subordination_state gorno_badakhshan_state jizzakh_state bukhara_state lebap_state navoiy_state baghlan_state }
+}
+air_region_34 = {
+	name = "New Mexico"
+	states = { new_mexico_state chihuahua_state west_texas_state northeast_texas_state northwest_texas_state south_texas_state east_texas_state coahuila_state }
+}
+air_region_35 = {
+	name = "Telangana"
+	states = { northeast_andhra_pradesh_state southwest_andhra_pradesh_state southwest_maharashtra_state goa_state north_karnataka_state west_karnataka_state south_karnataka_state kerala_state pondichery_state northeast_tamil_nadu_state southwest_tamil_nadu_state addu_atoll_state shaviyani_atoll_state haa_alif_atoll_state anuradhapura_state telangana_state }
+}
+air_region_36 = {
+	name = "Chatham Islands"
+	states = { chatham_islands_state }
+}
+air_region_37 = {
+	name = "Southwest Amazonas"
+	states = { acre_state southwest_amazonas_state ucayali_state puno_state arequipa_state lima_state cusco_departament_state ayacucho_state huancavelica_state huanuco_state junin_state }
+}
+air_region_38 = {
+	name = "Northeast Sakha Republic"
+	states = { northeast_sakha_republic_state }
+}
+air_region_39 = {
+	name = "Irkutsk"
+	states = { republic_of_buryatia_state zabaykalsky_krai_state irkutsk_state }
+}
+air_region_40 = {
+	name = "Southeast Western Australia"
+	states = { southeast_western_australia_state }
+}
+air_region_41 = {
+	name = "Houet"
+	states = { kebbi_state_state alibori_state niger_state_state kwara_state_state borgou_state oyo_state_state tillaberi_state tapoa_state northern_3_state plateaux_2_state houet_state ondo_state_state delta_state_state ashanti_state brong_ahafo_state kogi_state_state comoe_state }
+}
+air_region_42 = {
+	name = "South Jeolla"
+	states = { gangwon_state gyeonggi_state kumamoto_prefecture_state miyazaki_prefecture_state shikoku_state south_chungcheong_state chugoku_state hiroshima_prefecture_state south_pyongan_state south_hwanghae_state south_jeolla_state north_gyeongsang_state jeju_state }
+}
+air_region_43 = {
+	name = "Upper Nile"
+	states = { southern_nations_state bahr_al_ghazal_state equatoria_state upper_nile_state northwest_oromia_state south_kordofan_state northern_7_state }
+}
+air_region_44 = {
+	name = "North New Valley"
+	states = { red_sea_state butnan_state southwest_matrouh_state northeast_matrouh_state south_new_valley_state north_new_valley_state south_sinai_state ismailia_state al_qubbah_state giza_state minya_state }
+}
+air_region_45 = {
+	name = "East Amazonas"
+	states = { northeast_para_state southeast_para_state southwest_para_state east_amazonas_state northwest_mato_grosso_state east_mato_grosso_state }
+}
+air_region_46 = {
+	name = "South Georgia and the South Sandwich Islands"
+	states = { south_georgia_and_the_south_sandwich_islands_state }
+}
+air_region_47 = {
+	name = "North Carolina"
+	states = { ohio_state pennsylvania_state east_new_york_state west_new_york_state north_carolina_state virginia_state south_2_state new_jersey_state northeast_2_state west_virginia_state }
+}
+air_region_48 = {
+	name = "Bolivar"
+	states = { bolivar_state amazonas_2_state apure_state vichada_state curacao_state falcon_state anzoategui_state monagas_state aruba_state sangre_grande_regional_corporation_state federal_dependencies_state bonaire_state guarico_state_state cojedes_state barinas_state portuguesa_state }
+}
+air_region_49 = {
+	name = "Loreto"
+	states = { narino_state loreto_state orellana_state pastaza_state piura_state guayas_state manabi_state san_martin_state tungurahua_state }
+}
+air_region_50 = {
+	name = "Bretagne"
+	states = { aisne_state valais_state piemonte_state alpes_de_haute_provence_state turin_state haute_savoie_state huesca_state occitanie_state lleida_state aude_state bourgogne_franche_comte_state var_state bouches_du_rhone_state herault_state barcelona_state landes_state pays_de_la_loire_state bretagne_state normandie_state jersey_state sark_state bern_state piacenza_state gers_state isere_state drome_state centre_val_de_loire_state sarthe_state marne_state nouvelle_aquitaine_state vosges_state auvergne_rhone_alpes_state centre_val_de_loire_2_state aube_state nouvelle_aquitaine_2_state auvergne_rhone_alpes_2_state occitanie_2_state cote_dor_state orne_state saone_et_loire_state nouvelle_aquitaine_3_state yonne_state ile_de_france_state }
+}
+air_region_51 = {
+	name = "Southeast Heilongjiang"
+	states = { southeast_heilongjiang_state primorsky_krai_state northwest_jilin_state southwest_jilin_state east_jilin_state north_hamgyong_state chagang_state south_hamgyong_state }
+}
+air_region_52 = {
+	name = "Dinguiraye Prefecture"
+	states = { northern_state dinguiraye_prefecture_state bas_sassandra_state kouroussa_prefecture_state kayes_state tambacounda_state zanzan_state mopti_state wassoulou_state grand_gedeh_state gabu_state koulikoro_state central_river_state haut_sassandra_state n_zi_comoe_state vallee_du_bandama_state }
+}
+air_region_53 = {
+	name = "Equateur"
+	states = { equateur_state haute_kotto_prefecture_state west_orientale_state ouaka_prefecture_state ouham_prefecture_state }
+}
+air_region_54 = {
+	name = "Southwest Western Australia"
+	states = { southwest_western_australia_state }
+}
+air_region_55 = {
+	name = "Tocantins"
+	states = { south_maranhao_state north_maranhao_state piaui_state ceara_state rio_grande_do_norte_state paraiba_state pernambuco_state alagoas_state northeast_bahia_state west_bahia_state tocantins_state }
+}
+air_region_56 = {
+	name = "Ouargla"
+	states = { ghadames_state tataouine_state el_oued_state kasserine_state ouargla_state misrata_state kairouan_state bizerte_state skikda_state siliana_state sidi_bouzid_state bordj_bou_arreridj_state bouira_state el_bayadh_state ghardaia_state medea_state tiaret_state m_sila_state batna_state tebessa_state oum_el_bouaghi_state biskra_state djelfa_state mizdah_state xewkija_state }
+}
+air_region_57 = {
+	name = "Kamchatka Krai"
+	states = { magadan_state kamchatka_krai_state }
+}
+air_region_58 = {
+	name = "Yamalo-Nenets Autonomous Okrug"
+	states = { yamalo_nenets_autonomous_okrug_state }
+}
+air_region_59 = {
+	name = "Missouri"
+	states = { iowa_state missouri_state illinois_state arkansas_state indiana_state }
+}
+air_region_60 = {
+	name = "West Krasnoyarsk Krai"
+	states = { west_krasnoyarsk_krai_state }
+}
+air_region_61 = {
+	name = "South Sakha Republic"
+	states = { south_sakha_republic_state }
+}
+air_region_62 = {
+	name = "Northern Borders"
+	states = { basra_state al_muthanna_state kermanshah_state diyala_state maysan_state khuzestan_state northern_borders_state northeast_al_anbar_state najaf_state saladin_state iraq_state lorestan_state }
+}
+air_region_63 = {
+	name = "Dhofar"
+	states = { musandam_state emirate_of_abu_dhabi_state ad_dhahirah_state al_rayyan_state southeast_eastern_state dhofar_state hormozgan_state }
+}
+air_region_64 = {
+	name = "Southern"
+	states = { mzimba_state eastern_state matabeleland_north_state central_state masvingo_state southern_2_state tete_state mashonaland_east_state central_2_state zambezia_state midlands_state }
+}
+air_region_65 = {
+	name = "Western"
+	states = { western_2_state west_new_britain_state new_ireland_state manus_state }
+}
+air_region_66 = {
+	name = "Moxico"
+	states = { moxico_state kunene_state otjozondjupa_state ghanzi_state benguela_state huila_state }
+}
+air_region_67 = {
+	name = "Saratov"
+	states = { kursk_state belgorod_state voronezh_state saratov_state lipetsk_state tambov_state penza_state oryol_state kaluga_state vladimir_state ryazan_state tula_state southeast_moscow_state northwest_moscow_state }
+}
+air_region_68 = {
+	name = "Khovsgol"
+	states = { northeast_xinjiang_state govi_altai_state khovsgol_state tannu_tuva_state }
+}
+air_region_69 = {
+	name = "South Island"
+	states = { auckland_islands_state macquarie_island_state campbell_islands_state south_island_state north_island_state }
+}
+air_region_70 = {
+	name = "Colorado"
+	states = { colorado_state nebraska_state kansas_state oklahoma_state }
+}
+air_region_71 = {
+	name = "Kerman"
+	states = { semnan_state east_isfahan_state west_isfahan_state bushehr_state fars_state kerman_state yazd_state }
+}
+air_region_72 = {
+	name = "Kerguelen Islands"
+	states = { heard_island_and_mcdonald_islands_state kerguelen_islands_state crozet_islands_state }
+}
+air_region_73 = {
+	name = "Prilep"
+	states = { west_macedonia_state burgas_state krklareli_state centre_macedonia_state prilep_state sofia_state blagoevgrad_state east_macedonia_and_thrace_state kardzhali_state istanbul_state tekirdag_state canakkale_state bursa_state balkesir_state izmir_state aydn_state mugla_state thessalia_state central_greece_state peloponnese_state west_greece_state crete_state south_aegean_state north_aegean_state nisava_state kutahya_state manisa_state denizli_state plovdiv_state stara_zagora_state shumen_state lovech_state dodecanese_state }
+}
+air_region_74 = {
+	name = "Zagreb"
+	states = { usti_nad_labem_state saxony_state south_bavaria_state east_bavaria_state south_bohemian_state hradec_kralove_state moravian_silesian_state lower_austria_state upper_austria_state western_transdanubia_state grisons_state tyrol_state southern_transdanubia_state carinthia_state udine_state southwest_baden_wurttemberg_state styria_state nitra_state zagreb_state pest_state vysocina_state central_bohemian_state lombardia_state lombardia_2_state trentino_state veneto_state }
+}
+air_region_75 = {
+	name = "Highlands and Islands"
+	states = { northern_ireland_state perth_and_kinross_state north_east_state south_western_state cork_state donegal_state yorkshire_and_the_humber_state east_2_state south_east_state south_west_state east_wales_state cumbria_state highlands_and_islands_state isle_of_man_state outer_hebrides_state orkney_islands_state shetland_islands_state eysturoy_state east_midlands_state west_midlands_state oxfordshire_state south_west_2_state }
+}
+air_region_76 = {
+	name = "Volga"
+	states = { abkhazia_state volga_state kakheti_state republic_of_dagestan_state lori_state van_state kars_state al_hasakah_state mardin_state sanlurfa_state nineveh_state trabzon_state giresun_state erzincan_state mus_state erzurum_state malatya_state elazg_state bingol_state adyaman_state diyarbakr_state siirt_state }
+}
+air_region_77 = {
+	name = "Koror"
+	states = { koror_state yap_state_state guam_state rota_state saipan_state }
+}
+air_region_78 = {
+	name = "Hadhramaut"
+	states = { south_eastern_state hadhramaut_state najran_state asir_state al_jawf_state al_hudaydah_state shabwah_state south_riyadh_state }
+}
+air_region_79 = {
+	name = "Gedo"
+	states = { somali_state gedo_state somaliland_state tadjourah_state southeast_oromia_state addis_ababa_state harari_state }
+}
+air_region_80 = {
+	name = "Pohnpei State"
+	states = { ratak_chain_state pohnpei_state_state }
+}
+air_region_81 = {
+	name = "East Tibet"
+	states = { east_tibet_state west_bengal_state assam_state chattogram_state chin_state_state kachin_state_state sagaing_state northeast_state mizoram_state dhaka_state rajshahi_state khulna_state gasa_state }
+}
+air_region_82 = {
+	name = "Southwest Nunavut"
+	states = { southwest_nunavut_state }
+}
+air_region_83 = {
+	name = "Northwest Amazonas"
+	states = { northwest_amazonas_state amazonas_state caqueta_state guaviare_state }
+}
+air_region_84 = {
+	name = "Northeast Queensland"
+	states = { northeast_queensland_state southwest_queensland_state }
+}
+air_region_85 = {
+	name = "Northwest British Columbia"
+	states = { northwest_british_columbia_state }
+}
+air_region_86 = {
+	name = "Manitoba"
+	states = { manitoba_state }
+}
+air_region_87 = {
+	name = "Southwest Xinjiang"
+	states = { ladakh_state southwest_xinjiang_state west_tibet_state northwest_tibet_state uttarakhand_state }
+}
+air_region_88 = {
+	name = "Sarawak"
+	states = { east_kalimantan_state sarawak_state sulu_state tawi_tawi_state }
+}
+air_region_89 = {
+	name = "Northern"
+	states = { northern_4_state north_darfur_state north_kordofan_state }
+}
+air_region_90 = {
+	name = "Oriental"
+	states = { tangier_tetouan_state oriental_state navarre_state badajoz_state evora_state gibraltar_state naama_state caceres_state castelo_branco_state viseu_state salamanca_state zamora_state norte_state huelva_state beja_state chlef_state taza_al_hoceima_taounate_state gharb_chrarda_beni_hssen_state chaouia_ouardigha_state valenciana_state murcia_state almeria_state granada_state malaga_state seville_state santarem_state galicia_state asturias_state balearic_islands_state zaragoza_state albacete_state teruel_state cuenca_state toledo_2_state leon_state soria_state burgos_state avila_state fes_meknas_boulmane_state sidi_bel_abbes_state mascara_state ciudad_real_state cordoba_3_state guadalajara_state jaen_state community_of_madrid_state valladolid_state }
+}
+air_region_91 = {
+	name = "Northeast Guangxi"
+	states = { southeast_guangxi_state northeast_guangxi_state east_guangdong_state southwest_guangdong_state east_guangdong_2_state north_guangdong_state hainan_state northeast_fujian_state south_fujian_state west_fujian_state nantou_state kinmen_state batanes_state penghu_state macau_state lantau_island_state southeast_hunan_state southwest_hunan_state south_jiangxi_state northwest_jiangxi_state south_jiangxi_2_state }
+}
+air_region_92 = {
+	name = "South Caribbean Coast"
+	states = { olancho_state peten_state quintana_roo_state campeche_state chiapas_state izabal_state puntarenas_state toledo_state south_caribbean_coast_state usulutan_state bay_islands_state mexico_state francisco_morazan_state }
+}
+air_region_93 = {
+	name = "Borkou"
+	states = { kufra_state borkou_state ajdabiya_state murzuq_state jufra_state }
+}
+air_region_94 = {
+	name = "Florida"
+	states = { louisiana_state mississippi_state alabama_state florida_state georgia_state south_carolina_state kentucky_state tennessee_state }
+}
+air_region_95 = {
+	name = "Qaasuitsup"
+	states = { qaasuitsup_state }
+}
+air_region_96 = {
+	name = "Khanty-Mansi Autonomous Okrug"
+	states = { tyumen_state omsk_state khanty_mansi_autonomous_okrug_state tomsk_state }
+}
+air_region_97 = {
+	name = "Red Sea"
+	states = { afar_state amhara_state al_qadarif_state sennar_state river_nile_state gash_barka_state red_sea_2_state kassala_state white_nile_state }
+}
+air_region_98 = {
+	name = "Sermersooq"
+	states = { southern_4_state sermersooq_state }
+}
+air_region_99 = {
+	name = "Kanem"
+	states = { borno_state_state chari_baguirmi_state north_state yobe_state_state adamawa_state taraba_state_state benue_state_state diffa_state zamfara_state_state zinder_state kanem_state bauchi_state_state nasarawa_state_state kaduna_state_state kano_state_state }
+}
+air_region_100 = {
+	name = "Yukon"
+	states = { yukon_state }
+}
+air_region_101 = {
+	name = "Las Palmas"
+	states = { santa_cruz_de_tenerife_state las_palmas_state madeira_state azores_state }
+}
+air_region_102 = {
+	name = "Nevada"
+	states = { northwest_california_state southeast_california_state southwest_california_state oregon_state utah_state nevada_state }
+}
+air_region_103 = {
+	name = "Bukidnon"
+	states = { palawan_state eastern_visayas_region_viii_state quezon_state isabela_state basilan_state siquijor_state bohol_state negros_occidental_state western_visayas_region_vi_state romblon_state masbate_state marinduque_state catanduanes_state bukidnon_state }
+}
+air_region_104 = {
+	name = "Northwest Para"
+	states = { french_guiana_state sipaliwini_state roraima_state pomeroon_supenaam_state northwest_para_state amapa_state northeast_amazonas_state }
+}
+air_region_105 = {
+	name = "Kalbajar"
+	states = { kalbajar_state kurdistan_state west_azerbaijan_state east_azerbaijan_state ardabil_state kurdistan_2_state mazandaran_state zanjan_state aghjabadi_state markazi_state hamadan_state tehran_state }
+}
+air_region_106 = {
+	name = "Reunion"
+	states = { reunion_state grand_port_state port_glaud_state grand_anse_praslin_state british_indian_ocean_territory_state rodrigues_state }
+}
+air_region_107 = {
+	name = "New Brunswick"
+	states = { new_hampshire_state maine_state new_brunswick_state miquelon_langlade_state prince_edward_island_state }
+}
+air_region_108 = {
+	name = "East Inner Mongolia 2"
+	states = { east_inner_mongolia_state east_inner_mongolia_2_state southeast_liaoning_state northeast_liaoning_state west_liaoning_state northeast_shandong_state north_hebei_state south_hebei_state east_hebei_state northwest_hebei_state beijing_state north_shanxi_state }
+}
+air_region_109 = {
+	name = "North Western Australia"
+	states = { north_western_australia_state }
+}
+air_region_110 = {
+	name = "Aktobe"
+	states = { mangystau_state kyzylorda_state karakalpakstan_state aktobe_state west_kazakhstan_state }
+}
+air_region_111 = {
+	name = "Karaganda"
+	states = { almaty_state naryn_state jambyl_state karaganda_state }
+}
+air_region_112 = {
+	name = "Al-Jowf"
+	states = { southern_state homs_state rif_dimashq_state al_raqqah_state amman_state mafraq_state as_suwayda_state north_sinai_state southwest_al_anbar_state al_jowf_state ma_an_state deir_ez_zor_state tabuk_state hama_state }
+}
+air_region_113 = {
+	name = "Ilhas de Sotavento"
+	states = { sao_filipe_state ilhas_de_sotavento_state maio_state boa_vista_state ribeira_brava_state sal_state sao_vicente_state ilhas_de_barlavento_state }
+}
+air_region_114 = {
+	name = "Okinawa Prefecture"
+	states = { okinawa_prefecture_state }
+}
+air_region_115 = {
+	name = "Svalbard"
+	states = { svalbard_state }
+}
+air_region_116 = {
+	name = "Masuria"
+	states = { volhynia_state polesie_state nowogrodek_state klaipeda_state silesian_voivodeship_state lesser_poland_voivodeship_state presov_state podkarpackie_voivodeship_state lower_silesia_state upper_silesia_state podlaskie_voivodeship_state masuria_state east_brandenburg_state pomerania_state lublin_voivodeship_state kaunas_state masovian_voivodeship_state odz_voivodeship_state kuyavian_pomeranian_voivodeship_state greater_poland_voivodeship_state swietokrzyskie_voivodeship_state danzig_state }
+}
+air_region_117 = {
+	name = "Rio Negro"
+	states = { mendoza_state maule_state neuquen_state rio_negro_state san_luis_state la_pampa_state }
+}
+air_region_118 = {
+	name = "Elbasan"
+	states = { elbasan_state osijek_baranja_state kosovo_pomoravlje_state repuplika_srpska_state niksic_state zadar_state federacija_bosna_i_hercegovina_state federacija_bosna_i_hercegovina_2_state lika_senj_state apulia_state calabria_state potenza_state campania_state lazio_state sicily_state sardegna_state haute_corse_state zlatibor_state sicily_2_state toscana_state florence_state emilia_romagna_state bologna_state perugia_state frosinone_state abruzzo_state }
+}
+air_region_119 = {
+	name = "Santa Cruz"
+	states = { la_paz_state potosi_state santa_cruz_state chuquisaca_state rondonia_state beni_state southwest_mato_grosso_state cochabamba_state }
+}
+air_region_120 = {
+	name = "Northern Cape"
+	states = { karas_state northern_cape_state free_state_state eastern_cape_state thaba_tseka_state north_west_state western_cape_state kweneng_state }
+}
+air_region_121 = {
+	name = "Southwest Xinjiang 2"
+	states = { southeast_xinjiang_state southwest_xinjiang_2_state north_xinjiang_state }
+}
+air_region_122 = {
+	name = "Chhattisgarh"
+	states = { karnali_zone_state gandaki_zone_state bihar_state south_uttar_pradesh_state northwest_uttar_pradesh_state southeast_uttar_pradesh_state southwest_odisha_state northeast_odisha_state east_maharashtra_state jharkhand_state south_madhya_pradesh_state north_madhya_pradesh_state east_madhya_pradesh_state chhattisgarh_state }
+}
+air_region_123 = {
+	name = "Galapagos"
+	states = { galapagos_state kiribati_state }
+}
+air_region_124 = {
+	name = "Durango"
+	states = { tamaulipas_state nuevo_leon_state sinaloa_state veracruz_state jalisco_state michoacan_state guerrero_state oaxaca_state state_of_mexico_state puebla_state hidalgo_state guanajuato_state san_luis_potosi_state zacatecas_state durango_state }
+}
+air_region_125 = {
+	name = "Northwest Mato Grosso do Sul"
+	states = { northwest_rio_grande_do_sul_state southeast_rio_grande_do_sul_state formosa_state presidente_hayes_state itapua_state chaco_state corrientes_state southeast_mato_grosso_do_sul_state northwest_mato_grosso_do_sul_state alto_paraguay_state west_parana_state east_parana_state santa_catarina_state san_pedro_state }
+}
+air_region_126 = {
+	name = "South Sulawesi"
+	states = { east_nusa_tenggara_state oe_cusse_ambeno_state maluku_state south_sulawesi_state central_sulawesi_state north_maluku_state baucau_state }
+}
+air_region_127 = {
+	name = "Cordoba"
+	states = { entre_rios_state south_buenos_aires_state north_buenos_aires_state soriano_state buenos_aires_state tacuarembo_state durazno_state santa_fe_state cordoba_2_state }
+}
+air_region_128 = {
+	name = "Razavi Khorasan"
+	states = { mary_state ahal_state balkan_state dasoguz_state north_khorasan_state razavi_khorasan_state }
+}
+air_region_129 = {
+	name = "Kostanay"
+	states = { kostanay_state pavlodar_state }
+}
+air_region_130 = {
+	name = "Alberta"
+	states = { alberta_state saskatchewan_state }
+}
+air_region_131 = {
+	name = "Murmansk"
+	states = { norrbotten_state lapland_state finnmark_state murmansk_state }
+}
+air_region_132 = {
+	name = "Kasai-Oriental"
+	states = { east_orientale_state south_kivu_state eastern_3_state north_kivu_state kagera_state kalangala_state western_3_state kasai_oriental_state maniema_state tabora_state simiyu_state }
+}
+air_region_133 = {
+	name = "Tov"
+	states = { south_inner_mongolia_state dornogovi_state tov_state }
+}
+air_region_134 = {
+	name = "Southeast Ontario"
+	states = { southeast_ontario_state northwest_michigan_state southeast_michigan_state wisconsin_state }
+}
+air_region_135 = {
+	name = "North Krasnoyarsk Krai"
+	states = { north_krasnoyarsk_krai_state }
+}
+air_region_136 = {
+	name = "Matanzas"
+	states = { usnb_guantanamo_bay_state inagua_state providenciales_and_west_caicos_state mayaguana_state acklins_state clarendon_state cayman_islands_state artibonite_state camaguey_state isla_de_la_juventud_state matanzas_state exuma_state long_island_state rum_cay_state san_salvador_island_state cat_island_state new_providence_state north_andros_state north_eleuthera_state south_eleuthera_state east_grand_bahama_state south_abaco_state sandys_parish_state san_juan_2_state }
+}
+air_region_137 = {
+	name = "East"
+	states = { likouala_state south_state woleu_ntem_state sangha_state haut_ogooue_state lekoumou_state nyanga_state southwest_state centro_sur_state east_state bayelsa_state_state sao_tome_state principe_state bioko_sur_state centre_state }
+}
+air_region_138 = {
+	name = "Southeast Yunnan"
+	states = { northwest_yunnan_state northeast_yunnan_state southeast_yunnan_state west_yunnan_state northwest_guangxi_state west_guangxi_state quang_ninh_state ong_bac_state bac_giang_state southeast_sichuan_state west_sichuan_state east_sichuan_state north_sichuan_state south_sichuan_state chongqing_state north_guizhou_state east_guizhou_state southwest_guizhou_state }
+}
+air_region_139 = {
+	name = "Meta"
+	states = { choco_state zulia_state cesar_state boyaca_state cauca_state darien_state antioquia_state cordoba_state bolivar_2_state casanare_state meta_state santander_state tolima_state }
+}
+air_region_140 = {
+	name = "Shan State"
+	states = { shan_state_state sainyabuli_state luang_prabang_state tay_bac_state houaphanh_state rakhine_state_state bago_state andaman_and_nicobar_islands_state northern_6_state central_5_state magway_state mandalay_state }
+}
+air_region_141 = {
+	name = "Southern Denmark"
+	states = { northwest_bavaria_state rhineland_palatinate_state walloon_state luxembourg_state meuse_state luxembourg_2_state schleswig_holstein_state southeast_lower_saxony_state northwest_lower_saxony_state northeast_north_rhine_westphalia_state southwest_north_rhine_westphalia_state gelderland_state flemish_state northeast_baden_wurttemberg_state grand_est_state brandenburg_state mecklenburg_western_pomerania_state somme_state pas_de_calais_state north_brabant_state friesland_state free_hanseatic_bremen_state southern_denmark_state zealand_state hesse_state thuringia_state saxony_anhalt_state }
+}
+air_region_142 = {
+	name = "Amur"
+	states = { northeast_inner_mongolia_state northeast_inner_mongolia_2_state northwest_heilongjiang_state southwest_heilongjiang_state amur_state }
+}
+air_region_143 = {
+	name = "Komi Republic"
+	states = { arkhangelsk_state komi_republic_state }
+}
+air_region_144 = {
+	name = "Riau"
+	states = { perak_state riau_islands_state riau_state jambi_state south_sumatra_state lampung_state west_sumatra_state north_sumatra_state aceh_state johor_state pahang_state bangka_belitung_islands_state }
+}
+air_region_145 = {
+	name = "Southeast British Columbia"
+	states = { washington_state southeast_british_columbia_state }
+}
+air_region_146 = {
+	name = "Odessa"
+	states = { northern_great_plain_state carpathian_ruthenia_state great_southern_plain_state south_backa_state northern_hungary_state banska_bystrica_state teleorman_state constanta_state vratsa_state south_banat_state caras_severin_state branicevo_state suceava_state maramures_state stanislawow_state odessa_state comrat_state lwow_state belgrade_state tarnopol_state bihor_state dolj_state hunedoara_state prahova_state buzau_state arges_state harghita_state neamt_state bacau_state alba_state tulcea_state singerei_state }
+}
+air_region_147 = {
+	name = "Palauli"
+	states = { vavau_state alo_state palauli_state tongatapu_state haapai_state niue_state eastern_district_state tuamasaga_state }
+}
+air_region_148 = {
+	name = "Papua"
+	states = { papua_state }
+}
+air_region_149 = {
+	name = "South Krasnoyarsk Krai"
+	states = { south_krasnoyarsk_krai_state }
+}
+air_region_150 = {
+	name = "Vasterbotten"
+	states = { vasterbotten_state hedmark_state dalarna_state vastra_gotaland_state gavleborg_state skane_state telemark_state hordaland_state sogn_og_fjordane_state gotland_state eckero_state jomala_state kokar_state foglo_state sottunga_state jonkoping_state orebro_state }
+}
+air_region_151 = {
+	name = "Tiris Zemmour"
+	states = { laayoune_boujdour_sakia_el_hamra_state tiris_zemmour_state trarza_state louga_state hodh_ech_chargui_state hodh_el_gharbi_state }
+}
+air_region_152 = {
+	name = "Sindh"
+	states = { west_rajasthan_state northeast_rajasthan_state west_rajasthan_2_state southeast_rajasthan_state sindh_state west_gujarat_state east_gujarat_state dadra_and_nagar_haveli_and_daman_and_diu_state northeast_maharashtra_state west_maharashtra_state west_madhya_pradesh_state }
+}
+air_region_153 = {
+	name = "Vologda"
+	states = { volga_2_state kostroma_state yaroslavl_state ivanovo_state nizhny_novgorod_state vologda_state kirov_state }
+}
+air_region_154 = {
+	name = "North"
+	states = { north_2_state loyalty_islands_state tafea_state western_5_state malampa_state sanma_state penama_state torba_state }
+}
+air_region_155 = {
+	name = "Agadez"
+	states = { tahoua_state gao_state agadez_state tamanghasset_state }
+}
+air_region_156 = {
+	name = "Chukotka Autonomous Okrug"
+	states = { chukotka_autonomous_okrug_state }
+}
+air_region_157 = {
+	name = "Sonora"
+	states = { south_arizona_state north_arizona_state sonora_state baja_california_state southeast_california_2_state }
+}
+air_region_158 = {
+	name = "South Quebec"
+	states = { south_quebec_state west_quebec_state }
+}
+air_region_159 = {
+	name = "Menabe"
+	states = { niassa_state sofia_2_state nampula_state lindi_state coralline_seychelles_state mayotte_state moheli_state anjouan_state andjazidja_state menabe_state toamasina_state haute_matsiatra_state }
+}
+air_region_160 = {
+	name = "Northwest Katanga"
+	states = { mbeya_state muchinga_state kigoma_state northwest_katanga_state southeast_katanga_state northern_2_state northwestern_state }
+}
+air_region_161 = {
+	name = "Hokkaido"
+	states = { tohoku_state tohoku_2_state kanto_state chubu_state hokkaido_state nagano_prefecture_state chubu_2_state kinki_state }
+}
+air_region_162 = {
+	name = "North Riyadh"
+	states = { northwest_eastern_state al_madinah_state makkah_state north_riyadh_state ha_il_state }
+}
+air_region_163 = {
+	name = "Omnogovi"
+	states = { west_inner_mongolia_state southwest_inner_mongolia_state southwest_inner_mongolia_2_state southeast_gansu_state east_gansu_state omnogovi_state ningxia_state north_shaanxi_state north_shaanxi_2_state west_shanxi_state }
+}
+air_region_164 = {
+	name = "Northern Territory"
+	states = { northern_territory_state eastern_5_state }
+}
+air_region_165 = {
+	name = "South Dakota"
+	states = { minnesota_state south_dakota_state }
+}
+air_region_166 = {
+	name = "Tristan da Cunha"
+	states = { tristan_da_cunha_state bouvet_island_state }
+}
+air_region_167 = {
+	name = "North Quebec"
+	states = { north_quebec_state }
+}
+air_region_168 = {
+	name = "West New South Wales"
+	states = { south_new_south_wales_state northeast_new_south_wales_state west_new_south_wales_state jervis_bay_territory_state victoria_state tasmania_state australian_capital_territory_state }
+}
+air_region_169 = {
+	name = "Southwest Punjab"
+	states = { gilgit_baltistan_state khyber_pakhtunkhwa_state paktika_state northeast_punjab_state southwest_punjab_state punjab_state himachal_pradesh_state jammu_and_kashmir_state badakhshan_state haryana_state }
+}
+air_region_170 = {
+	name = "West Konya"
+	states = { aleppo_state gaziantep_state alexandretta_state northern_cyprus_state samsun_state kastamonu_state antalya_state mersin_state adana_state bolu_state ankara_state bilecik_state eskisehir_state cankr_state karabuk_state tokat_state sivas_state corum_state east_konya_state west_konya_state karaman_state nigde_state kayseri_state isparta_state aksaray_state yozgat_state krsehir_state afyonkarahisar_state kahramanmaras_state }
+}

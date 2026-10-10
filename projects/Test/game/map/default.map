@@ -1,0 +1,9 @@
+provinces = "provinces.bmp"
+heightmap = "heightmap.bmp"
+terrain = "terrain.bmp"
+trees = "trees.png"
+rivers = "rivers.png"
+locations = "locations.txt"
+sea_level = 20
+height_scale = 4
+pixels_per_unit = 5

@@ -1,0 +1,22 @@
+# Factories (production feature). Levels are stored per state: buildings = { civilian_factory = 2 }
+#   cost          construction cost of one level (civilian factories add construction points per day)
+#   max_level     most levels in one state
+#   shares_slots  shares the state's building slots with other such buildings (HOI4)
+#   potential     optional trigger (state scope) for where it may be built
+
+civilian_factory = {
+	name = "Civilian Factory"
+	desc = "Builds buildings and makes consumer goods."
+	cost = 10800
+	max_level = 20
+	category = factory
+	shares_slots = yes
+}
+military_factory = {
+	name = "Military Factory"
+	desc = "Produces equipment for production lines."
+	cost = 7200
+	max_level = 20
+	category = factory
+	shares_slots = yes
+}

@@ -1,0 +1,12 @@
+declare_war = {
+	name = "Declare War"
+	potential = { NOT = { is_at_war_with = scope:recipient } }
+	allow = { can_declare_war_on = scope:recipient }
+	on_accept = { declare_war = scope:recipient }
+}
+improve_relations = {
+	name = "Improve Relations"
+	cost = 10
+	cooldown_days = 180
+	on_accept = { reverse_add_opinion = { target = scope:recipient value = 25 } }
+}

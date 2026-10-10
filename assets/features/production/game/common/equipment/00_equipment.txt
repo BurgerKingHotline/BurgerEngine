@@ -1,0 +1,28 @@
+# Equipment, made by military factories (Production menu) and used by divisions.
+#   cost            production cost of one unit
+#   category        army / naval / air (naval equipment is built in dockyards)
+#   default_for     unit categories that need it when a unit type lists no 'equipment = { ... }'
+#   default_amount  how many such a unit needs
+# A unit type can also list exactly what it needs:  equipment = { infantry_equipment = 100 support_equipment = 10 }
+
+infantry_equipment = {
+	name = "Infantry Equipment"
+	cost = 0.5
+	category = army
+	default_for = { infantry cavalry }
+	default_amount = 100
+}
+support_equipment = {
+	name = "Support Equipment"
+	cost = 2
+	category = army
+	default_for = { support }
+	default_amount = 25
+}
+artillery_equipment = {
+	name = "Artillery"
+	cost = 3.5
+	category = army
+	default_for = { support artillery }
+	default_amount = 12
+}

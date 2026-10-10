@@ -1,0 +1,2 @@
+name = "Island map (10 countries)"
+description = "The sample game's island: 251 locations, 48 states, 10 countries with flags. No mechanics - add them with features."

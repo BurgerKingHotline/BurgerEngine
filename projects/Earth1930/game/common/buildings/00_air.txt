@@ -1,0 +1,8 @@
+# Air bases (air feature). Each level holds air_base_capacity planes (defines).
+air_base = {
+	name = "Air Base"
+	desc = "Air wings are stationed here. Each level holds more planes."
+	cost = 4000
+	max_level = 10
+	category = military
+}

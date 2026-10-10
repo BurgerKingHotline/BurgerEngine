@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <AssemblyName>BurgerStudio</AssemblyName>
+    <RootNamespace>Burger.Studio</RootNamespace>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Raylib-cs" Version="7.0.2" />
+    <PackageReference Include="rlImgui-cs" Version="3.2.0" />
+    <PackageReference Include="ImGui.NET" Version="1.91.6.1" />
+    <ProjectReference Include="..\Burger.Core\Burger.Core.csproj" />
+    <ProjectReference Include="..\Burger.Game\Burger.Game.csproj" />
+  </ItemGroup>
+</Project>

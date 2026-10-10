@@ -1,0 +1,8 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Combat: empty template"
+category = "Military"
+order = 14
+description = "A short, commented combat model to write your own rules from scratch."
+requires = { military }
+group = combat
+defines = { combat_model = custom }

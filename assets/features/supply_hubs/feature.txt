@@ -1,0 +1,9 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Supply: hubs & railways"
+category = "Military"
+order = 17
+description = "HOI4 supply: the capital and supply hubs feed nearby land, but a hub only works while railways connect it to the capital. Cut the railway and the armies it feeds starve."
+requires = { military }
+group = supply
+conflicts = { supply_range }
+generate = { starting_infrastructure starting_railways }

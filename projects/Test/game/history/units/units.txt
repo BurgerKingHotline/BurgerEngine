@@ -1,0 +1,2 @@
+AAA = { army = { name = "Royal Army" general = aaa_king division = { template = infantry_division location = first_town count = 2 } } }
+BBB = { division = { template = infantry_division location = third_town count = 2 } }

@@ -1,0 +1,6 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Division designer"
+category = "Military"
+order = 18
+description = "Players design their own division templates in the game: choose battalions, see the stats, equipment and training time, update or delete designs. Designs are stored in the save."
+requires = { military }

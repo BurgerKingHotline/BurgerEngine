@@ -1,0 +1,31 @@
+# Custom resources: new per-country numbers without any C#.
+# Each one automatically gets:  a value for triggers (prestige >= 20),  effects add_prestige = 5 / set_prestige = 10,
+# a top bar display, and the monthly change below.
+prestige = {
+	name = "Prestige"
+	desc = "Respect for our realm. Won in battle and at court, it slowly fades."
+	start = 10
+	min = -100
+	max = 100
+	monthly = {
+		value = prestige
+		multiply = -0.02          # fades 2% per month
+		add = { value = num_of_allies multiply = 0.2 }
+	}
+	color = { 230 190 80 }
+	decimals = 1
+}
+
+stability = {
+	name = "Stability"
+	desc = "How content the realm is. Wars and high taxes lower it."
+	start = 50
+	min = 0
+	max = 100
+	monthly = {
+		value = 0.5
+		if = { limit = { is_at_war = yes } subtract = 1.5 }
+		if = { limit = { has_modifier = war_taxes } subtract = 1 }
+	}
+	color = { 120 200 255 }
+}

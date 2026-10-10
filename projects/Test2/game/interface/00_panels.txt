@@ -1,0 +1,64 @@
+# Custom windows and map modes - user interface for your own mechanics, no C# needed.
+# Each panel gets a button in the left menu bar (with 'icon' or its first letters) and opens on the left.
+# Elements (shown in order): header, text, bar, button, separator, list (repeats for every item of an iterator).
+# Text can show values: [ROOT.prestige], [ROOT.ruler], [THIS.tax]
+
+panel = {
+	id = court
+	title = "Royal Court"
+	button_text = "Court"
+	icon = "gfx/interface/icons/court.png"   # button in the left menu bar (optional)
+	hotkey = F7
+	header = "[ROOT]"
+	text = "Ruler: [ROOT.ruler]"
+	bar = { text = "Prestige: [ROOT.prestige]" value = prestige min = -100 max = 100 color = { 230 190 80 } }
+	bar = { text = "Stability: [ROOT.stability]" value = stability min = 0 max = 100 color = { 120 200 255 } }
+	separator = yes
+	button = {
+		text = "Hold a royal feast ([ROOT.feast_cost] gold)"
+		tooltip = "A grand feast impresses the nobility and foreign envoys."
+		allow = { gold >= feast_cost NOT = { has_modifier = royal_feast } }
+		effect = {
+			add_gold = -feast_cost
+			add_prestige = 5
+			add_stability = 5
+			add_modifier = { name = royal_feast months = 6 }
+		}
+	}
+	button = {
+		text = "Drill the army (50 gold)"
+		allow = { gold >= 50 NOT = { has_modifier = drilled_troops } }
+		effect = { add_gold = -50 add_modifier = { name = drilled_troops years = 2 } }
+	}
+	separator = yes
+	header = "States"
+	list = {
+		iterator = owned_state
+		text = "[THIS]: tax [THIS.tax], manpower [THIS.manpower]"
+		button = {
+			text = "Invest in [THIS] (30 gold)"
+			allow = { owner = { gold >= 30 } }
+			effect = { owner = { add_gold = -30 } add_tax = 0.5 }
+		}
+	}
+}
+
+map_mode = {
+	id = wealth
+	name = "Wealth"
+	value = { value = state.tax }      # location scope
+	min = 0
+	max = 6
+	low_color = { 140 60 50 }
+	high_color = { 240 210 80 }
+}
+
+map_mode = {
+	id = prestige_map
+	name = "Prestige"
+	value = { value = owner.prestige }
+	min = -20
+	max = 60
+	low_color = { 80 80 160 }
+	high_color = { 240 200 90 }
+}

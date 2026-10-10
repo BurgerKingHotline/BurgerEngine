@@ -1,0 +1,173 @@
+# Countries. The three letter tag (A-Z, 0-9) is used everywhere to refer to the country.
+# name, color and flag can be changed during the game with set_country_name, set_country_color, set_flag_image.
+
+VAL = {
+	name = "Kingdom of Valoria"
+	color = { 52 92 170 }
+	flag = "gfx/flags/VAL.png"
+	capital = pelastad
+	government = monarchy
+	gold = 150
+	manpower = 12000
+	ruler = val_ruler
+	heir = val_heir
+	names = {
+		male = { Jorund Kasimir Stellan Leopold Gareth Ivo Edmund Ulric Magnus Piotr }
+		female = { Sigrid Ilse Katarina Nadia Liesel Tamara Brigid Dagny }
+		family = { "Valcourt" "Aubert" }
+	}
+}
+
+KES = {
+	name = "Kestrel Union"
+	color = { 176 58 48 }
+	flag = "gfx/flags/KES.png"
+	capital = belargard
+	government = republic
+	gold = 160
+	manpower = 13000
+	ruler = kes_ruler
+	heir = kes_heir
+	names = {
+		male = { Dorian Roderic Jorund Kasimir Magnus Ulric Edmund Gareth Fintan Bran }
+		female = { Ilse Adela Liesel Elisa Tamara Helena Vera Sigrid }
+		family = { "Kestrel" "Marlow" }
+	}
+}
+
+DRV = {
+	name = "Dravian Empire"
+	color = { 90 60 120 }
+	flag = "gfx/flags/DRV.png"
+	capital = yrennar
+	government = empire
+	gold = 170
+	manpower = 14000
+	ruler = drv_ruler
+	heir = drv_heir
+	names = {
+		male = { Piotr Theodric Ulric Halvar Bran Gareth Fintan Wendel Magnus Leopold }
+		female = { Ilse Liesel Freya Johanna Runa Brigid Adela Tamara }
+		family = { "Dravescu" "Oranu" }
+	}
+}
+
+OST = {
+	name = "Ostmark"
+	color = { 110 110 110 }
+	flag = "gfx/flags/OST.png"
+	capital = dunasted
+	government = monarchy
+	gold = 180
+	manpower = 15000
+	ruler = ost_ruler
+	heir = ost_heir
+	names = {
+		male = { Roderic Theodric Osric Fintan Aldric Piotr Ivo Wendel Stellan Edmund }
+		female = { Runa Brigid Sigrid Petra Adela Helena Elisa Dagny }
+		family = { "von Ost" "Brandt" }
+	}
+}
+
+SUN = {
+	name = "Sundar Sultanate"
+	color = { 214 170 60 }
+	flag = "gfx/flags/SUN.png"
+	capital = wesewyn
+	government = monarchy
+	gold = 190
+	manpower = 16000
+	ruler = sun_ruler
+	heir = sun_heir
+	names = {
+		male = { Roderic Fintan Gareth Aldric Piotr Stellan Ulric Nikolai Viktor Ivo }
+		female = { Adela Brigid Mila Katarina Nadia Helena Tamara Sigrid }
+		family = { "al-Sundar" "Haddad" }
+	}
+}
+
+THA = {
+	name = "Thalor"
+	color = { 40 130 90 }
+	flag = "gfx/flags/THA.png"
+	capital = noruros
+	government = republic
+	gold = 200
+	manpower = 17000
+	ruler = tha_ruler
+	heir = tha_heir
+	names = {
+		male = { Magnus Osric Edmund Kasimir Piotr Nikolai Leopold Stellan Fintan Gareth }
+		female = { Adela Freya Brigid Nadia Catrin Runa Ilse Greta }
+		family = { "Thalorin" "Vesk" }
+	}
+}
+
+ZEM = {
+	name = "Zemlyan Tsardom"
+	color = { 150 90 40 }
+	flag = "gfx/flags/ZEM.png"
+	capital = breiheim
+	government = empire
+	gold = 210
+	manpower = 18000
+	ruler = zem_ruler
+	heir = zem_heir
+	names = {
+		male = { Aldric Ivo Halvar Osric Bran Roderic Gareth Fintan Viktor Wendel }
+		female = { Freya Catrin Mila Johanna Ottilie Elisa Ilse Tamara }
+		family = { "Zemlov" "Orlov" }
+	}
+}
+
+MAR = {
+	name = "Marrow League"
+	color = { 60 160 170 }
+	flag = "gfx/flags/MAR.png"
+	capital = calovik
+	government = republic
+	gold = 220
+	manpower = 19000
+	ruler = mar_ruler
+	heir = mar_heir
+	names = {
+		male = { Gareth Bran Viktor Dorian Ulric Kasimir Wendel Nikolai Fintan Halvar }
+		female = { Ottilie Adela Katarina Helena Dagny Runa Nadia Elisa }
+		family = { "Marrow" "Tidewell" }
+	}
+}
+
+BRE = {
+	name = "Duchy of Brenn"
+	color = { 200 110 150 }
+	flag = "gfx/flags/BRE.png"
+	capital = falosted
+	government = monarchy
+	gold = 230
+	manpower = 20000
+	ruler = bre_ruler
+	heir = bre_heir
+	names = {
+		male = { Stellan Roderic Ulric Bran Cedric Magnus Kasimir Fintan Dorian Theodric }
+		female = { Dagny Tamara Nadia Runa Helena Adela Catrin Ottilie }
+		family = { "Brennhold" "Falk" }
+	}
+}
+
+ULM = {
+	name = "Ulmar"
+	color = { 120 150 50 }
+	flag = "gfx/flags/ULM.png"
+	capital = quinenwick
+	government = monarchy
+	gold = 240
+	manpower = 21000
+	ruler = ulm_ruler
+	heir = ulm_heir
+	names = {
+		male = { Gareth Halvar Wendel Edmund Ivo Dorian Nikolai Viktor Osric Aldric }
+		female = { Ottilie Elisa Catrin Mila Liesel Greta Dagny Adela }
+		family = { "Ulmaren" "Grim" }
+	}
+}
+

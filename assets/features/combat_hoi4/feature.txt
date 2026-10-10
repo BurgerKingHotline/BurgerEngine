@@ -1,0 +1,8 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Combat: Hearts of Iron IV style"
+category = "Military"
+order = 11
+description = "Hourly rounds, combat width, soft/hard attack against defense and breakthrough, armor and piercing, organisation and strength damage."
+requires = { military }
+group = combat
+defines = { combat_model = hoi4 }

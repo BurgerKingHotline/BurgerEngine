@@ -1,0 +1,4 @@
+# Extra connections between locations that do not touch on the province map (straits),
+# or borders that should not be crossable.
+# adjacency = { from = location_a to = location_b type = strait }
+# adjacency = { from = location_a to = location_b type = impassable }

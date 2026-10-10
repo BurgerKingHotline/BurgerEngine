@@ -1,0 +1,5 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Characters & dynasties"
+category = "Characters"
+order = 40
+description = "Rulers and heirs, families and marriages, births and deaths, succession, traits and stats. Rulers are created automatically for every country."

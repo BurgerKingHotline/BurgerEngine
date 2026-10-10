@@ -1,0 +1,2 @@
+name = "Earth 1930"
+description = "The whole world on 1 January 1930: about 6400 locations, 1450 states and 74 countries with 1930 borders. Colonies belong to their empires; dominions and the British Raj are subjects of the United Kingdom (with the diplomacy feature)."

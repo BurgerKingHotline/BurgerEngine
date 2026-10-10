@@ -1,0 +1,11 @@
+# Shown names (location and state names are in their own files).
+plains = "Plains"
+forest = "Forest"
+hills = "Hills"
+mountains = "Mountains"
+desert = "Desert"
+marsh = "Marsh"
+ocean = "Ocean"
+jungle = "Jungle"
+tundra = "Tundra"
+glacier = "Glacier"

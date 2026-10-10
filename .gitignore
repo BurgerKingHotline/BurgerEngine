@@ -1,0 +1,11 @@
+bin/
+obj/
+.vs/
+*.user
+projects/*/export/
+projects/*/saves/
+projects/*/logs/
+_probe/
+_helper.bat
+burger.bat
+BurgerEngine.bat

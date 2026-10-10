@@ -1,0 +1,15 @@
+# Country event 'my_country_event' - created in Burger Studio.
+# Pop-ups with options. Fire them from on actions, effects (country_event = { id = x days = 10 }) or with mean_time_to_happen. ROOT is the country (or character for character_event).
+
+country_event = {
+	id = my_country_event
+	title = "Event title"
+	desc = "Event text. [ROOT] is the country."
+	is_triggered_only = yes
+	trigger = { }
+	immediate = { }
+	option = {
+		name = "OK"
+		add_gold = 10
+	}
+}

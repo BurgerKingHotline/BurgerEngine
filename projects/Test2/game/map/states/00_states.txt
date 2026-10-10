@@ -1,0 +1,387 @@
+# States: groups of locations. A state is owned and cored by countries.
+# state_id = { name = "Display Name" owner = TAG cores = { TAG } claims = { TAG } manpower = 100 tax = 2 locations = { a b c } }
+
+noruros_state = {
+	name = "Noruros Vale"
+	owner = THA
+	cores = { THA }
+	manpower = 206
+	tax = 2.7
+	locations = { noruros breanmar zanormar yrarford coremont }
+}
+belargard_state = {
+	name = "Belargard Highlands"
+	owner = KES
+	cores = { KES }
+	manpower = 212
+	tax = 3.3 buildings = { workshop = 1 }
+	locations = { belargard rosiamar torenton breegrad coranheim }
+}
+goriaros_state = {
+	name = "Goriaros March"
+	owner = MAR
+	cores = { MAR }
+	manpower = 200
+	tax = 3.3
+	locations = { goriaros karagard elaburg faliheim yruton }
+}
+breiheim_state = {
+	name = "Breiheim Coast"
+	owner = ZEM
+	cores = { ZEM }
+	manpower = 196
+	tax = 3.4
+	locations = { breiheim breenmar areholm cororpolis salanpolis }
+}
+draanmar_state = {
+	name = "Draanmar March"
+	owner = THA
+	cores = { THA }
+	manpower = 213
+	tax = 2.9
+	locations = { draanmar lorenar draiasted dunanmar corustad }
+}
+draistad_state = {
+	name = "Draistad Plains"
+	owner = THA
+	cores = { THA }
+	manpower = 192
+	tax = 3.3
+	locations = { draistad falorford loragrad wesenburg }
+}
+calovik_state = {
+	name = "Calovik Plains"
+	owner = MAR
+	cores = { MAR }
+	manpower = 174
+	tax = 2.2
+	locations = { calovik weseheim draawick }
+}
+zananton_state = {
+	name = "Zananton March"
+	owner = VAL
+	cores = { VAL }
+	manpower = 174
+	tax = 2.5
+	locations = { zananton coraburg yredale }
+}
+breosted_state = {
+	name = "Breosted March"
+	owner = ULM
+	cores = { ULM } claims = { VAL }
+	manpower = 163
+	tax = 1.8
+	locations = { breosted toraford gorugrad }
+}
+ulorholm_state = {
+	name = "Ulorholm March"
+	owner = BRE
+	cores = { BRE } claims = { DRV }
+	manpower = 182
+	tax = 3.0
+	locations = { ulorholm gororstad zaniaheim drauvik }
+}
+gorimar_state = {
+	name = "Gorimar Coast"
+	owner = THA
+	cores = { THA } claims = { ZEM }
+	manpower = 214
+	tax = 2.8
+	locations = { gorimar valarros coranburg dunargard karomont }
+}
+noroburg_state = {
+	name = "Noroburg Coast"
+	owner = VAL
+	cores = { VAL }
+	manpower = 193
+	tax = 2.4
+	locations = { noroburg peliaholm yriagard galiagrad rosamar }
+}
+cororgard_state = {
+	name = "Cororgard Vale"
+	owner = THA
+	cores = { THA } claims = { OST }
+	manpower = 169
+	tax = 2.6
+	locations = { cororgard corormar istanmar brearvik }
+}
+elarburg_state = {
+	name = "Elarburg Plains"
+	owner = BRE
+	cores = { BRE } claims = { ULM }
+	manpower = 189
+	tax = 3.2
+	locations = { elarburg karewyn corengrad quinenton toriamar }
+}
+draiawick_state = {
+	name = "Draiawick March"
+	owner = THA
+	cores = { THA } claims = { ZEM }
+	manpower = 195
+	tax = 3.0
+	locations = { draiawick fenendale haranmont rosumont pelowyn }
+}
+elovik_state = {
+	name = "Elovik Coast"
+	owner = OST
+	cores = { OST }
+	manpower = 234
+	tax = 3.3
+	locations = { elovik osiaford dunangrad eryanton calimar fenanton }
+}
+lorimont_state = {
+	name = "Lorimont Highlands"
+	owner = DRV
+	cores = { DRV } claims = { KES }
+	manpower = 190
+	tax = 2.9
+	locations = { lorimont breisted dunanwick roseholm faloros }
+}
+yrevik_state = {
+	name = "Yrevik Highlands"
+	owner = ULM
+	cores = { ULM }
+	manpower = 241
+	tax = 3.5
+	locations = { yrevik eryiawick falanmont zanegard draiaholm galormar }
+}
+breiawyn_state = {
+	name = "Breiawyn"
+	owner = ZEM
+	cores = { ZEM }
+	manpower = 156
+	tax = 2.1
+	locations = { breiawyn galuford dunaheim }
+}
+corested_state = {
+	name = "Corested Highlands"
+	owner = MAR
+	cores = { MAR }
+	manpower = 252
+	tax = 4.4
+	locations = { corested zanudale corostad yrewick duniagard aroton rosanheim }
+}
+quinanstad_state = {
+	name = "Quinanstad Coast"
+	owner = ZEM
+	cores = { ZEM }
+	manpower = 196
+	tax = 2.5
+	locations = { quinanstad dunuholm gorarvik elanmont }
+}
+wesengrad_state = {
+	name = "Wesengrad Reach"
+	owner = ZEM
+	cores = { ZEM }
+	manpower = 178
+	tax = 2.5
+	locations = { wesengrad ulomar dunimar zanarmar }
+}
+yrennar_state = {
+	name = "Yrennar Coast"
+	owner = DRV
+	cores = { DRV }
+	manpower = 162
+	tax = 2.8
+	locations = { yrennar ulanmont zanengard lorianar }
+}
+valugrad_state = {
+	name = "Valugrad Vale"
+	owner = OST
+	cores = { OST }
+	manpower = 223
+	tax = 3.1 buildings = { workshop = 1 }
+	locations = { valugrad rosansted uleburg feniaheim rosiheim }
+}
+rosomont_state = {
+	name = "Rosomont Highlands"
+	owner = ULM
+	cores = { ULM } claims = { BRE }
+	manpower = 158
+	tax = 2.3
+	locations = { rosomont lorawick ularmont }
+}
+dunasted_state = {
+	name = "Dunasted Plains"
+	owner = OST
+	cores = { OST }
+	manpower = 246
+	tax = 3.3
+	locations = { dunasted gorarnar pelenton marewick nororgard eliawyn }
+}
+elorburg_state = {
+	name = "Elorburg"
+	owner = ULM
+	cores = { ULM }
+	manpower = 193
+	tax = 2.7
+	locations = { elorburg torodale peluwick wesorford }
+}
+falosted_state = {
+	name = "Falosted Plains"
+	owner = BRE
+	cores = { BRE }
+	manpower = 150
+	tax = 2.6
+	locations = { falosted breewyn torivik }
+}
+harianar_state = {
+	name = "Harianarshire"
+	owner = ZEM
+	cores = { ZEM }
+	manpower = 165
+	tax = 3.1 buildings = { workshop = 1 }
+	locations = { harianar istaros lorarwick yrarros }
+}
+valomar_state = {
+	name = "Valomar Vale"
+	owner = MAR
+	cores = { MAR }
+	manpower = 222
+	tax = 3.1
+	locations = { valomar rosaburg elengrad isteton fenorwick }
+}
+toreburg_state = {
+	name = "Toreburg Vale"
+	owner = THA
+	cores = { THA } claims = { ULM }
+	manpower = 201
+	tax = 2.8 buildings = { workshop = 1 }
+	locations = { toreburg eryuwick valestad karargard quinestad }
+}
+karuvik_state = {
+	name = "Karuvik Plains"
+	owner = DRV
+	cores = { DRV } claims = { BRE }
+	manpower = 165
+	tax = 2.4
+	locations = { karuvik ulimar cororvik salorstad }
+}
+marestad_state = {
+	name = "Marestad March"
+	owner = KES
+	cores = { KES }
+	manpower = 246
+	tax = 3.9
+	locations = { marestad pelorvik fenusted beliton karenar valenar karuford }
+}
+peleford_state = {
+	name = "Peleford Reach"
+	owner = KES
+	cores = { KES }
+	manpower = 211
+	tax = 2.1
+	locations = { peleford caligard draarburg calenburg pelawyn }
+}
+noriagrad_state = {
+	name = "Noriagrad Highlands"
+	owner = ZEM
+	cores = { ZEM }
+	manpower = 210
+	tax = 2.2 buildings = { workshop = 1 }
+	locations = { noriagrad pelumont ararsted gorarton elupolis }
+}
+pelastad_state = {
+	name = "Pelastad Plains"
+	owner = VAL
+	cores = { VAL }
+	manpower = 188
+	tax = 3.3
+	locations = { pelastad dunuwyn norianar galiwick quinangrad }
+}
+belarburg_state = {
+	name = "Belarburg Coast"
+	owner = MAR
+	cores = { MAR }
+	manpower = 204
+	tax = 3.2 buildings = { workshop = 1 }
+	locations = { belarburg faliaholm istiaheim aroburg goroburg }
+}
+yrinar_state = {
+	name = "Yrinar Vale"
+	owner = THA
+	cores = { THA }
+	manpower = 135
+	tax = 2.2
+	locations = { yrinar istorgard falaford }
+}
+areheim_state = {
+	name = "Areheim Coast"
+	owner = VAL
+	cores = { VAL }
+	manpower = 171
+	tax = 2.8
+	locations = { areheim norodale beliros wesorgard }
+}
+istipolis_state = {
+	name = "Istipolis Vale"
+	owner = OST
+	cores = { OST }
+	manpower = 200
+	tax = 3.0
+	locations = { istipolis brearburg zanevik corawyn }
+}
+eryorwyn_state = {
+	name = "Eryorwyn March"
+	owner = DRV
+	cores = { DRV }
+	manpower = 150
+	tax = 2.4
+	locations = { eryorwyn calestad }
+}
+brearford_state = {
+	name = "Brearford Coast"
+	owner = ULM
+	cores = { ULM } claims = { VAL }
+	manpower = 114
+	tax = 1.8
+	locations = { brearford maromar }
+}
+osenwyn_state = {
+	name = "Osenwyn Coast"
+	owner = VAL
+	cores = { VAL }
+	manpower = 198
+	tax = 2.4
+	locations = { osenwyn falianar beleton calengard }
+}
+quineton_state = {
+	name = "Quineton Highlands"
+	owner = BRE
+	cores = { BRE } claims = { ULM }
+	manpower = 180
+	tax = 2.8
+	locations = { quineton harowyn loriaros quinoton }
+}
+salimar_state = {
+	name = "Salimarshire"
+	owner = VAL
+	cores = { VAL }
+	manpower = 202
+	tax = 3.0
+	locations = { salimar salunar galorwick istinar aroford }
+}
+draennar_state = {
+	name = "Draennar"
+	owner = BRE
+	cores = { BRE }
+	manpower = 161
+	tax = 2.4
+	locations = { draennar galarsted osiamar }
+}
+quinenwick_state = {
+	name = "Quinenwick Vale"
+	owner = ULM
+	cores = { ULM }
+	manpower = 205
+	tax = 2.4
+	locations = { quinenwick draipolis goroholm salanstad toriawyn }
+}
+wesewyn_state = {
+	name = "Wesewynshire"
+	owner = SUN
+	cores = { SUN }
+	manpower = 93
+	tax = 1.1
+	locations = { wesewyn }
+}

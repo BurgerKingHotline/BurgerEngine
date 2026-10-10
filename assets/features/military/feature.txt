@@ -1,0 +1,6 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Land military"
+category = "Military"
+order = 10
+description = "Unit types, division templates, divisions and armies with generals, movement, fronts, battles and occupation. A recruit menu trains new divisions."
+generate = { starting_armies }

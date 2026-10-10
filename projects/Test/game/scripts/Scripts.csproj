@@ -1,0 +1,25 @@
+<!-- Only for code completion in Visual Studio / VS Code / Rider. The game compiles these scripts itself at startup. -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>annotations</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <NoWarn>CS1591</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\Jason\Desktop\BurgerEngine\src\Burger.Core\Burger.Core.csproj" />
+    <Using Include="Burger.Core" />
+    <Using Include="Burger.Core.AI" />
+    <Using Include="Burger.Core.Characters" />
+    <Using Include="Burger.Core.Data" />
+    <Using Include="Burger.Core.Diplomacy" />
+    <Using Include="Burger.Core.Economy" />
+    <Using Include="Burger.Core.Events" />
+    <Using Include="Burger.Core.Map" />
+    <Using Include="Burger.Core.Model" />
+    <Using Include="Burger.Core.Modding" />
+    <Using Include="Burger.Core.Script" />
+    <Using Include="Burger.Core.Scripting" />
+    <Using Include="Burger.Core.Warfare" />
+  </ItemGroup>
+</Project>

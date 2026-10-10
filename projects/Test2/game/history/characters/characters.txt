@@ -1,0 +1,443 @@
+# Starting characters. Reference them as character:<id> in scripts.
+# Stats (from common/defines.txt character_stats): martial, finesse, charisma, zeal.
+
+val_ruler = {
+	first_name = Cedric
+	family = "Valcourt"
+	birth_date = 1801.6.8
+	country = VAL
+	martial = 7 finesse = 6 charisma = 9 zeal = 8
+	traits = { charismatic wrathful }
+}
+val_consort = {
+	first_name = Nadia
+	family = "Aubert"
+	female = yes
+	birth_date = 1804.5.11
+	country = VAL
+	spouse = val_ruler
+}
+val_heir = {
+	first_name = Halvar
+	family = "Valcourt"
+	birth_date = 1828.12.18
+	country = VAL
+	father = val_ruler
+	mother = val_consort
+	traits = { diligent }
+}
+val_general_1 = {
+	first_name = Bran
+	family = "Steiner"
+	age = 53
+	country = VAL
+	general = yes
+	martial = 8 finesse = 4 charisma = 6 zeal = 3
+	traits = { reckless }
+}
+val_general_2 = {
+	first_name = Kasimir
+	family = "Marsh"
+	age = 54
+	country = VAL
+	general = yes
+	martial = 10 finesse = 2 charisma = 2 zeal = 2
+	traits = { tactician }
+}
+
+kes_ruler = {
+	first_name = Roderic
+	family = "Kestrel"
+	birth_date = 1789.7.25
+	country = KES
+	martial = 9 finesse = 8 charisma = 9 zeal = 5
+	traits = { just }
+}
+kes_consort = {
+	first_name = Ilse
+	family = "Marlow"
+	female = yes
+	birth_date = 1791.7.9
+	country = KES
+	spouse = kes_ruler
+}
+kes_heir = {
+	first_name = Theodric
+	family = "Kestrel"
+	birth_date = 1817.2.8
+	country = KES
+	father = kes_ruler
+	mother = kes_consort
+	traits = { zealous }
+}
+kes_general_1 = {
+	first_name = Dorian
+	family = "Steiner"
+	age = 57
+	country = KES
+	general = yes
+	martial = 9 finesse = 5 charisma = 6 zeal = 3
+	traits = { brave }
+}
+kes_general_2 = {
+	first_name = Leopold
+	family = "Kord"
+	age = 50
+	country = KES
+	general = yes
+	martial = 8 finesse = 6 charisma = 5 zeal = 3
+	traits = { reckless }
+}
+
+drv_ruler = {
+	first_name = Magnus
+	family = "Dravescu"
+	birth_date = 1798.7.4
+	country = DRV
+	martial = 6 finesse = 5 charisma = 9 zeal = 5
+	traits = { tactician }
+}
+drv_consort = {
+	first_name = Ilse
+	family = "Oranu"
+	female = yes
+	birth_date = 1804.11.21
+	country = DRV
+	spouse = drv_ruler
+}
+drv_heir = {
+	first_name = Ivo
+	family = "Dravescu"
+	birth_date = 1825.2.20
+	country = DRV
+	father = drv_ruler
+	mother = drv_consort
+	traits = { charismatic }
+}
+drv_general_1 = {
+	first_name = Theodric
+	family = "Lind"
+	age = 39
+	country = DRV
+	general = yes
+	martial = 7 finesse = 4 charisma = 6 zeal = 5
+	traits = { tactician }
+}
+drv_general_2 = {
+	first_name = Leopold
+	family = "Rask"
+	age = 48
+	country = DRV
+	general = yes
+	martial = 10 finesse = 6 charisma = 3 zeal = 5
+	traits = { tactician }
+}
+
+ost_ruler = {
+	first_name = Nikolai
+	family = "von Ost"
+	birth_date = 1797.2.13
+	country = OST
+	martial = 3 finesse = 8 charisma = 6 zeal = 7
+	traits = { just paranoid }
+}
+ost_consort = {
+	first_name = Petra
+	family = "Brandt"
+	female = yes
+	birth_date = 1802.4.4
+	country = OST
+	spouse = ost_ruler
+}
+ost_heir = {
+	first_name = Aldric
+	family = "von Ost"
+	birth_date = 1820.10.4
+	country = OST
+	father = ost_ruler
+	mother = ost_consort
+	traits = { diligent }
+}
+ost_general_1 = {
+	first_name = Leopold
+	family = "Kord"
+	age = 54
+	country = OST
+	general = yes
+	martial = 5 finesse = 6 charisma = 2 zeal = 5
+	traits = { tactician }
+}
+ost_general_2 = {
+	first_name = Stellan
+	family = "Vance"
+	age = 50
+	country = OST
+	general = yes
+	martial = 4 finesse = 5 charisma = 6 zeal = 3
+	traits = { brave }
+}
+
+sun_ruler = {
+	first_name = Edmund
+	family = "al-Sundar"
+	birth_date = 1796.9.2
+	country = SUN
+	martial = 4 finesse = 5 charisma = 4 zeal = 8
+	traits = { zealous drunkard }
+}
+sun_consort = {
+	first_name = Catrin
+	family = "Haddad"
+	female = yes
+	birth_date = 1801.1.25
+	country = SUN
+	spouse = sun_ruler
+}
+sun_heir = {
+	first_name = Cedric
+	family = "al-Sundar"
+	birth_date = 1816.12.19
+	country = SUN
+	father = sun_ruler
+	mother = sun_consort
+	traits = { just }
+}
+sun_general_1 = {
+	first_name = Bran
+	family = "Steiner"
+	age = 48
+	country = SUN
+	general = yes
+	martial = 4 finesse = 5 charisma = 3 zeal = 6
+	traits = { cautious }
+}
+sun_general_2 = {
+	first_name = Gareth
+	family = "Vance"
+	age = 51
+	country = SUN
+	general = yes
+	martial = 6 finesse = 3 charisma = 3 zeal = 6
+	traits = { reckless }
+}
+
+tha_ruler = {
+	first_name = Theodric
+	family = "Thalorin"
+	birth_date = 1785.6.6
+	country = THA
+	martial = 3 finesse = 5 charisma = 6 zeal = 6
+	traits = { just lazy }
+}
+tha_consort = {
+	first_name = Nadia
+	family = "Vesk"
+	female = yes
+	birth_date = 1787.8.1
+	country = THA
+	spouse = tha_ruler
+}
+tha_heir = {
+	first_name = Halvar
+	family = "Thalorin"
+	birth_date = 1810.10.12
+	country = THA
+	father = tha_ruler
+	mother = tha_consort
+	traits = { honest }
+}
+tha_general_1 = {
+	first_name = Piotr
+	family = "Steiner"
+	age = 59
+	country = THA
+	general = yes
+	martial = 6 finesse = 3 charisma = 6 zeal = 6
+	traits = { tactician }
+}
+tha_general_2 = {
+	first_name = Gareth
+	family = "Lind"
+	age = 55
+	country = THA
+	general = yes
+	martial = 10 finesse = 6 charisma = 4 zeal = 2
+	traits = { tactician }
+}
+
+zem_ruler = {
+	first_name = Osric
+	family = "Zemlov"
+	birth_date = 1791.10.2
+	country = ZEM
+	martial = 8 finesse = 5 charisma = 7 zeal = 3
+	traits = { honest cruel }
+}
+zem_consort = {
+	first_name = Adela
+	family = "Orlov"
+	female = yes
+	birth_date = 1792.2.22
+	country = ZEM
+	spouse = zem_ruler
+}
+zem_heir = {
+	first_name = Jorund
+	family = "Zemlov"
+	birth_date = 1811.1.25
+	country = ZEM
+	father = zem_ruler
+	mother = zem_consort
+	traits = { brave }
+}
+zem_general_1 = {
+	first_name = Cedric
+	family = "Kord"
+	age = 57
+	country = ZEM
+	general = yes
+	martial = 8 finesse = 2 charisma = 4 zeal = 5
+	traits = { tactician }
+}
+zem_general_2 = {
+	first_name = Theodric
+	family = "Holt"
+	age = 51
+	country = ZEM
+	general = yes
+	martial = 5 finesse = 5 charisma = 4 zeal = 6
+	traits = { cautious }
+}
+
+mar_ruler = {
+	first_name = Halvar
+	family = "Marrow"
+	birth_date = 1798.12.25
+	country = MAR
+	martial = 7 finesse = 6 charisma = 4 zeal = 4
+	traits = { honest }
+}
+mar_consort = {
+	first_name = Helena
+	family = "Tidewell"
+	female = yes
+	birth_date = 1804.4.5
+	country = MAR
+	spouse = mar_ruler
+}
+mar_heir = {
+	first_name = Fintan
+	family = "Marrow"
+	birth_date = 1826.6.6
+	country = MAR
+	father = mar_ruler
+	mother = mar_consort
+	traits = { zealous }
+}
+mar_general_1 = {
+	first_name = Magnus
+	family = "Vance"
+	age = 54
+	country = MAR
+	general = yes
+	martial = 10 finesse = 2 charisma = 6 zeal = 2
+	traits = { tactician }
+}
+mar_general_2 = {
+	first_name = Theodric
+	family = "Marsh"
+	age = 40
+	country = MAR
+	general = yes
+	martial = 5 finesse = 5 charisma = 6 zeal = 5
+	traits = { cautious }
+}
+
+bre_ruler = {
+	first_name = Nikolai
+	family = "Brennhold"
+	birth_date = 1790.12.19
+	country = BRE
+	martial = 8 finesse = 3 charisma = 4 zeal = 8
+	traits = { diligent paranoid }
+}
+bre_consort = {
+	first_name = Brigid
+	family = "Falk"
+	female = yes
+	birth_date = 1796.4.7
+	country = BRE
+	spouse = bre_ruler
+}
+bre_heir = {
+	first_name = Piotr
+	family = "Brennhold"
+	birth_date = 1817.3.27
+	country = BRE
+	father = bre_ruler
+	mother = bre_consort
+	traits = { honest }
+}
+bre_general_1 = {
+	first_name = Jorund
+	family = "Marsh"
+	age = 58
+	country = BRE
+	general = yes
+	martial = 9 finesse = 4 charisma = 2 zeal = 4
+	traits = { reckless }
+}
+bre_general_2 = {
+	first_name = Kasimir
+	family = "Lind"
+	age = 41
+	country = BRE
+	general = yes
+	martial = 6 finesse = 3 charisma = 3 zeal = 2
+	traits = { tactician }
+}
+
+ulm_ruler = {
+	first_name = Ivo
+	family = "Ulmaren"
+	birth_date = 1779.10.13
+	country = ULM
+	martial = 6 finesse = 7 charisma = 5 zeal = 3
+	traits = { honest }
+}
+ulm_consort = {
+	first_name = Liesel
+	family = "Grim"
+	female = yes
+	birth_date = 1781.2.23
+	country = ULM
+	spouse = ulm_ruler
+}
+ulm_heir = {
+	first_name = Theodric
+	family = "Ulmaren"
+	birth_date = 1799.10.11
+	country = ULM
+	father = ulm_ruler
+	mother = ulm_consort
+	traits = { just }
+}
+ulm_general_1 = {
+	first_name = Magnus
+	family = "Ferro"
+	age = 53
+	country = ULM
+	general = yes
+	martial = 6 finesse = 5 charisma = 5 zeal = 3
+	traits = { tactician }
+}
+ulm_general_2 = {
+	first_name = Theodric
+	family = "Marsh"
+	age = 50
+	country = ULM
+	general = yes
+	martial = 6 finesse = 5 charisma = 3 zeal = 3
+	traits = { reckless }
+}
+

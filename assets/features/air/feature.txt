@@ -1,0 +1,7 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Air (wings & air regions)"
+category = "Military"
+order = 21
+description = "HOI4 air war: the map is split into air regions; air wings at air bases fly air superiority (a combat bonus for the side that holds the sky), close air support (hits enemy divisions in battles) or strategic bombing (knocks out factories and railways, needs production) over regions in range. With the production feature military factories build the planes."
+requires = { military }
+generate = { starting_air_regions starting_air_bases starting_air }

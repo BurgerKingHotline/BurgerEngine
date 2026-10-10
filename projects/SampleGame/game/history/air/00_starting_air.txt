@@ -1,0 +1,39 @@
+# Starting air wings, created when the air feature was added. Edit freely.
+# TAG = { wing = { type = plane_type base = state_with_air_base planes = 50 name = "..." } }
+
+VAL = {
+	wing = { type = fighter base = pelastad_state planes = 50 }
+	wing = { type = close_air_support base = pelastad_state planes = 50 }
+}
+KES = {
+	wing = { type = fighter base = belargard_state planes = 50 }
+}
+DRV = {
+	wing = { type = fighter base = yrennar_state planes = 50 }
+}
+OST = {
+	wing = { type = fighter base = dunasted_state planes = 50 }
+}
+SUN = {
+	wing = { type = fighter base = wesewyn_state planes = 50 }
+}
+THA = {
+	wing = { type = fighter base = noruros_state planes = 50 }
+	wing = { type = close_air_support base = noruros_state planes = 50 }
+}
+ZEM = {
+	wing = { type = fighter base = breiheim_state planes = 50 }
+	wing = { type = close_air_support base = breiheim_state planes = 50 }
+}
+MAR = {
+	wing = { type = fighter base = calovik_state planes = 50 }
+	wing = { type = close_air_support base = calovik_state planes = 50 }
+}
+BRE = {
+	wing = { type = fighter base = falosted_state planes = 50 }
+	wing = { type = close_air_support base = falosted_state planes = 50 }
+}
+ULM = {
+	wing = { type = fighter base = quinenwick_state planes = 50 }
+	wing = { type = close_air_support base = quinenwick_state planes = 50 }
+}

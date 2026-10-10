@@ -1,0 +1,8 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Production (factories & equipment)"
+category = "Military"
+order = 15
+description = "HOI4 production: civilian and military factories in states, production lines with efficiency, an equipment stockpile and a construction queue. Training and reinforcing divisions use manpower and equipment instead of gold."
+requires = { military }
+defines = { recruit_gold_cost = no }
+generate = { starting_factories }

@@ -1,0 +1,8 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Combat: Europa Universalis style"
+category = "Military"
+order = 12
+description = "Daily dice rolls with fire and shock phases, general pips, morale and discipline."
+requires = { military }
+group = combat
+defines = { combat_model = eu4 }

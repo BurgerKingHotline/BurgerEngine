@@ -1,0 +1,203 @@
+# Diplomatic actions (Imperator: Rome style) - shown in the country panel.
+# Scopes:  ROOT / scope:actor = the country doing the action,  scope:recipient = the target country.
+#   potential        shown only if true
+#   allow            clickable only if true (each condition is listed in the tooltip)
+#   cost             gold paid when used           cooldown_days   per target
+#   requires_acceptance = yes  → the AI decides with ai_acceptance (> 0 = yes), the player gets a popup
+#   ai_acceptance    base + modifiers; opinion_factor = recipient's opinion of us × factor;
+#                    strength_factor = factor × (our military / their military - 1)
+#   on_accept / on_decline   effects        ai_will_do   how much the AI wants to do it (0 = never)
+
+improve_relations = {
+	name = "Improve Relations"
+	desc = "Send diplomats to improve their opinion of us (+25, decays over time)."
+	cost = 10
+	cooldown_days = 180
+	potential = { NOT = { is_at_war_with = scope:recipient } }
+	allow = { gold >= 10 }
+	on_accept = {
+		reverse_add_opinion = { target = scope:recipient value = 25 name = "Improved relations" }
+	}
+	ai_will_do = {
+		base = 0
+		modifier = { add = 2 scope:recipient = { opinion = { target = ROOT value < 0 } } }
+		modifier = { add = 1 borders = scope:recipient }
+	}
+}
+
+send_gift = {
+	name = "Send Gift"
+	desc = "Send 50 gold as a gift (+40 opinion)."
+	cost = 50
+	cooldown_days = 365
+	potential = { NOT = { is_at_war_with = scope:recipient } }
+	allow = { gold >= 50 }
+	on_accept = {
+		scope:recipient = { add_gold = 50 }
+		reverse_add_opinion = { target = scope:recipient value = 40 name = "Gift" }
+	}
+}
+
+insult = {
+	name = "Insult"
+	desc = "Make our contempt known (-40 opinion)."
+	cooldown_days = 365
+	potential = { NOT = { is_allied_with = scope:recipient } }
+	on_accept = {
+		reverse_add_opinion = { target = scope:recipient value = -40 name = "Insulted" }
+	}
+}
+
+offer_alliance = {
+	name = "Offer Alliance"
+	desc = "Allies are called to arms when either of us is attacked."
+	requires_acceptance = yes
+	potential = {
+		NOT = { is_allied_with = scope:recipient }
+		NOT = { is_at_war_with = scope:recipient }
+	}
+	allow = {
+		free_relations >= 1
+		scope:recipient = { free_relations >= 1 }
+	}
+	ai_acceptance = {
+		base = -25
+		opinion_factor = 0.5
+		modifier = { add = 15 borders = scope:recipient }
+		modifier = { add = -1000 scope:recipient = { is_at_war_with = ROOT } }
+	}
+	on_accept = {
+		create_alliance = scope:recipient
+		reverse_add_opinion = { target = scope:recipient value = 20 name = "Alliance" }
+	}
+	on_decline = {
+		reverse_add_opinion = { target = scope:recipient value = -5 name = "Rejected alliance" }
+	}
+	ai_will_do = {
+		base = 0
+		modifier = { add = 1 scope:recipient = { opinion = { target = ROOT value > 25 } } }
+	}
+}
+
+break_alliance = {
+	name = "Break Alliance"
+	potential = { is_allied_with = scope:recipient }
+	on_accept = {
+		break_alliance = scope:recipient
+		reverse_add_opinion = { target = scope:recipient value = -50 name = "Broke alliance" }
+	}
+}
+
+request_military_access = {
+	name = "Request Military Access"
+	desc = "Allows our armies to move through their land."
+	requires_acceptance = yes
+	potential = {
+		NOT = { has_military_access = scope:recipient }
+		NOT = { is_allied_with = scope:recipient }
+		NOT = { is_at_war_with = scope:recipient }
+	}
+	ai_acceptance = {
+		base = -10
+		opinion_factor = 0.4
+	}
+	on_accept = {
+		scope:recipient = { grant_military_access = ROOT }
+	}
+}
+
+guarantee_independence = {
+	name = "Guarantee Independence"
+	desc = "We will defend them if they are attacked."
+	potential = {
+		NOT = { is_guaranteeing = scope:recipient }
+		NOT = { is_at_war_with = scope:recipient }
+	}
+	allow = { free_relations >= 1 }
+	on_accept = {
+		guarantee = scope:recipient
+		reverse_add_opinion = { target = scope:recipient value = 30 name = "Guaranteed us" }
+	}
+}
+
+fabricate_claim = {
+	name = "Fabricate Claim"
+	desc = "Forge documents proving one of their states is rightfully ours. Claims give a cheaper casus belli."
+	cost = 30
+	cooldown_days = 365
+	potential = {
+		borders = scope:recipient
+		NOT = { is_allied_with = scope:recipient }
+	}
+	allow = { gold >= 30 }
+	on_accept = {
+		fabricate_claim = { target = scope:recipient }
+		reverse_add_opinion = { target = scope:recipient value = -25 name = "Fabricated claims" }
+	}
+	ai_will_do = {
+		base = 0
+		modifier = { add = 1 military_strength > scope:recipient.military_strength }
+		modifier = { factor = 0 is_at_war = yes }
+	}
+}
+
+declare_war = {
+	name = "Declare War"
+	desc = "The best available casus belli is used (claims are cheaper in peace deals)."
+	potential = {
+		NOT = { is_at_war_with = scope:recipient }
+		NOT = { is_allied_with = scope:recipient }
+	}
+	allow = {
+		can_declare_war_on = scope:recipient
+		num_of_divisions >= 1
+	}
+	on_accept = {
+		declare_war = scope:recipient
+	}
+	ai_will_do = {
+		base = 0
+		modifier = {
+			add = 4
+			has_claim_on = scope:recipient
+			borders = scope:recipient
+			military_strength > scope:recipient.military_strength
+		}
+		modifier = { factor = 0 is_at_war = yes }
+	}
+}
+
+demand_subjugation = {
+	name = "Demand Subjugation"
+	desc = "Demand that they become our client state."
+	requires_acceptance = yes
+	cooldown_days = 730
+	potential = {
+		borders = scope:recipient
+		NOT = { is_subject_of = scope:recipient }
+		NOT = { is_overlord_of = scope:recipient }
+		NOT = { is_at_war_with = scope:recipient }
+	}
+	allow = { free_relations >= 1 }
+	ai_acceptance = {
+		base = -60
+		opinion_factor = 0.3
+		strength_factor = 20
+		modifier = { add = -50 scope:recipient = { num_of_states >= 4 } }
+	}
+	on_accept = {
+		make_subject = { target = scope:recipient type = client_state }
+	}
+	on_decline = {
+		reverse_add_opinion = { target = scope:recipient value = -30 name = "Demanded our submission" }
+	}
+}
+
+release_subject = {
+	name = "Release Subject"
+	potential = { is_overlord_of = scope:recipient }
+	on_accept = {
+		release_subject = scope:recipient
+		reverse_add_opinion = { target = scope:recipient value = 50 name = "Released us" }
+	}
+}

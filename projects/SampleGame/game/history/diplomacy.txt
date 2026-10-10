@@ -1,0 +1,6 @@
+# Starting relations: alliance, military_access, guarantee, subject, opinion, truce, war
+
+alliance = { first = VAL second = OST }
+opinion = { from = KES to = DRV value = -40 name = "Old grudge" decay = 0 }
+guarantee = { guarantor = THA guaranteed = MAR }
+opinion = { from = ZEM to = THA value = -30 name = "Border disputes" decay = 0 }

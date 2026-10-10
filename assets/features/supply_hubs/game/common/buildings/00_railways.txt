@@ -1,0 +1,15 @@
+# Railways and supply hubs (supply_hubs feature).
+railway = {
+	name = "Railway"
+	desc = "Connects supply hubs to the capital. A hub only works while friendly states with railways link it to the capital."
+	cost = 1600
+	max_level = 5
+	category = infrastructure
+}
+supply_hub = {
+	name = "Supply Hub"
+	desc = "Feeds supply to the land around it when connected to the capital by railways."
+	cost = 6000
+	max_level = 1
+	category = infrastructure
+}

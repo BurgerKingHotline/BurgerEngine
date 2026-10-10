@@ -1,0 +1,6 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Fog of war"
+category = "Military"
+order = 20
+description = "Players only see their own land, their allies and what is around their armies; the rest of the map is greyed out and enemy armies are hidden."
+defines = { fog_of_war = yes }

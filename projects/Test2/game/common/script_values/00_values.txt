@@ -1,0 +1,25 @@
+# Script values: named formulas usable anywhere a number is (triggers, effects, text: [ROOT.army_size]).
+army_size = {
+	value = num_of_divisions
+}
+
+total_tax = {
+	value = 0
+	every_owned_state = { add = tax }
+}
+
+feast_cost = {
+	value = 20
+	add = { value = num_of_states multiply = 5 }
+	round = yes
+}
+
+# Defining one of these names REPLACES an engine formula (no C# needed). Remove the # to try:
+#   country_monthly_income, country_monthly_expenses, country_monthly_manpower, max_diplomatic_relations,
+#   character_yearly_death_chance, character_yearly_birth_chance, division_combat_power,
+#   division_org_recovery, location_war_value, base_opinion
+#
+# country_monthly_income = {
+#     value = total_tax
+#     multiply = { value = stability divide = 100 add = 0.5 }    # stable realms collect more
+# }
