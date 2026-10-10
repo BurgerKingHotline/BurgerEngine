@@ -333,6 +333,7 @@ public sealed class App
         var map = Renderer!;
         var cam = Camera!;
         _hud!.HandleKeys();
+        // camera input + damped movement are resolved here, before BeginDrawing - never inside the draw loop
         cam.Update(dt, Gui.MouseOverUi, false, !_hud.KeyboardCaptured);
         var hovered = Gui.MouseOverUi ? null : map.Pick(Gui.Mouse, cam.Camera);
         if (hovered != map.Hovered) { map.Hovered = hovered; map.Dirty = true; }
