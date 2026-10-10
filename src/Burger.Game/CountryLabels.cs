@@ -543,7 +543,7 @@ public sealed class CountryLabels
             for (int i = 0; i < n; i++)
             {
                 var p = lb.Points[i];
-                scr[i] = Viewport.ToScreen(new Vector3(p.X / ppu, lb.Heights[i], p.Y / ppu), cam);
+                scr[i] = Viewport.SnapToScreen(new Vector3(p.X / ppu, lb.Heights[i], p.Y / ppu), cam);
                 minX = Math.Min(minX, scr[i].X); maxX = Math.Max(maxX, scr[i].X); minY = Math.Min(minY, scr[i].Y); maxY = Math.Max(maxY, scr[i].Y);
             }
             if (maxX < -100 || minX > Viewport.W + 100 || maxY < -100 || minY > Viewport.H + 100) continue;

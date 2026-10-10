@@ -34,7 +34,7 @@ public sealed class MapOverlay
             foreach (var l in _game.World.Locations)
             {
                 if (l.IsWater || l.PixelCount < 30) continue;
-                var s = Viewport.ToScreen(_map.LocationPos(l, 0.1f), cam);
+                var s = Viewport.SnapToScreen(_map.LocationPos(l, 0.1f), cam);
                 if (!OnScreen(s, 0)) continue;
                 string name = l.DisplayName;
                 var m = Gui.Measure(name, 13);
@@ -63,7 +63,7 @@ public sealed class MapOverlay
         foreach (var b in w.Battles)
         {
             if (!_game.IsVisible(b.Location)) continue; // fog of war
-            var s = Viewport.ToScreen(_map.LocationPos(b.Location, 0.3f), cam);
+            var s = Viewport.SnapToScreen(_map.LocationPos(b.Location, 0.3f), cam);
             if (!OnScreen(s)) continue;
             float r = 13 * scale;
             Raylib.DrawCircleV(s, r + 3, new Color(0, 0, 0, 160));
@@ -89,13 +89,13 @@ public sealed class MapOverlay
             int slot = perLocation.TryGetValue(loc, out var k) ? k : 0;
             perLocation[loc] = slot + 1;
             var basePos = _map.LocationPos(loc, 0.35f);
-            var s = Viewport.ToScreen(basePos, cam);
+            var s = Viewport.SnapToScreen(basePos, cam);
             if (!OnScreen(s)) continue;
             // moving units are drawn part of the way to their next location
             var first = g.First();
             if (first.Path.Count > 0 && first.Battle == null && g.All(d => d.Path.Count > 0 && d.Path[0] == first.Path[0]))
             {
-                var next = Viewport.ToScreen(_map.LocationPos(first.Path[0], 0.35f), cam);
+                var next = Viewport.SnapToScreen(_map.LocationPos(first.Path[0], 0.35f), cam);
                 s = Vector2.Lerp(s, next, (float)Math.Clamp(first.MoveProgress, 0, 1) * 0.8f);
             }
             float cw = 50 * scale, ch = 22 * scale;
@@ -159,10 +159,10 @@ public sealed class MapOverlay
         // route of the selected fleet
         if (ui.SelectedFleet is { Path.Count: > 0 } sf)
         {
-            var from = Viewport.ToScreen(_map.LocationPos(sf.Location, 0.3f), cam);
+            var from = Viewport.SnapToScreen(_map.LocationPos(sf.Location, 0.3f), cam);
             foreach (var l in sf.Path)
             {
-                var to = Viewport.ToScreen(_map.LocationPos(l, 0.3f), cam);
+                var to = Viewport.SnapToScreen(_map.LocationPos(l, 0.3f), cam);
                 Raylib.DrawLineEx(from, to, 3, new Color(120, 200, 250, 230));
                 from = to;
             }
@@ -175,9 +175,9 @@ public sealed class MapOverlay
             if (f.Owner != player && !_game.IsVisible(f.Location)) continue;
             int slot = perLocation.TryGetValue(f.Location, out var k) ? k : 0;
             perLocation[f.Location] = slot + 1;
-            var s = Viewport.ToScreen(_map.LocationPos(f.Location, 0.35f), cam);
+            var s = Viewport.SnapToScreen(_map.LocationPos(f.Location, 0.35f), cam);
             if (f.Path.Count > 0)
-                s = Vector2.Lerp(s, Viewport.ToScreen(_map.LocationPos(f.Path[0], 0.35f), cam), (float)Math.Clamp(f.MoveProgress, 0, 1) * 0.8f);
+                s = Vector2.Lerp(s, Viewport.SnapToScreen(_map.LocationPos(f.Path[0], 0.35f), cam), (float)Math.Clamp(f.MoveProgress, 0, 1) * 0.8f);
             if (!OnScreen(s)) continue;
             float cw = 46 * scale, ch = 20 * scale;
             var rect = new Rectangle(s.X - cw / 2, s.Y + 16 * scale + slot * (ch + 8 * scale), cw, ch);
@@ -231,7 +231,7 @@ public sealed class MapOverlay
             var st = g.Key;
             if (st.Locations.Count == 0) continue;
             var loc = st.Locations.OrderByDescending(l => l.PixelCount).First();
-            var s = Viewport.ToScreen(_map.LocationPos(loc, 0.35f), cam);
+            var s = Viewport.SnapToScreen(_map.LocationPos(loc, 0.35f), cam);
             if (!OnScreen(s)) continue;
             float cw = 46 * scale, ch = 18 * scale;
             var rect = new Rectangle(s.X - cw / 2, s.Y - 34 * scale, cw, ch);
@@ -275,7 +275,7 @@ public sealed class MapOverlay
                 Vector2? prev = null;
                 foreach (var (x, y) in adj.BorderPoints)
                 {
-                    var s = Viewport.ToScreen(_map.WorldPos(x, y, 0.15f), cam);
+                    var s = Viewport.SnapToScreen(_map.WorldPos(x, y, 0.15f), cam);
                     if (prev != null && Vector2.Distance(prev.Value, s) < 80) Raylib.DrawLineEx(prev.Value, s, thick, col);
                     prev = s;
                 }
@@ -291,8 +291,8 @@ public sealed class MapOverlay
             {
                 var pts = army.FrontPairs.Count > 0 ? army.FrontPairs.Select(p => p.Own).Distinct().ToList() : army.Divisions.Select(d => d.Location).ToList();
                 var start3 = new Vector2(pts.Average(l => l.CenterX), pts.Average(l => l.CenterY));
-                var a = Viewport.ToScreen(_map.WorldPos(start3.X, start3.Y, 0.4f), cam);
-                var b = Viewport.ToScreen(_map.LocationPos(army.Objective, 0.4f), cam);
+                var a = Viewport.SnapToScreen(_map.WorldPos(start3.X, start3.Y, 0.4f), cam);
+                var b = Viewport.SnapToScreen(_map.LocationPos(army.Objective, 0.4f), cam);
                 if (OnScreen(a, 2000) && OnScreen(b, 2000) && Vector2.Distance(a, b) > 8)
                 {
                     var col = army.Mode == ArmyMode.Offensive ? new Color(225, 55, 45, sel ? 245 : 190) : new Color(225, 160, 60, sel ? 230 : 160);
@@ -328,7 +328,7 @@ public sealed class MapOverlay
                 Vector2? prev = null;
                 foreach (var l in line)
                 {
-                    var p = Viewport.ToScreen(_map.LocationPos(l, 0.3f), cam);
+                    var p = Viewport.SnapToScreen(_map.LocationPos(l, 0.3f), cam);
                     if (prev != null)
                     {
                         // dashed segment
@@ -344,7 +344,7 @@ public sealed class MapOverlay
             if (sel && army.FrontLimit.Count > 0)
                 foreach (var l in army.FrontLimit)
                 {
-                    var p = Viewport.ToScreen(_map.LocationPos(l, 0.3f), cam);
+                    var p = Viewport.SnapToScreen(_map.LocationPos(l, 0.3f), cam);
                     Raylib.DrawCircleLines((int)p.X, (int)p.Y, 7, new Color(120, 230, 120, 230));
                     Raylib.DrawCircleLines((int)p.X, (int)p.Y, 8, new Color(0, 0, 0, 160));
                 }
@@ -353,10 +353,10 @@ public sealed class MapOverlay
         foreach (var d in ui.SelectedDivisions)
         {
             if (d.Path.Count == 0) continue;
-            var from = Viewport.ToScreen(_map.LocationPos(d.Location, 0.3f), cam);
+            var from = Viewport.SnapToScreen(_map.LocationPos(d.Location, 0.3f), cam);
             foreach (var l in d.Path)
             {
-                var to = Viewport.ToScreen(_map.LocationPos(l, 0.3f), cam);
+                var to = Viewport.SnapToScreen(_map.LocationPos(l, 0.3f), cam);
                 Raylib.DrawLineEx(from, to, 3, d.AttackTarget == l ? new Color(230, 60, 60, 230) : new Color(250, 220, 90, 220));
                 from = to;
             }
