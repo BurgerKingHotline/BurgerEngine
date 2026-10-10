@@ -23,6 +23,18 @@ public static class Viewport
     public static Vector2 ToScreen(Vector3 world, Camera3D cam) => Raylib.GetWorldToScreenEx(world, cam, W, H);
 
     /// <summary>
+    /// Unprojects a screen point onto the plane y = planeY. Returns null if the ray doesn't hit it ahead of the eye.
+    /// </summary>
+    public static Vector3? ScreenToPlane(Vector2 screen, Camera3D cam, float planeY)
+    {
+        var ray = Ray(screen, cam);
+        if (Math.Abs(ray.Direction.Y) < 1e-4f) return null;
+        float t = (planeY - ray.Position.Y) / ray.Direction.Y;
+        if (t < 0) return null;
+        return ray.Position + ray.Direction * t;
+    }
+
+    /// <summary>
     /// Projects a world point to screen space and snaps X/Y to whole pixels. Use for text/UI overlays:
     /// sub-pixel positions make glyphs shimmer while the camera moves.
     /// </summary>

@@ -21,7 +21,8 @@ public sealed class CameraController
     public float MaxDistance;
     /// <summary>Damping strength per frame: currentPos += (targetPos - currentPos) * SmoothFactor. Default 0.15f.</summary>
     public float SmoothFactor = 0.15f;
-    private Vector3? _dragAnchor;
+    private Vector2? _dragAnchor; // screen-space cursor position while middle-dragging
+    private Vector3 _dragTarget;  // logical Target captured at drag start / last re-anchor
 
     // Internal smoothed state (the "current" side of the Lerp). Read-only from outside.
     private Vector3 _currentPos;
@@ -72,8 +73,14 @@ public sealed class CameraController
         float wheel = Raylib.GetMouseWheelMove();
         if (wheel != 0 && !mouseOverUi && !wheelUsed)
         {
-            // keep the ground point under the cursor stable around the smoothed camera, then adjust the logical zoom
-            var before = _map.GroundPoint(mouse, Camera);
+            // Keep the world point under the cursor attached to the cursor while zooming.
+            // IMPORTANT: all projections use the DESIRED (logical) camera, never the damped one.
+            // The damped camera lags behind the logical pose, so anchoring against it makes each
+            // frame's correction compound onto the previous lag — the focus point visibly jumps
+            // around the map instead of staying pinned to the mouse. Anchoring against the logical
+            // pose is self-consistent: damping only smooths the visual travel, never the anchor math.
+            var desiredNow = BuildDesiredCamera(out _);
+            var before = _map.GroundPoint(mouse, desiredNow);
             Distance = Math.Clamp(Distance * MathF.Pow(0.85f, wheel), MinDistance, MaxDistance);
             if (before != null)
             {
@@ -82,13 +89,33 @@ public sealed class CameraController
             }
         }
 
-        // middle mouse drag
-        if (Raylib.IsMouseButtonPressed(MouseButton.Middle) && !mouseOverUi) _dragAnchor = _map.GroundPoint(mouse, Camera);
+        // Middle mouse drag: pan by tracking the cursor in SCREEN space against the logical camera.
+        // Re-projecting through a moving camera (ground-point delta) feeds back into itself every
+        // frame and causes the jumping described above; screen-space deltas are pure input and stable.
+        if (Raylib.IsMouseButtonPressed(MouseButton.Middle) && !mouseOverUi)
+        {
+            _dragAnchor = mouse; // screen-space anchor
+            _dragTarget = Target; // logical target at drag start
+        }
         if (Raylib.IsMouseButtonReleased(MouseButton.Middle)) _dragAnchor = null;
         if (_dragAnchor != null && Raylib.IsMouseButtonDown(MouseButton.Middle))
         {
-            var now = _map.GroundPoint(mouse, Camera);
-            if (now != null) Target += _dragAnchor.Value - now.Value;
+            Vector2 delta = mouse - _dragAnchor.Value;
+            if (delta != Vector2.Zero)
+            {
+                var cam = BuildDesiredCamera(out _);
+                // project the drag-start focus point, offset it by the cursor movement, and unproject
+                // onto the same y-plane the focus sits on (terrain height is sampled once at capture,
+                // so the math can't feed back into itself as the camera moves)
+                var s0 = Viewport.ToScreen(_dragTarget, cam);
+                var p1 = Viewport.ScreenToPlane(new Vector2(s0.X - delta.X, s0.Y - delta.Y), cam, _dragTarget.Y);
+                if (p1 != null)
+                {
+                    Target = new Vector3(p1.Value.X, 0, p1.Value.Z);
+                    _dragAnchor = mouse; // re-anchor each frame so drift can't accumulate
+                    _dragTarget = Target;
+                }
+            }
         }
 
         ClampLogical();
