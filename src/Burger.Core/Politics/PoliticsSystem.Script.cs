@@ -54,6 +54,7 @@ public sealed partial class PoliticsSystem
         {
             if (ctx.This is not Country c || !Enabled) return;
             string? ideology = n.GetString("ideology");
+            if (string.Equals(ideology, "ruling", StringComparison.OrdinalIgnoreCase)) ideology = Of(c).Ruling;
             if (ideology == null || !IdeologyByKey.ContainsKey(ideology)) { Log.ErrorOnce("addpop:" + ideology, $"add_popularity: unknown ideology '{ideology}'"); return; }
             AddPopularity(c, ideology, s.ResolveNumber(n.GetString("value") ?? n.GetString("popularity"), ctx));
         }, (ctx, n) => $"{Name(n.GetString("ideology"))} popularity: {ScriptEngine.FormatSigned(100 * s.ResolveNumber(n.GetString("value") ?? n.GetString("popularity"), ctx))}%");

@@ -21,6 +21,7 @@ public static class WorldLoader
         LoadUnits(game);
         LoadDiplomacy(game);
         game.Politics.LoadHistory();
+        game.Population.InitWorld();
         game.Warfare.RebuildIndex();
     }
 

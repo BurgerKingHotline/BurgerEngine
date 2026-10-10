@@ -46,6 +46,9 @@ public sealed partial class Studio
          : k == Specs.Ideologies || k == Specs.Governments ? FeatureSet.Politics
          : k == Specs.LawGroups ? FeatureSet.Laws
          : k == Specs.CabinetPosts ? FeatureSet.Cabinet
+         : k == Specs.CultureGroups ? FeatureSet.Population
+         : k == Specs.ReligionGroups ? FeatureSet.Religion
+         : k == Specs.PopTypes ? FeatureSet.SocialClasses
          : null;
 
     public bool KindAvailable(BlockSpec k)

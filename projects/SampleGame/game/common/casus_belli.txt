@@ -1,17 +1,107 @@
-# Reasons for war. allow: ROOT = the attacker, scope:recipient = the target.
-# The engine picks the valid casus belli with the highest ai_weight when war is declared.
+# Reasons for war (EU style). allow: ROOT = the attacker, scope:recipient = the target (optional extra conditions).
+# The engine picks the valid casus belli with the highest ai_weight when war is declared without choosing one;
+# the player picks one in the Declare War window.
+#   war_goal               what the war is about - decides which demands are cheaper and whether the CB is valid at all:
+#                            conquest     any land                         claims    states we claim
+#                            cores        states that are our cores        culture   states where our culture is the majority
+#                            religion     states where our faith is the majority
+#                            liberation   free a people the enemy does not accept (peace term: release them as a country)
+#                            ideology     regime change (peace term: put our ideology in power) and land
+#                            independence a subject fighting its overlord (peace term: independence)
+#                            subjugation  make them a subject        humiliation  take their prestige and stability
+#                          claims/cores/culture/religion/liberation need at least one such state to be valid.
+#   goal_cost_multiplier   price of demands that match the war goal (default 0.5)
+#   peace_cost_multiplier  price of all other demands
+#   max_demands            highest total war-score cost of a peace deal (default 100)
+#   ticking_war_score      holding the goal states adds war score every month (up to 25); not holding any after a year loses it
+#   others_opinion         opinion every other country gets of the attacker (infamy)
+# Allies that join a war add their own goals (their best land casus belli against an enemy): faction war goals.
+
+reclaim_cores = {
+	name = "Reclaim Cores"
+	war_goal = cores
+	goal_cost_multiplier = 0.4
+	peace_cost_multiplier = 1.0
+	ticking_war_score = yes
+	others_opinion = -3
+	ai_weight = 20
+}
+cultural_unification = {
+	name = "Cultural Unification"
+	allow = { has_feature = population }
+	war_goal = culture
+	goal_cost_multiplier = 0.5
+	ticking_war_score = yes
+	others_opinion = -5
+	ai_weight = 15
+}
 claim = {
 	name = "Press Claims"
-	allow = {
-		scope:recipient = { any_owned_state = { is_claimed_by = ROOT } }
-	}
-	peace_cost_multiplier = 0.75   # demands are cheaper
-	others_opinion = -5            # everyone else dislikes the aggressor a little
+	war_goal = claims
+	goal_cost_multiplier = 0.5
+	peace_cost_multiplier = 0.9
+	ticking_war_score = yes
+	others_opinion = -5
 	ai_weight = 10
+}
+independence = {
+	name = "War of Independence"
+	allow = { liberty_desire >= 50 }
+	war_goal = independence
+	goal_cost_multiplier = 0.5
+	max_demands = 60
+	others_opinion = 0
+	ai_weight = 30
+}
+liberation = {
+	name = "Liberation"
+	allow = { has_feature = population }
+	war_goal = liberation
+	goal_cost_multiplier = 0.5
+	max_demands = 80
+	others_opinion = -2
+	ai_weight = 0.5   # the AI frees peoples only when nothing better is at hand
+}
+ideological_war = {
+	name = "Ideological War"
+	allow = { has_feature = politics ideological_enemy = scope:recipient }
+	war_goal = ideology
+	goal_cost_multiplier = 0.5
+	peace_cost_multiplier = 1.0
+	others_opinion = -12
+	ai_weight = 5
+}
+holy_war = {
+	name = "Holy War"
+	allow = { has_feature = religion NOT = { same_religion_group = scope:recipient } }
+	war_goal = religion
+	goal_cost_multiplier = 0.6
+	others_opinion = -10
+	ai_weight = 4
+}
+subjugation = {
+	name = "Subjugation"
+	allow = { stronger_than = { target = scope:recipient ratio = 2 } }
+	war_goal = subjugation
+	goal_cost_multiplier = 0.5
+	max_demands = 60
+	others_opinion = -15
+	ai_weight = 3
+}
+humiliation = {
+	name = "Humiliate"
+	allow = { opinion = { target = scope:recipient value < -50 } }
+	war_goal = humiliation
+	goal_cost_multiplier = 0.5
+	max_demands = 40
+	others_opinion = -5
+	ai_weight = 2
 }
 conquest = {
 	name = "Conquest"
 	allow = { always = yes }
+	war_goal = conquest
+	goal_cost_multiplier = 1.0
 	peace_cost_multiplier = 1.0
 	others_opinion = -25
 	ai_weight = 1

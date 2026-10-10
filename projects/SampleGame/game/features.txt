@@ -22,4 +22,11 @@ features = {
 	laws
 	cabinet
 	civil_wars
+	population
+	religion
+	social_classes
+	cores_claims
+	colonization
+	buildings_classic
+	independence
 }

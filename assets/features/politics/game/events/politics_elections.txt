@@ -1,0 +1,49 @@
+# Election campaigns (politics feature). The engine fires on_election_campaign (common/on_actions/20_politics.txt)
+# for every country that holds elections, election_campaign_days (60) before the vote.
+namespace = election
+
+country_event = {
+	id = election.1
+	title = "Election Campaign"
+	desc = "The election is two months away. The governing party asks how hard it should campaign - and what it may promise."
+	is_triggered_only = yes
+	trigger = { holds_elections = yes }
+	option = {
+		name = "Rally the voters across the country"
+		trigger = { political_power >= 50 }
+		add_political_power = -50
+		add_popularity = { ideology = ruling value = 0.06 }
+		ai_chance = { factor = 1 modifier = { factor = 2 ruling_popularity < 0.4 } }
+	}
+	option = {
+		name = "Promise generous reforms"
+		add_popularity = { ideology = ruling value = 0.03 }
+		add_stability = -3
+		ai_chance = { factor = 1 }
+	}
+	option = {
+		name = "Run a quiet campaign"
+		add_political_power = 20
+		ai_chance = { factor = 1 modifier = { factor = 2 ruling_popularity > 0.55 } }
+	}
+}
+
+country_event = {
+	id = election.2
+	title = "Campaign Scandal"
+	desc = "A newspaper has uncovered bribes paid by the governing party's campaign managers."
+	is_triggered_only = yes
+	trigger = { holds_elections = yes }
+	option = {
+		name = "Deny everything"
+		add_popularity = { ideology = ruling value = -0.04 }
+		ai_chance = { factor = 1 }
+	}
+	option = {
+		name = "Sack the managers"
+		trigger = { political_power >= 30 }
+		add_political_power = -30
+		add_popularity = { ideology = ruling value = -0.01 }
+		ai_chance = { factor = 1 }
+	}
+}

@@ -1,0 +1,15 @@
+# Claims from religion (cores_claims feature, with religion). Cultural claims are made automatically every year.
+claim_fellow_believers = {
+	name = "Claim Fellow Believers' Land"
+	desc = "Claim the neighbouring states of this country where our faith is the majority."
+	potential = {
+		has_feature = religion
+		has_fellow_believers_in = scope:recipient
+	}
+	cooldown_days = 365
+	on_accept = {
+		add_religious_claims = scope:recipient
+		reverse_add_opinion = { target = scope:recipient value = -25 name = "Claimed our land" }
+	}
+	ai_will_do = { base = 0.3 modifier = { add = 1 stronger_than = { target = scope:recipient ratio = 1.5 } } }
+}

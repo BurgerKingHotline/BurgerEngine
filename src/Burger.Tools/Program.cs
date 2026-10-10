@@ -248,13 +248,36 @@ public static class Program
             Console.WriteLine($"  battle plans: {game.World.Armies.Count(x => x.Objective != null)} armies with an offensive arrow, {game.World.Armies.Count(x => x.Fallback.Count > 0)} with a fallback line");
         if (game.Features.Has(FeatureSet.LendLease))
             Console.WriteLine($"  lend-lease: {game.Support.Deals.Count} deals, {game.Support.EquipmentSent:0} equipment sent; volunteers: {game.Support.VolunteersSent} sent, {game.World.Divisions.Count(d => d.VolunteerFrom != null)} abroad now");
+        if (game.Population.Enabled)
+        {
+            var Pop = game.Population;
+            var alive = game.World.Countries.Where(c => c.Exists).ToList();
+            double now = game.World.States.Sum(Pop.TotalOf), start = game.World.States.Sum(s => Pop.HasPops(s) ? Pop.Of(s).InitialTotal : 0);
+            int foreignMajority = game.World.States.Count(s => s.Owner != null && Pop.MajorityCulture(s) is { } mc && !Pop.IsAccepted(s.Owner, mc));
+            Console.WriteLine($"  population: {Burger.Core.Population.PopulationSystem.Format(now)} people ({(start > 0 ? (now / start - 1) : 0):+0.0%;-0.0%} since the start), {Pop.CultureByKey.Count} cultures, " +
+                              $"{foreignMajority} states with a foreign majority" + (Pop.ReligionEnabled ? $", {Pop.ReligionByKey.Count} religions" : "") +
+                              (Pop.CoresEnabled ? $", cores +{Pop.CoresGained}/-{Pop.CoresLost}, {Pop.ClaimsMade} claims" : "") +
+                              (Pop.ColonizationEnabled ? $", {Pop.ColoniesFounded} colonies ({game.World.States.Count(s => s.Owner == null)} unowned states left)" : "") +
+                              $", {Pop.BuildingsBuilt} gold buildings" +
+                              (Pop.IndependenceEnabled ? $", {Pop.Independence.Count} independence movements (strongest {(Pop.Independence.Count > 0 ? Pop.Independence.Max(m => m.Progress) : 0):0}%), {Pop.IndependenceDeclared} declared independence ({Pop.IndependenceWon} won, {Pop.IndependenceCrushed} crushed, {Pop.IndependenceWars.Count} wars active)" : ""));
+        }
         if (game.Politics.Enabled)
         {
             var P = game.Politics;
             var alive = game.World.Countries.Where(c => c.Exists).ToList();
             Console.WriteLine($"  politics: rulers {string.Join(", ", alive.GroupBy(c => P.Of(c).Ruling).OrderByDescending(g => g.Count()).Select(g => $"{g.Key} {g.Count()}"))}; " +
                               $"{alive.Count(P.HoldsElections)} hold elections, {P.ElectionsHeld} elections, {P.GovernmentChanges} government changes, {P.LawsChanged} laws changed" +
-                              (P.CivilWarsEnabled ? $", {P.Movements.Count} movements, {P.CivilWarsStarted} civil wars ({P.CivilWars.Count} active), {P.Revolutions} revolutions/coups" : ""));
+                              (P.CivilWarsEnabled ? $", {P.Movements.Count} movements, {P.CivilWarsStarted} civil wars ({P.CivilWars.Count} active), {P.Revolutions} revolutions ({P.Coups} coups)" : ""));
+        }
+        if (game.Features.Has(FeatureSet.Diplomacy))
+        {
+            var D = game.Diplomacy;
+            var R = game.World.Relations;
+            var alive = game.World.Countries.Where(c => c.Exists).ToList();
+            var subj = R.Subjects.Keys.Where(c => c.Exists).ToList();
+            Console.WriteLine($"  diplomacy: casus belli used {string.Join(", ", D.CasusBelliUsed.OrderByDescending(kv => kv.Value).Select(kv => $"{kv.Key} {kv.Value}"))}; " +
+                              $"{D.PeaceDeals} peace deals ({D.WhitePeaces} white), {R.Pacts.Count} pacts, {subj.Count} subjects (liberty {(subj.Count > 0 ? subj.Average(D.LibertyDesire) : 0):0}% avg), " +
+                              $"war exhaustion avg {(alive.Count > 0 ? alive.Average(D.WarExhaustion) : 0):0.0} (max {(alive.Count > 0 ? alive.Max(D.WarExhaustion) : 0):0.0}), {D.MenLost.Values.Sum() / 1e6:0.0}M war dead");
         }
     }
 
@@ -428,7 +451,9 @@ public static class Program
                 Check(fought > 0, $"combat model '{model}': {fought} battles fought, war score {g3.World.WarBetween(a, b)?.WarScore ?? 0:0}");
             }
             if (game.Features.Has(FeatureSet.Military) && game.Features.Has(FeatureSet.Diplomacy)) MilitaryFeatureTests(project);
+            if (game.Features.Has(FeatureSet.Military) && game.Features.Has(FeatureSet.Diplomacy)) WarGoalTests(project);
             if (game.Features.Has(FeatureSet.Politics)) PoliticsFeatureTests(project);
+            if (game.Features.Has(FeatureSet.Population)) PopulationFeatureTests(project);
         }
         int simErrors = Log.ErrorCount - errorsBefore;
         if (simErrors > 0)
@@ -503,6 +528,213 @@ public static class Program
         }
     }
 
+    /// <summary>Growth, assimilation, conversion, cores, colonies and saving of pops (when installed).</summary>
+    /// <summary>Casus belli and war goals, ticking war score, faction goals, war exhaustion and AI peace, pacts, liberty desire and
+    /// independence wars, diplomatic plays, the end of a country (player becomes an observer, nothing of it keeps acting).</summary>
+    private static void WarGoalTests(string project)
+    {
+        var g = Game.Load(GameDir(project), compileScripts: true, seed: 9);
+        g.StartNewGame(null);
+        g.Ai.Enabled = false;
+        var D = g.Diplomacy;
+        var a = g.World.Countries.Where(c => c.Exists && Builtins.NeighborCountries(g, c).Count >= 2).OrderByDescending(c => c.OwnedStates.Count).First();
+        var b = Builtins.NeighborCountries(g, a).Where(x => x.OwnedStates.Count >= 2).OrderByDescending(x => x.OwnedStates.Count).First();
+        foreach (var t in g.World.Relations.Truces.Keys.ToList()) g.World.Relations.Truces.Remove(t);
+        g.World.Relations.SetAlliance(a, b, false);
+        // a lost core gives a cheap casus belli
+        var core = b.OwnedStates.Where(s => s != b.Capital?.State).OrderBy(s => s.Index).First();
+        core.Cores.Add(a);
+        var cbs = D.ValidCasusBelli(a, b);
+        var reclaim = cbs.FirstOrDefault(cb => cb.WarGoal == WarGoalType.Cores);
+        Check(reclaim != null, $"war goals: a lost core gives {a.Tag} a casus belli on {b.Tag} ({string.Join(", ", cbs.Select(cb => cb.Key))})");
+        if (reclaim == null) return;
+        var war = D.DeclareWar(a, b, reclaim)!;
+        Check(war != null && war.Goals.Count >= 1 && war.Goals[0].Holder == a && D.GoalStates(war.Goals[0]).Contains(core), "war goals: the war is about the core state");
+        var goalTerm = new PeaceTerm { Type = PeaceTermType.TransferState, State = core, Beneficiary = a };
+        double goalCost = D.TermCost(war!, goalTerm, a, b);
+        var other = b.OwnedStates.FirstOrDefault(s => s != core && s != b.Capital?.State && !s.Cores.Contains(a) && !s.Claims.Contains(a));
+        if (other != null)
+        {
+            double otherCost = D.TermCost(war!, new PeaceTerm { Type = PeaceTermType.TransferState, State = other, Beneficiary = a }, a, b);
+            double size(State s) => s.Locations.Count;
+            Check(goalCost / size(core) < otherCost / size(other), $"war goals: the goal state is cheaper to demand ({goalCost:0.0} for {size(core)} locations vs {otherCost:0.0} for {size(other)})");
+        }
+        // holding the goal ticks war score
+        foreach (var l in core.Locations) g.Warfare.SetController(l, a, silent: true);
+        for (int m = 0; m < 3; m++) D.MonthlyTick();
+        Check(war!.TickingScore >= 3, $"war goals: holding the goal adds war score ({war.TickingScore:0})");
+        // an ally with its own claim adds its war goal (faction war goals)
+        var ally = Builtins.NeighborCountries(g, b).FirstOrDefault(x => x != a && !war.Involves(x));
+        if (ally != null)
+        {
+            var claim = b.OwnedStates.FirstOrDefault(s => s != core && s != b.Capital?.State);
+            if (claim != null)
+            {
+                claim.Claims.Add(ally);
+                D.JoinWar(ally, war, true);
+                Check(war.Goals.Any(x => x.Holder == ally && D.GoalStates(x).Contains(claim)), $"faction war goals: {ally.Tag} joined with its own claim on {claim.DisplayName}");
+            }
+        }
+        // war exhaustion makes the loser accept more
+        D.UpdateWarScores();
+        double score = war.ScoreFor(a);
+        var offer = new PeaceOffer { War = war, From = a, To = b, FromIsWinner = true };
+        foreach (var st in b.OwnedStates.Where(s => s != b.Capital?.State).OrderByDescending(s => s == core))
+        {
+            offer.Terms.Add(new PeaceTerm { Type = PeaceTermType.TransferState, State = st, Beneficiary = a });
+            if (D.OfferCost(offer) > Math.Max(0, score) + 15) break;
+        }
+        double cost = D.OfferCost(offer);
+        D.SetWarExhaustion(b, 0);
+        bool fresh = D.AiWouldAccept(offer);
+        D.SetWarExhaustion(b, 18);
+        bool tired = D.AiWouldAccept(offer);
+        Check(D.InvalidReason(offer) != null || (!fresh && tired), $"war exhaustion: {b.Tag} refuses demands worth {cost:0} at war score {score:0} when fresh, accepts when exhausted (fresh {fresh}, tired {tired})");
+        Check(g.Modifiers.Sum(b, "stability_target") < g.Modifiers.Sum(a, "stability_target") + 50 && D.ExhaustionModifierValue(b, "stability_target") < 0, "war exhaustion: it lowers stability");
+        for (int m = 0; m < 2; m++) D.MonthlyTick();
+        Check(D.WarExhaustion(a) > 0, $"war exhaustion: grows while at war ({a.Tag} {D.WarExhaustion(a):0.0})");
+        D.EndWar(war);
+        foreach (var t in g.World.Relations.Truces.Keys.ToList()) g.World.Relations.Truces.Remove(t);
+        // non-aggression pacts
+        D.CreatePact(a, b, 10);
+        Check(g.Rules.Diplomacy.CannotDeclareWarReason(g, a, b, reclaim) != null, "pacts: a non-aggression pact blocks war");
+        D.BreakPact(a, b);
+        Check(g.Rules.Diplomacy.CannotDeclareWarReason(g, a, b, reclaim) == null && D.Opinion(b, a) < 0, "pacts: breaking it allows war again and angers them");
+        // diplomatic play: cede the claimed state
+        int before = a.OwnedStates.Count;
+        g.RunEffect("cede_claimed_state = " + b.Tag, a);
+        Check(a.OwnedStates.Count == before + 1 && core.Owner == a, $"diplomatic play: {b.Tag} ceded {core.DisplayName}");
+        // liberty desire and a war of independence
+        var type = g.Data.SubjectTypes.Values.First();
+        double baseLd = type.LibertyDesire;
+        g.World.Relations.SetSubject(b, a, type);
+        type.LibertyDesire = 90;
+        D.MonthlyTick();
+        double ld = D.LibertyDesire(b);
+        var indep = g.Data.CasusBelli.Values.FirstOrDefault(cb => cb.WarGoal == WarGoalType.Independence);
+        Check(ld >= 50 && indep != null && g.Rules.Diplomacy.CannotDeclareWarReason(g, b, a, indep) == null, $"liberty desire: a subject at {ld:0}% may fight for independence");
+        if (indep != null && ld >= 50)
+        {
+            var iw = D.DeclareWar(b, a, indep);
+            var free = new PeaceOffer { War = iw!, From = b, To = a, FromIsWinner = true };
+            free.Terms.Add(new PeaceTerm { Type = PeaceTermType.Independence, Beneficiary = b });
+            Check(iw != null && D.InvalidReason(free) == null, "liberty desire: the war of independence can end with independence" + (iw != null ? $" ({D.InvalidReason(free)})" : ""));
+            if (iw != null) { D.ApplyPeace(free); Check(g.World.Relations.OverlordOf(b) == null, $"liberty desire: {b.Tag} is free"); }
+        }
+        type.LibertyDesire = baseLd;
+        // the end of a country: nothing keeps acting, and a player becomes an observer
+        foreach (var t in g.World.Relations.Truces.Keys.ToList()) g.World.Relations.Truces.Remove(t);
+        var victim = g.World.Countries.Where(c => c.Exists && c != a).OrderByDescending(c => g.Navy.FleetsOf(c).Count() + g.World.Divisions.Count(d => d.Owner == c)).First();
+        g.SetPlayer(victim.Tag);
+        g.Diplomacy.Annex(a, victim);
+        Check(!victim.Exists && g.World.Player == null && !g.Navy.FleetsOf(victim).Any() && !g.World.Divisions.Any(d => d.Owner == victim) && !g.Air.WingsOf(victim).Any(),
+              $"elimination: {victim.Tag} lost everything, its fleets, wings and divisions are gone and the player is an observer");
+        // the ledger knows the world total
+        g.Statistics.MonthlyTick();
+        Check(g.Statistics.WorldSeries("states").Last() > 0, "ledger: world totals");
+    }
+
+    private static void PopulationFeatureTests(string project)
+    {
+        var g = Game.Load(GameDir(project), compileScripts: true, seed: 21);
+        g.StartNewGame(null);
+        g.Ai.Enabled = false;
+        var P = g.Population;
+        var land = g.World.States.Where(s => s.Locations.Any(l => l.IsLand)).ToList();
+        Check(land.All(s => P.TotalOf(s) > 0) && g.World.Countries.Where(c => c.Exists).All(c => P.Of(c).Culture != null), "population: every land state has people and every country a culture");
+        var c = g.World.Countries.Where(x => x.Exists).OrderByDescending(x => x.OwnedStates.Count).First();
+        var st = c.OwnedStates.OrderBy(s => s.Index).First();
+        double before = P.TotalOf(st);
+        // a foreign minority of another culture group and religion
+        var foreign = P.CultureByKey.Values.FirstOrDefault(cu => !P.IsAccepted(c, cu.Key));
+        var otherFaith = P.ReligionEnabled ? P.ReligionByKey.Keys.FirstOrDefault(r => r != P.Of(c).Religion) : null;
+        if (foreign != null)
+        {
+            g.RunEffect($"add_pops = {{ culture = {foreign.Key} {(otherFaith != null ? $"religion = {otherFaith}" : "")} size = {before * 0.5:0} }}", st);
+            // shares of the state's people (the state may grow or take in migrants meanwhile)
+            double f0 = P.Of(st).Pops.Where(p => p.Culture == foreign.Key).Sum(p => p.Size) / P.TotalOf(st);
+            double r0 = otherFaith != null ? P.Of(st).Pops.Where(p => p.Religion == otherFaith).Sum(p => p.Size) / P.TotalOf(st) : 0;
+            for (int h = 0; h < 24 * 365; h++) g.Tick();
+            double f1 = P.Of(st).Pops.Where(p => p.Culture == foreign.Key).Sum(p => p.Size) / P.TotalOf(st);
+            Check(f1 < f0, $"population: a foreign minority assimilates ({f0:P1} -> {f1:P1} of the state in a year)");
+            if (otherFaith != null)
+            {
+                double r1 = P.Of(st).Pops.Where(p => p.Religion == otherFaith).Sum(p => p.Size) / P.TotalOf(st);
+                Check(r1 < r0, $"religion: people of another faith convert ({r0:P1} -> {r1:P1})");
+            }
+            // colonies are not assimilated or converted
+            var colony = c.OwnedStates.FirstOrDefault(s => s != st && s != c.Capital?.State && P.HasPops(s));
+            if (colony != null)
+            {
+                colony.Category = "colony";
+                Check(P.IsColony(colony) && g.Rules.Population.YearlyAssimilation(g, colony, P.Of(colony).Pops[0]) == 0
+                      && g.Rules.Population.YearlyConversion(g, colony, P.Of(colony).Pops[0]) == 0, "population: colonies are not assimilated or converted");
+                colony.Category = "";
+            }
+        }
+        else for (int h = 0; h < 24 * 365; h++) g.Tick();
+        Check(g.World.States.Sum(P.TotalOf) > 0 && Math.Abs(P.TotalOf(st) - before) > 0.5, $"population: people grow or move ({Burger.Core.Population.PopulationSystem.Format(before)} -> {Burger.Core.Population.PopulationSystem.Format(P.TotalOf(st))})");
+        if (P.CoresEnabled)
+        {
+            // a conquered state of a foreign culture becomes a core only after core_years
+            var other = g.World.Countries.First(x => x.Exists && x != c);
+            var target = other.OwnedStates.First();
+            g.Diplomacy.TransferState(target, c);
+            target.Cores.Remove(c);
+            for (int h = 0; h < 24 * 31; h++) g.Tick();
+            bool foreignMajority = P.MajorityCulture(target) is { } mc && !P.IsAccepted(c, mc);
+            Check(!foreignMajority || !target.Cores.Contains(c), "cores: a newly conquered foreign state is not a core");
+            P.Of(target).OwnedSinceDay -= (int)(g.Data.Defines.Get("core_years", 25) * 365) + 1;
+            for (int h = 0; h < 24 * 31; h++) g.Tick();
+            Check(!foreignMajority || !target.Cores.Contains(c), "cores: no core after core_years while under half the people are of our cultures");
+            // once most people there are of our culture (and we have held it long enough) it becomes a core
+            string own = P.Of(c).Culture!;
+            var tp = P.Of(target).Pops;
+            foreach (var p in tp) if (!P.IsAccepted(c, p.Culture)) p.Culture = own;
+            for (int h = 0; h < 24 * 31; h++) g.Tick();
+            Check(target.Cores.Contains(c), $"cores: a core once over half the people are of our cultures ({P.AcceptedShare(target, c):P0})");
+        }
+        if (P.ColonizationEnabled)
+        {
+            // make an owned border state unowned, then settle it from the neighbour
+            var empty = g.World.States.FirstOrDefault(s => s.Owner != null && s.Owner != c && s.Owner.OwnedStates.Count > 1 && P.NeighbourStates(s).Any(n => n.Owner == c));
+            if (empty != null)
+            {
+                var old = empty.Owner!;
+                empty.Owner = null;
+                foreach (var l in empty.Locations) l.Controller = null;
+                g.World.RefreshOwnership();
+                c.Gold += 1000;
+                var reason = P.Colonize(c, empty);
+                Check(reason == null, "colonization: colonists are sent to unowned land" + (reason != null ? $" ({reason})" : ""));
+                for (int m = 0; m < 60 && empty.Owner == null; m++) for (int h = 0; h < 24 * 30; h++) g.Tick();
+                Check(empty.Owner == c, $"colonization: the colony became a state of {c.Name}");
+            }
+        }
+        if (P.IndependenceEnabled)
+        {
+            // a state whose people are all of an unaccepted culture forms an independence movement, then breaks away
+            var sep = c.OwnedStates.Where(s => s != c.Capital?.State && P.HasPops(s)).OrderBy(s => s.Index).LastOrDefault();
+            var cult = P.CultureByKey.Values.FirstOrDefault(cu => !P.IsAccepted(c, cu.Key) && cu.Group.Key != "auto_cultures");
+            if (sep != null && cult != null)
+            {
+                foreach (var p in P.Of(sep).Pops) p.Culture = cult.Key;
+                for (int h = 0; h < 24 * 31; h++) g.Tick();
+                Check(P.IndependenceOf(c).Any(m => m.Culture == cult.Key), $"independence: a {cult.Name} movement forms in {sep.DisplayName}");
+                var free = P.DeclareIndependence(c, cult.Key);
+                Check(free != null && free.Exists && sep.Owner == free, $"independence: {free?.Name} broke away from {c.Name}");
+                if (free != null && g.Features.Has(FeatureSet.Military) && g.Features.Has(FeatureSet.Diplomacy))
+                    Check(g.World.AtWar(free, c) && P.InIndependenceWar(c) && g.World.Divisions.Any(d => d.Owner == free), "independence: it fights a war of independence with its own army");
+            }
+        }
+        string tmp = Path.Combine(Path.GetTempPath(), "burger_population.sav");
+        SaveGame.Save(g, tmp);
+        var g2 = Game.Load(GameDir(project), compileScripts: true, seed: 21);
+        SaveGame.Load(g2, tmp);
+        double t1 = g.World.States.Sum(P.TotalOf), t2 = g2.World.States.Sum(g2.Population.TotalOf);
+        Check(Math.Abs(t1 - t2) < 1 + t1 * 1e-6 && g2.Population.Of(g2.World.GetCountry(c.Tag)!).Culture == P.Of(c).Culture, "population: pops and cultures are saved");
+    }
+
     /// <summary>Elections, laws, movements and civil wars (when installed).</summary>
     private static void PoliticsFeatureTests(string project)
     {
@@ -553,11 +785,33 @@ public static class Program
                 g.Politics.MonthlyTick();
                 Check(P.MovementsOf(target).Any(), $"movements: a banned party with {P.PopularityOf(target, ban.Bans.First()):P0} support forms a movement");
             }
+            // a hugely popular shut-out ideology takes power in a coup when the government has little support
+            var dict = P.Ideologies.FirstOrDefault(i => !i.Elections);
+            var coupLand = alive.FirstOrDefault(x => x != c && x != target && x.Exists);
+            if (dict != null && coupLand != null)
+            {
+                P.SetRulingParty(coupLand, dict.Key);
+                var rival = P.Ideologies.First(i => i.Key != dict.Key);
+                P.AddPopularity(coupLand, rival.Key, 0.85 - P.PopularityOf(coupLand, rival.Key));
+                P.Of(coupLand).CalmUntilDay = int.MinValue;
+                for (int m = 0; m < 36 && P.Of(coupLand).Ruling == dict.Key; m++) g.Politics.MonthlyTick();
+                Check(P.Of(coupLand).Ruling != dict.Key && !P.InCivilWar(coupLand), $"coups: {rival.Name} with 85% support took power in {coupLand.Name} without a civil war (now {P.Of(coupLand).Ruling})");
+            }
             if (g.Features.Has(FeatureSet.Military) && g.Features.Has(FeatureSet.Diplomacy))
             {
                 var ide = P.Ideologies.First(i => i.Key != P.Of(c).Ruling).Key;
                 int statesBefore = c.OwnedStates.Count;
+                int divsBefore = g.World.Divisions.Count(d => d.Owner == c && d.VolunteerFrom == null);
                 var rebel = P.StartCivilWar(c, ide, 0.4);
+                if (rebel != null)
+                {
+                    int rd = g.World.Divisions.Count(d => d.Owner == rebel);
+                    Check(Math.Abs(rd - divsBefore * 0.4) <= 1.5, $"civil war: the rebels get their share of the army ({rd} of {divsBefore} divisions at 40% support)");
+                    g.Statistics.MonthlyTick();
+                    double ledgerStates = g.Statistics.Series("states", c.Tag).Last();
+                    Check(Math.Abs(ledgerStates - statesBefore) < 0.5 && double.IsNaN(g.Statistics.Series("states", rebel.Tag).Last()),
+                          $"ledger: rebels count as part of {c.Name} during the civil war ({ledgerStates} states)");
+                }
                 Check(rebel != null && rebel.Exists && c.OwnedStates.Count < statesBefore && g.World.AtWar(rebel, c), $"civil war: {rebel?.Name} split from {c.Name} ({rebel?.OwnedStates.Count} of {statesBefore} states)");
                 if (rebel != null)
                 {
@@ -574,6 +828,29 @@ public static class Program
                     Check(!rebel.Exists && c.Exists && P.Of(c).Ruling == ide && !P.InCivilWar(c), $"civil war: the revolution won and {c.Name} is now ruled by {P.Of(c).Ruling}");
                 }
             }
+        }
+        // parties of minorities win seats but never govern (population)
+        var Pop = g.Population;
+        var demo2 = alive.FirstOrDefault(x => x.Exists && P.HoldsElections(x));
+        if (Pop.Enabled && demo2 != null)
+        {
+            var foreign = Pop.CultureByKey.Values.FirstOrDefault(cu => !Pop.IsAccepted(demo2, cu.Key) && cu.Group.Key != "auto_cultures");
+            var st = demo2.OwnedStates.FirstOrDefault(Pop.HasPops);
+            if (foreign != null && st != null)
+            {
+                g.RunEffect($"add_pops = {{ culture = {foreign.Key} size = {Pop.TotalOf(demo2) * 0.4:0} }}", st);
+                P.HoldElection(demo2);
+                string key = "culture:" + foreign.Key;
+                Check(P.Of(demo2).Seats.GetValueOrDefault(key) > 0 && P.Of(demo2).Government.All(x => P.Ideology(x) != null),
+                      $"parties: the {P.PartyName(demo2, key)} won {P.Of(demo2).Seats.GetValueOrDefault(key)} seats and is not in government");
+            }
+        }
+        // culture policy laws
+        if (Pop.Enabled && P.LawsEnabled && P.Laws.TryGetValue("equal_rights", out var eq))
+        {
+            var cc = alive.First(x => x.Exists);
+            P.Enact(cc, eq, free: true);
+            Check(g.Modifiers.Sum(cc, "minority_output") > 0 && g.Modifiers.Sum(cc, "culture_tension") < 0, "culture policy: Equal Rights raises minority output and lowers tension");
         }
     }
 

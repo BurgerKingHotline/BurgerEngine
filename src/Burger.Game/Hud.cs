@@ -55,11 +55,13 @@ public sealed partial class Hud
             if (Raylib.IsKeyPressed(KeyboardKey.P) && Has(FeatureSet.Production)) ToggleLeft(LeftPanel.Production);
             if (Raylib.IsKeyPressed(KeyboardKey.N) && Has(FeatureSet.Navy)) ToggleLeft(LeftPanel.Navy);
             if (Raylib.IsKeyPressed(KeyboardKey.O) && G.Politics.Enabled) ToggleLeft(LeftPanel.Politics);
+            if (Raylib.IsKeyPressed(KeyboardKey.U) && G.Population.Enabled) ToggleLeft(LeftPanel.Population);
         }
         if (Raylib.IsKeyPressed(KeyboardKey.F2)) Ui.ErrorsOpen = !Ui.ErrorsOpen;
         if (Raylib.IsKeyPressed(KeyboardKey.F4) && Has(FeatureSet.Diplomacy)) ToggleRight(RightPanel.Wars);
         if (Raylib.IsKeyPressed(KeyboardKey.F5)) _app.QuickSave();
         if (Raylib.IsKeyPressed(KeyboardKey.F8)) ToggleRight(RightPanel.World);
+        if (Raylib.IsKeyPressed(KeyboardKey.F9)) ToggleRight(RightPanel.Ledger);
         if (Raylib.IsKeyPressed(KeyboardKey.F10)) ToggleEditor();
         HandleMechanicKeys();
         if (Raylib.IsKeyPressed(KeyboardKey.Escape))
@@ -108,7 +110,9 @@ public sealed partial class Hud
         if (Map.Mode == MapMode.Diplomacy && !Has(FeatureSet.Diplomacy)) Map.Mode = (MapMode)(((int)Map.Mode + 1) % Enum.GetValues<MapMode>().Length);
         if (Map.Mode == MapMode.Supply && !G.Features.HasSupply) Map.Mode = (MapMode)(((int)Map.Mode + 1) % Enum.GetValues<MapMode>().Length);
         if (Map.Mode == MapMode.Air && !Has(FeatureSet.Air)) Map.Mode = (MapMode)(((int)Map.Mode + 1) % Enum.GetValues<MapMode>().Length);
-        if (Map.Mode == MapMode.Ideology && !G.Politics.Enabled) Map.Mode = MapMode.Political;
+        if (Map.Mode == MapMode.Ideology && !G.Politics.Enabled) Map.Mode = (MapMode)(((int)Map.Mode + 1) % Enum.GetValues<MapMode>().Length);
+        if (Map.Mode is MapMode.Population or MapMode.Culture && !G.Population.Enabled) Map.Mode = MapMode.Political;
+        if (Map.Mode == MapMode.Religion && !G.Population.ReligionEnabled) Map.Mode = MapMode.Political;
         Map.Dirty = true;
     }
 
@@ -249,7 +253,7 @@ public sealed partial class Hud
             Map.Dirty = true;
         }
         // map modes that change every day (supply) refresh daily
-        if (G.World.Date.TotalDays != _lastDay) { _lastDay = G.World.Date.TotalDays; if (Map.Mode is MapMode.Supply or MapMode.Air) Map.Dirty = true; }
+        if (G.World.Date.TotalDays != _lastDay) { _lastDay = G.World.Date.TotalDays; if (Map.Mode is MapMode.Supply or MapMode.Air || (G.World.Date.Day == 1 && Map.Mode is MapMode.Population or MapMode.Culture or MapMode.Religion)) Map.Dirty = true; }
         DrawTopBar();
         if (Ui.EditorActive) DrawEditor();
         else
@@ -269,6 +273,7 @@ public sealed partial class Hud
                 case LeftPanel.Navy: DrawNavyPanel(); break;
                 case LeftPanel.Air: DrawAirPanel(); break;
                 case LeftPanel.Politics: DrawPoliticsPanel(); break;
+                case LeftPanel.Population: DrawPopulationPanel(); break;
             }
             DrawSupportDialog();
         }
@@ -277,6 +282,7 @@ public sealed partial class Hud
             case RightPanel.Wars: DrawWarsPanel(); break;
             case RightPanel.Peace: DrawPeacePanel(); break;
             case RightPanel.World: DrawWorldPanel(); break;
+            case RightPanel.Ledger: DrawLedgerPanel(); break;
         }
         DrawMapModes();
         DrawSelectedDivisions();
@@ -385,6 +391,9 @@ public sealed partial class Hud
         rx -= wdw;
         if (Gui.Button(new Rectangle(rx, 8 * S, wdw, 30 * S), "World", true, "All countries of the world (F8)", Ui.Right == RightPanel.World, 15))
             ToggleRight(RightPanel.World);
+        rx -= wdw + 4 * S;
+        if (Gui.Button(new Rectangle(rx, 8 * S, wdw, 30 * S), "Ledger", true, "Charts of population, income, armies and more over time (F9)", Ui.Right == RightPanel.Ledger, 15))
+            ToggleRight(RightPanel.Ledger);
     }
 
     private void Separator(ref float x)
@@ -426,6 +435,8 @@ public sealed partial class Hud
         if (G.Features.HasSupply && Has(FeatureSet.Military)) modes.Add(("Supply", MapMode.Supply));
         if (Has(FeatureSet.Air)) modes.Add(("Air", MapMode.Air));
         if (G.Politics.Enabled) modes.Add(("Ideology", MapMode.Ideology));
+        if (G.Population.Enabled) { modes.Add(("People", MapMode.Population)); modes.Add(("Culture", MapMode.Culture)); }
+        if (G.Population.ReligionEnabled) modes.Add(("Religion", MapMode.Religion));
         modes.Add(("Locations", MapMode.Locations));
         var custom = G.Interface.MapModes;
         int total = modes.Count + custom.Count;
@@ -435,7 +446,7 @@ public sealed partial class Hud
         float w = total * (bw + gap) - gap + 2 * pad;
         var r = new Rectangle(Raylib.GetScreenWidth() - w - 8 * S, Raylib.GetScreenHeight() - MapModeBarH - 8 * S, w, MapModeBarH);
         Gui.Block(r);
-        Gui.Frame(r, Gui.MenuBar, false);
+        Gui.Frame(r, Gui.MenuBar, false, "menu_bar");
         float x = r.X + pad, y = r.Y + 5 * S, h = r.Height - 10 * S;
         foreach (var (name, mode) in modes)
         {

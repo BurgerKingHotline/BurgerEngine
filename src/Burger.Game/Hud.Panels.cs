@@ -26,7 +26,7 @@ public sealed partial class Hud
     {
         var l = Ui.SelectedLocation;
         if (l == null) { Ui.Left = LeftPanel.None; return; }
-        var r = LeftRect(800 * S);
+        var r = LeftRect(G.Population.Enabled ? 2000 : 800 * S);
         Gui.Panel(r, l.DisplayName);
         if (Gui.CloseButton(r)) { CloseLeft(); return; }
         float x = r.X + 12 * S, y = r.Y + 36 * S, lh = 22 * S;
@@ -49,6 +49,7 @@ public sealed partial class Hud
             Row("Tax / month", $"{st.Tax:0.##}");
             Row("Manpower / month", $"{st.Manpower:0}");
             Row("Locations", st.Locations.Count.ToString());
+            if (G.Population.Enabled) y = DrawStatePopulation(st, x, y + 4 * S, r.Width - 24 * S);
             if (st.Buildings.Count > 0)
             {
                 // buildings in two columns so long lists stay inside the panel
@@ -151,7 +152,13 @@ public sealed partial class Hud
             if (Gui.Hover(opR))
             {
                 var mods = R.Opinions.TryGetValue((c, player), out var list) ? list : new List<OpinionModifier>();
-                Gui.Tooltip($"Base: {G.Rules.Diplomacy.BaseOpinion(G, c, player):+0;-0;0}\n" + string.Join("\n", mods.Select(m => $"{m.Name}: {m.Value:+0;-0;0}")));
+                var parts = new List<string> { $"Base: {G.Rules.Diplomacy.BaseOpinion(G, c, player):+0;-0;0}" };
+                void Part(string name, double v) { if (Math.Abs(v) >= 0.5) parts.Add($"{name}: {v:+0;-0;0}"); }
+                Part("Ideology", G.Politics.IdeologyOpinion(c, player));
+                Part("Religion", G.Population.ReligionOpinion(c, player));
+                Part("Our colonies", G.Population.ColonialOpinion(c, player));
+                parts.AddRange(mods.Select(m => $"{m.Name}: {m.Value:+0;-0;0}"));
+                Gui.Tooltip(string.Join("\n", parts));
             }
             y += lh;
             var rel = new List<string>();
@@ -164,8 +171,22 @@ public sealed partial class Hud
             if (R.IsGuaranteeing(player, c)) rel.Add("We guarantee them");
             if (R.IsGuaranteeing(c, player)) rel.Add("They guarantee us");
             if (R.HasTruce(player, c, G.World.Date)) rel.Add("Truce");
-            Gui.Label(rel.Count == 0 ? "No relations" : string.Join(", ", rel), x, y, 15, rel.Contains("AT WAR") ? Gui.Bad : Gui.Text);
+            if (R.HasPact(player, c, G.World.Date)) rel.Add("Non-aggression pact");
+            Gui.Label(Gui.Fit(rel.Count == 0 ? "No relations" : string.Join(", ", rel), r.Width - 24 * S, 15), x, y, 15, rel.Contains("AT WAR") ? Gui.Bad : Gui.Text);
             y += lh;
+            // subjects: liberty desire; anyone: war exhaustion and the casus belli we have
+            if (R.OverlordOf(c) != null || R.OverlordOf(player) == c)
+            {
+                var sub = R.OverlordOf(c) != null ? c : player;
+                double ld = G.Diplomacy.LibertyDesire(sub);
+                var lr = new Rectangle(x, y, r.Width - 24 * S, lh);
+                Gui.Label($"Liberty desire ({sub.Tag}): {ld:0}%", x, y, 15, ld >= 50 ? Gui.Bad : Gui.Text);
+                if (Gui.Hover(lr)) Gui.Tooltip("How much the subject wants to be free (0-100): its strength and size compared to the overlord, its opinion of it, a different ideology or culture, the overlord losing a war and the tribute.\nAt 50 it no longer joins its overlord's wars and may fight a War of Independence.");
+                y += lh;
+            }
+            if (G.Diplomacy.WarExhaustion(c) > 0.05) { Gui.Label($"War exhaustion: {G.Diplomacy.WarExhaustion(c):0.0} / {G.Diplomacy.MaxWarExhaustion:0}", x, y, 15, Gui.TextDim); y += lh; }
+            var cbs = G.Diplomacy.ValidCasusBelli(player, c).Where(cb => cb.WarGoal != WarGoalType.Conquest).Select(cb => Localisation.Get(cb.Name)).ToList();
+            if (cbs.Count > 0) { Gui.Label(Gui.Fit("Our casus belli: " + string.Join(", ", cbs), r.Width - 24 * S, 14), x, y, 14, Gui.Gold); y += lh; }
         }
         else if (player == c && Has(FeatureSet.Diplomacy))
         {
@@ -175,7 +196,8 @@ public sealed partial class Hud
             var allies = R.AlliesOf(c).ToList();
             if (allies.Count > 0) { Gui.Label("Allies: " + string.Join(", ", allies.Select(a => a.Tag)), x, y, 15); y += lh; }
             var subjects = R.SubjectsOf(c).ToList();
-            if (subjects.Count > 0) { Gui.Label("Subjects: " + string.Join(", ", subjects.Select(a => a.Tag)), x, y, 15); y += lh; }
+            if (subjects.Count > 0) { Gui.Label(Gui.Fit("Subjects: " + string.Join(", ", subjects.Select(a => $"{a.Tag} ({G.Diplomacy.LibertyDesire(a):0}% liberty)")), r.Width - 24 * S, 15), x, y, 15); y += lh; }
+            if (G.Diplomacy.WarExhaustion(c) > 0.05) { Gui.Label($"War exhaustion: {G.Diplomacy.WarExhaustion(c):0.0} / {G.Diplomacy.MaxWarExhaustion:0}", x, y, 15, G.Diplomacy.WarExhaustion(c) >= 10 ? Gui.Bad : Gui.TextDim); y += lh; }
         }
 
         if (G.Politics.Enabled) y = DrawCountryPolitics(c, x, y + 6 * S, r.Width - 24 * S);

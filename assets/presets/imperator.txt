@@ -2,5 +2,5 @@
 name = "Imperator style"
 order = 4
 description = "Characters with interactions, armies with Imperator combat and sieges, diplomacy, economy, AI."
-features = { military combat_imperator supply_range diplomacy economy characters character_interactions ai }
+features = { military combat_imperator supply_range diplomacy economy characters character_interactions population religion social_classes cores_claims colonization independence buildings_classic ai }
 defines = { combat_model = imperator occupation_hours = 48 }

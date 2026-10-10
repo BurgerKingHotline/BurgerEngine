@@ -139,6 +139,8 @@ public sealed class Battle
     public GameDate StartDate;
     public int Hours;
     public double AttackerLosses, DefenderLosses;
+    /// <summary>Men lost per country in this battle (strength lost as a share of the division's manpower).</summary>
+    public Dictionary<Country, double> MenLost = new();
     /// <summary>Free data storage for custom combat models (e.g. current EU4 phase).</summary>
     public Dictionary<string, double> Data = new();
     /// <summary>0..1 how well the attacker is doing (for UI).</summary>

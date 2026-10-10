@@ -194,6 +194,7 @@ public static class SaveGame
         foreach (var (g, d) in R.Guarantees) { var n = rel.AddBlock("guarantee"); n.Add("guarantor", g.Tag); n.Add("guaranteed", d.Tag); }
         foreach (var kv in R.Subjects) { var n = rel.AddBlock("subject"); n.Add("subject", kv.Key.Tag); n.Add("overlord", kv.Value.Overlord.Tag); n.Add("type", kv.Value.Type.Key); }
         foreach (var kv in R.Truces) { var n = rel.AddBlock("truce"); n.Add("first", kv.Key.Item1.Tag); n.Add("second", kv.Key.Item2.Tag); n.Add("until", kv.Value.ToScript()); }
+        foreach (var kv in R.Pacts) { var n = rel.AddBlock("pact"); n.Add("first", kv.Key.Item1.Tag); n.Add("second", kv.Key.Item2.Tag); n.Add("until", kv.Value.ToScript()); }
         foreach (var kv in R.Opinions)
             foreach (var m in kv.Value)
             {
@@ -297,6 +298,7 @@ public static class SaveGame
         w.Relations.Guarantees.Clear();
         w.Relations.Subjects.Clear();
         w.Relations.Truces.Clear();
+        w.Relations.Pacts.Clear();
         w.Relations.Opinions.Clear();
         w.ActionCooldowns.Clear();
         w.FiredOnceEvents.Clear();
@@ -525,6 +527,7 @@ public static class SaveGame
                     if (G("subject") is { } s4 && G("overlord") is { } o4 && data.SubjectTypes.TryGetValue(n.GetString("type") ?? "", out var st4)) R.SetSubject(s4, o4, st4);
                     break;
                 case "truce": if (G("first") is { } a5 && G("second") is { } b5) R.AddTruce(a5, b5, GameDate.Parse(n.GetString("until") ?? "", w.Date)); break;
+                case "pact": if (G("first") is { } a7 && G("second") is { } b7) R.AddPact(a7, b7, GameDate.Parse(n.GetString("until") ?? "", w.Date)); break;
                 case "opinion":
                     if (G("from") is { } a6 && G("to") is { } b6)
                     {

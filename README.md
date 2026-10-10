@@ -126,8 +126,19 @@ characters or money until you add them).
 | `laws` | law groups (conscription, economy, press, political parties) that cost political power and give modifiers; laws can ban parties or suspend elections (`common/laws/`) |
 | `cabinet` | ministers from the governing parties in cabinet posts, bonuses from their stats (`common/cabinet/`; needs `characters`) |
 | `civil_wars` | political movements with demands that revolt unless you give in or suppress them, and HOI4-style civil wars that split the country |
+| `population` | pops of a culture in every state that grow, assimilate and migrate and scale tax and manpower; accepted cultures; People menu (U), People and Culture map modes (`common/cultures/`, `history/pops/`, `backend/Population.cs`) |
+| `religion` | religions in families, state religion, conversion, religious opinion and unrest, Religion map mode (`common/religions/`) |
+| `social_classes` | Imperator-style classes (nobles, clergy, burghers, peasants, serfs) with promotion, for older eras (`common/pop_types/`) |
+| `cores_claims` | cores where at least half the people are of accepted cultures (at once for your own culture, else after 25 years), cores lost after 50 years, cultural claims every year, a religious claim action; non-core states give 60% |
+| `colonization` | EU-style colonists that settle unowned land near your territory |
+| `independence` | independence movements of unaccepted cultures (calmer in colonies than in conquered land) that break away and fight wars of independence unless suppressed, released or accepted |
+| `buildings_classic` / `buildings_modern` | farms, aqueducts, markets, temples, barracks / hospitals, housing, schools, radio and police stations that change growth, room, tax, assimilation and stability |
+
+The **Ledger** (top right, F9) charts population, income, manpower, divisions, factories, war dead, war exhaustion,
+stability, colonies, coups and more over time for the biggest countries and yours, or for the whole world; C# mods can add
+their own metrics with `Game.Statistics.Add(...)`.
 | `fog_of_war` | hidden enemy armies and greyed-out land you cannot see (`backend/Vision.cs`) |
-| `diplomacy` | wars, casus belli, war score, peace deals, opinion, alliances, access, guarantees, subjects, diplomatic actions |
+| `diplomacy` | EU-style casus belli with war goals (cores, claims, culture, religion, liberation, ideology, independence...), faction war goals, ticking war score, war exhaustion, EU-style peace offers (land, subjects, independence, releasing peoples, regime change, humiliation), AI peace, liberty desire of subjects, non-aggression pacts, diplomatic plays, opinion, alliances, access, guarantees, diplomatic actions |
 | `characters` | rulers, heirs, families, births, deaths, succession, traits (rulers are created for every country) |
 | `character_interactions` | appoint heir, make general, gifts, marriages, execution |
 | `economy` | tax income, upkeep, manpower; training costs gold and manpower (without it training is free) |

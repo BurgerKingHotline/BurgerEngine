@@ -1,0 +1,49 @@
+# Religions (religion feature), in religion groups. Countries set theirs with religion = ... in common/countries;
+# cultures give new pops a religion (common/cultures). Scripts: religion = catholic, religion_group = christian,
+# same_religion = scope:recipient, set_state_religion = protestant, convert_pops = { religion = sunni share = 0.5 }.
+# Opinion: same religion +10, same group 0, other group -10 (defines same_religion_opinion, ...).
+
+christian = {
+	name = "Christian"
+	color = { 200 200 220 }
+	catholic = { name = "Catholic" color = { 225 215 120 } }
+	protestant = { name = "Protestant" color = { 90 120 200 } }
+	orthodox = { name = "Orthodox" color = { 210 150 60 } }
+	oriental = { name = "Oriental Christian" color = { 180 90 150 } }
+}
+muslim = {
+	name = "Muslim"
+	color = { 40 150 70 }
+	sunni = { name = "Sunni" color = { 40 150 70 } }
+	shia = { name = "Shia" color = { 20 100 50 } }
+	ibadi = { name = "Ibadi" color = { 110 170 90 } }
+}
+jewish = {
+	name = "Jewish"
+	color = { 90 170 210 }
+	judaism = { name = "Judaism" color = { 90 170 210 } }
+}
+dharmic = {
+	name = "Dharmic"
+	color = { 220 120 40 }
+	hindu = { name = "Hindu" color = { 230 120 40 } }
+	sikh = { name = "Sikh" color = { 240 170 60 } }
+	jain = { name = "Jain" color = { 200 150 100 } }
+}
+eastern = {
+	name = "Eastern"
+	color = { 200 80 80 }
+	buddhist = { name = "Buddhist" color = { 240 200 60 } }
+	shinto = { name = "Shinto" color = { 220 60 60 } }
+	chinese_folk = { name = "Confucian & folk" color = { 190 80 50 } }
+}
+traditional = {
+	name = "Traditional"
+	color = { 140 110 80 }
+	animist = { name = "Traditional faiths" color = { 140 110 80 } }
+}
+secular = {
+	name = "Secular"
+	color = { 160 160 160 }
+	irreligious = { name = "Irreligious" color = { 170 170 170 } }
+}

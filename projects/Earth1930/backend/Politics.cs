@@ -52,6 +52,12 @@ public class GamePoliticsRules : PoliticsRules
             }
             foreach (var kv in fromNeighbours) Add(kv.Key, Math.Min(0.6, kv.Value));
         }
+        // a ruling party that holds no elections keeps a core of support (repression, patronage, the army)
+        if (!pol.HoldsElections(c))
+        {
+            double floor = d.Get("ruling_party_floor", 0.15), cur = p.Popularity.GetValueOrDefault(p.Ruling);
+            if (cur < floor) Add(p.Ruling, (floor - cur) * 100 * 0.15);
+        }
         // chance
         foreach (var i in pol.Ideologies) Add(i.Key, (game.Rng.NextDouble() - 0.5) * d.Get("random_drift", 0.4));
         return drift;
@@ -76,6 +82,35 @@ public class GamePoliticsRules : PoliticsRules
         return votes;
     }
 
+    /// <summary>
+    /// Votes of minority parties (population features): people of an unaccepted culture vote for its national party
+    /// (minority_party_turnout, 70%, of them) and people of a faith other than the state religion that make up at least
+    /// religious_party_min_share (10%) vote for a religious party (religious_party_turnout, 40%). Only people outside
+    /// colonies vote. Keys: culture:KEY and religion:KEY; values are shares of all votes.
+    /// </summary>
+    public override Dictionary<string, double> MinorityVotes(Game game, Country c)
+    {
+        var result = new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase);
+        var pop = game.Population;
+        var d = game.Data.Defines;
+        var voters = c.OwnedStates.Where(s => pop.HasPops(s) && !pop.IsColony(s)).ToList();
+        double total = voters.Sum(pop.TotalOf);
+        if (total <= 0) return result;
+        double minShare = d.Get("minority_party_min_share", 0.03);
+        foreach (var (culture, size) in pop.Breakdown(voters, p => p.Culture))
+        {
+            double share = size / total;
+            if (share >= minShare && !pop.IsAccepted(c, culture)) result["culture:" + culture] = share * d.Get("minority_party_turnout", 0.7);
+        }
+        if (pop.ReligionEnabled && pop.Of(c).Religion is { } state)
+            foreach (var (religion, size) in pop.Breakdown(voters, p => p.Religion))
+            {
+                double share = size / total;
+                if (religion != state && share >= d.Get("religious_party_min_share", 0.1)) result["religion:" + religion] = share * d.Get("religious_party_turnout", 0.4);
+            }
+        return result;
+    }
+
     /// <summary>True if the parties of these two ideologies govern together (both must accept each other).</summary>
     public override bool WillGovernWith(Game game, Country c, IdeologyDef a, IdeologyDef b)
         => a.Key == b.Key || (a.Coalition.Contains(b.Key) && b.Coalition.Contains(a.Key));
@@ -89,17 +124,45 @@ public class GamePoliticsRules : PoliticsRules
         return game.Data.Defines.Get("movement_speed", 0.5) * (popularity - threshold) * 100 * (1.5 - stability / 100.0);
     }
 
+    /// <summary>
+    /// Monthly chance that a shut-out ideology with this much support takes power in a coup (no war).
+    /// Likelier the more popular it is, the less popular the government is and the lower stability is.
+    /// </summary>
+    public override double CoupChance(Game game, Country c, IdeologyDef ideology, double popularity)
+    {
+        var d = game.Data.Defines;
+        double threshold = d.Get("coup_threshold", 0.4);
+        if (popularity < threshold) return 0;
+        double ruling = game.Politics.Of(c).Popularity.GetValueOrDefault(game.Politics.Of(c).Ruling);
+        double stability = StabilityOf(game, c);
+        return d.Get("coup_chance", 0.06) * (1 + (popularity - threshold) * 5) * (1.5 - ruling) * (1.5 - stability / 100.0);
+    }
+
     /// <summary>Monthly chance that a shut-out ideology with this much support starts a civil war (HOI4 style).</summary>
     public override double CivilWarChance(Game game, Country c, IdeologyDef ideology, double popularity)
     {
         double threshold = game.Data.Defines.Get("civil_war_threshold", 0.5);
         if (popularity < threshold) return 0;
-        return game.Data.Defines.Get("civil_war_chance", 0.15) * (0.5 + (popularity - threshold) * 2);
+        return game.Data.Defines.Get("civil_war_chance", 0.08) * (0.5 + (popularity - threshold) * 2);
     }
 
-    /// <summary>Share of the country (states, divisions) that joins the rebels.</summary>
+    /// <summary>
+    /// True if a revolt turns into a civil war, false if it is a coup: a government that still has real support
+    /// (civil_war_loyal_share, 20%) fights; an unpopular one is simply pushed aside.
+    /// </summary>
+    public override bool RevoltIsCivilWar(Game game, Country c, string ideology, double popularity)
+    {
+        var p = game.Politics.Of(c);
+        double loyal = p.Government.Sum(g => p.Popularity.GetValueOrDefault(g));
+        return loyal >= game.Data.Defines.Get("civil_war_loyal_share", 0.2) && popularity < game.Data.Defines.Get("coup_above", 0.75);
+    }
+
+    /// <summary>Share of the country (states, divisions, treasury) that joins the rebels: the ideology's support.</summary>
     public override double CivilWarShare(Game game, Country c, string ideology, double popularity)
-        => Math.Clamp(popularity, 0.2, 0.6);
+        => Math.Clamp(popularity, 0.1, 0.9);
+
+    /// <summary>Years after a coup or civil war before the next one can start.</summary>
+    public override double CalmYears(Game game, Country c) => game.Data.Defines.Get("revolt_calm_years", 5);
 }
 
 /// <summary>Installs the politics rules.</summary>

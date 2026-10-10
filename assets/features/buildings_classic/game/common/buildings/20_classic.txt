@@ -1,0 +1,16 @@
+# Pre-modern buildings (buildings_classic feature). Levels are stored per state.
+#   gold_cost / build_months   bought with gold in the state window (games without production)
+#   cost                       construction cost with the production feature
+#   modifier                   state modifiers per level: pop_growth (yearly), pop_capacity (+share), tax, assimilation, conversion, promotion
+#   country_modifier           owner's modifiers per level (stability_target, manpower, ...)
+
+farm = { name = "Farms" desc = "More food: the state can feed more people." gold_cost = 60 build_months = 12 cost = 3000 max_level = 5 category = civil
+	modifier = { pop_capacity = 0.08 pop_growth = 0.002 } }
+aqueduct = { name = "Aqueduct" desc = "Clean water lets towns grow." gold_cost = 100 build_months = 18 cost = 5000 max_level = 2 category = civil
+	modifier = { pop_capacity = 0.15 pop_growth = 0.001 } }
+market = { name = "Market" desc = "Trade brings tax and lets peasants become burghers." gold_cost = 80 build_months = 12 cost = 4000 max_level = 3 category = civil
+	modifier = { tax = 0.1 promotion = 0.5 } }
+temple = { name = "Temple" desc = "Converts people to the state religion and keeps them content." gold_cost = 70 build_months = 12 cost = 3500 max_level = 2 category = civil
+	modifier = { conversion = 1 assimilation = 0.3 } country_modifier = { stability_target = 0.3 } }
+barracks = { name = "Barracks" desc = "Trains soldiers: more manpower for the country." gold_cost = 80 build_months = 12 cost = 4000 max_level = 3 category = military
+	country_modifier = { manpower = 0.01 } }

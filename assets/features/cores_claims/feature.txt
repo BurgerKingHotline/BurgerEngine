@@ -1,0 +1,6 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Cores & claims"
+category = "Population"
+order = 73
+description = "Countries gain cores on states where an accepted culture is the majority or that they have owned for 25 years, and slowly lose cores they no longer hold (a claim remains). Every year they claim neighbouring states where their culture is the majority; with religion, a diplomatic action claims states of fellow believers. States that are not cores give 60% tax and manpower."
+requires = { population }

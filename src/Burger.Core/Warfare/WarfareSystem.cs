@@ -648,6 +648,7 @@ public sealed class WarfareSystem
         foreach (var a in b.Attackers) { a.Battle = null; a.AttackTarget = null; }
         foreach (var d in b.Defenders) d.Battle = null;
 
+        foreach (var kv in b.MenLost) _game.Diplomacy.RecordLosses(kv.Key, kv.Value);
         var war = _game.World.WarBetween(b.AttackerCountry, b.DefenderCountry);
         if (war != null)
         {

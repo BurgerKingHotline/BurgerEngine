@@ -67,9 +67,33 @@ public sealed class ThemeDef
     public float FontScale = 1f;
     /// <summary>Multiplies the automatic interface scale (which depends on the screen height).</summary>
     public float UiScale = 1f;
-    /// <summary>Optional 9-slice images (stretched with <see cref="TextureBorder"/> pixels kept at the edges).</summary>
+    /// <summary>Optional 9-slice images (stretched with <see cref="TextureBorder"/> pixels kept at the edges). Older keys; same as Textures["panel"] etc.</summary>
     public string? PanelTexture, ButtonTexture, TopBarTexture;
     public int TextureBorder = 12;
+    /// <summary>
+    /// Images of the interface elements by name (see <see cref="KnownTextures"/>), from <c>textures = { panel = "gfx/interface/ui/panel.png" ... }</c>.
+    /// Elements without an image are drawn with the theme colors.
+    /// </summary>
+    public readonly Dictionary<string, string> Textures = new(StringComparer.OrdinalIgnoreCase);
+    /// <summary>Pixels kept unstretched at the edges of each image (9-slice), from <c>texture_borders = { panel = 12 }</c>; 0 stretches the whole image.</summary>
+    public readonly Dictionary<string, int> TextureBorders = new(StringComparer.OrdinalIgnoreCase);
+
+    public static readonly string[] KnownTextures =
+    {
+        "panel", "panel_header", "menu_bar", "top_bar", "tooltip", "button", "button_hover", "button_selected", "button_disabled",
+        "close_button", "close_button_hover", "bar", "bar_fill", "text_field", "text_field_focused", "scrollbar", "scroll_thumb",
+        "card", "card_selected", "section_line",
+    };
+
+    /// <summary>The image of an element (null = drawn with colors).</summary>
+    public string? TextureOf(string name) => Textures.TryGetValue(name, out var t) && !string.IsNullOrWhiteSpace(t) ? t
+        : name switch { "panel" => PanelTexture, "button" => ButtonTexture, "top_bar" => TopBarTexture, _ => null };
+
+    public void SetTexture(string name, string? path)
+    {
+        if (path == null) Textures.Remove(name); else Textures[name] = path;
+        Version++;
+    }
     /// <summary>Draw the decorated (gradient, double border, corner) style. Off = flat panels.</summary>
     public bool Ornate = true;
     /// <summary>Colors by name: panel, panel_border, panel_inner_border, panel_header, top_bar, text, text_dim, title, good, bad,
@@ -105,6 +129,16 @@ public sealed class ThemeDef
         TopBarTexture = n.GetString("top_bar_texture", TopBarTexture);
         TextureBorder = n.GetInt("texture_border", TextureBorder);
         if (n.Get("ornate") is { } o) Ornate = o.Value is "yes" or "true" or "1";
+        if (n.Get("textures") is { } textures)
+            foreach (var t in textures.All)
+            {
+                if (t.Value == null) continue;
+                if (!KnownTextures.Contains(t.Key, StringComparer.OrdinalIgnoreCase))
+                    Log.Warn($"Unknown interface texture '{t.Key}' (known: {string.Join(", ", KnownTextures)})", t.Location);
+                Textures[t.Key] = t.Value;
+            }
+        if (n.Get("texture_borders") is { } borders)
+            foreach (var b in borders.All) if (b.Value != null) TextureBorders[b.Key] = (int)Math.Max(0, b.AsDouble());
         if (n.Get("colors") is { } colors)
             foreach (var c in colors.All)
             {

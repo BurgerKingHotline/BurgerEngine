@@ -1,6 +1,6 @@
 # Preset: the features (and rules) a new project starts with.
 name = "Europa Universalis style"
 order = 3
-description = "Armies with EU-style combat and sieges, fleets, diplomacy, economy, rulers and heirs, AI."
-features = { military combat_eu4 supply_range navy diplomacy economy characters ai }
+description = "Armies with EU-style combat and sieges, fleets, diplomacy, economy, rulers and heirs, pops with cultures, religion and classes, cores and claims, colonization, pre-modern buildings, AI."
+features = { military combat_eu4 supply_range navy diplomacy economy characters population religion social_classes cores_claims colonization independence buildings_classic ai }
 defines = { combat_model = eu4 occupation_hours = 48 }

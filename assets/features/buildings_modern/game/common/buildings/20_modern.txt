@@ -1,0 +1,14 @@
+# Modern buildings (buildings_modern feature). Built with civilian factories (production), or bought with gold
+# (gold_cost / build_months) in games without production. Modifiers are per level - see 20_classic.txt of the
+# buildings_classic feature for the keys.
+
+hospital = { name = "Hospital" desc = "Fewer people die: faster growth." cost = 4000 gold_cost = 120 build_months = 12 max_level = 3 category = civil
+	modifier = { pop_growth = 0.003 pop_capacity = 0.05 } }
+housing = { name = "Housing" desc = "Apartment blocks: room for more people." cost = 3000 gold_cost = 80 build_months = 12 max_level = 5 category = civil
+	modifier = { pop_capacity = 0.06 } }
+school = { name = "Schools" desc = "Children learn the national language: assimilation and a little more tax." cost = 5000 gold_cost = 120 build_months = 18 max_level = 3 category = civil
+	modifier = { assimilation = 0.5 tax = 0.04 } }
+radio_station = { name = "Radio Station" desc = "National broadcasts: assimilation and support for the government." cost = 4000 gold_cost = 100 build_months = 12 max_level = 1 category = civil
+	modifier = { assimilation = 0.5 } country_modifier = { stability_target = 0.2 ruling_party_drift = 0.02 } }
+police_station = { name = "Police Station" desc = "Order in the streets." cost = 3000 gold_cost = 80 build_months = 12 max_level = 2 category = civil
+	country_modifier = { stability_target = 0.3 } }

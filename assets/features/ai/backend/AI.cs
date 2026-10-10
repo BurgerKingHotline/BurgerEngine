@@ -35,6 +35,7 @@ public class GameAi : AiSystem
             if (Game.Features.Has(FeatureSet.Navy)) ManageNavy(c);
             Game.Decisions.AiMonthly(c);
             if (Game.Features.Has(FeatureSet.Politics)) ManagePolitics(c);
+            if (Game.Features.Has(FeatureSet.Population)) ManagePopulation(c);
             if (Game.Features.Has(FeatureSet.Diplomacy))
             {
                 Diplomacy(c);
@@ -172,6 +173,9 @@ public class GameAi : AiSystem
     /// <summary>Laws, ministers and political movements (politics features).</summary>
     public override void ManagePolitics(Country c) => Game.Politics.AiMonthly(c);
 
+    /// <summary>Colonies and buildings for its people (population features).</summary>
+    public override void ManagePopulation(Country c) => Game.Population.AiMonthly(c);
+
     // ------------------------------------------------------------------------------------------- diplomacy
     public override void Diplomacy(Country c)
     {
@@ -201,75 +205,120 @@ public class GameAi : AiSystem
     }
 
     // ------------------------------------------------------------------------------------------- peace
+    /// <summary>
+    /// AI peace: a winner makes demands once the war score covers them (sooner when worn out), a loser offers what the
+    /// enemy could take anyway, and exhausted countries in a war that goes nowhere look for a white peace.
+    /// </summary>
     public override void Peace(Country c)
     {
         var w = Game.World;
+        var D = Game.Diplomacy;
         foreach (var war in w.WarsOf(c).ToList())
         {
             if (war.LeaderOf(c) != c) continue;
+            if (war.Vars.HasFlag("civil_war")) continue;
             var enemy = war.EnemyLeaderOf(c);
             double score = war.ScoreFor(c);
             int months = (w.Date.TotalDays - war.StartDate.TotalDays) / 30;
             if (Game.PendingProposals.Any(p => p.Kind == ProposalKind.Peace && p.War == war)) continue;
+            double tired = Game.Rules.Diplomacy.PeaceWillingness(Game, war, c);
 
-            if (score >= 25 && months >= 2)
+            // winning: demand what the war score pays for (a worn-out winner settles for less, sooner)
+            if (score >= Math.Max(8, 25 - tired * 0.5) && months >= 2)
             {
                 var offer = BuildDemands(war, c, enemy, score);
-                if (offer.Terms.Count > 0) { Game.Diplomacy.SendPeaceOffer(offer); continue; }
+                if (offer.Terms.Count > 0) { D.SendPeaceOffer(offer); continue; }
             }
-            if (score <= -40)
+            // losing badly (or worn out and losing): offer the enemy what it could take anyway
+            if (score <= -40 + tired * 0.5 && score < -5)
             {
-                // losing badly: offer the enemy what it could take anyway
                 var demands = BuildDemands(war, enemy, c, -score);
                 var concession = new PeaceOffer { War = war, From = c, To = enemy, FromIsWinner = false };
                 concession.Terms.AddRange(demands.Terms);
-                if (concession.Terms.Count > 0 && (enemy.IsPlayer || Game.Diplomacy.AiWouldAccept(concession)))
+                if (concession.Terms.Count > 0 && (enemy.IsPlayer || D.AiWouldAccept(concession)))
                 {
-                    Game.Diplomacy.SendPeaceOffer(concession);
+                    D.SendPeaceOffer(concession);
                     continue;
                 }
             }
-            if (score <= -40 || (months >= Game.Data.Defines.WarExhaustionPeaceMonths && Math.Abs(score) < 15))
+            // a war that goes nowhere, or exhaustion: white peace
+            bool stalemate = w.Date.TotalDays - war.LastChangeDay > 365 && months >= 12;
+            if (score <= -40 || (months >= Game.Data.Defines.WarExhaustionPeaceMonths && Math.Abs(score) < 15)
+                || (stalemate && Math.Abs(score) < 25) || (D.WarExhaustion(c) >= 10 && score < 15))
             {
                 var white = new PeaceOffer { War = war, From = c, To = enemy, FromIsWinner = false };
                 white.Terms.Add(new PeaceTerm { Type = PeaceTermType.WhitePeace });
-                if (enemy.IsPlayer || Game.Diplomacy.AiWouldAccept(white)) Game.Diplomacy.SendPeaceOffer(white);
+                if (enemy.IsPlayer || D.AiWouldAccept(white)) D.SendPeaceOffer(white);
             }
         }
     }
 
-    /// <summary>Builds the best demands the AI can afford with its war score.</summary>
+    /// <summary>
+    /// Builds the best demands the AI can afford with its war score: first what the war is about (war goal states, freeing
+    /// a subject, regime change, liberating a people), each state going to the side member that fights for it (faction war
+    /// goals), then other occupied land; never more than the war goals allow (max_demands).
+    /// </summary>
     public override PeaceOffer BuildDemands(War war, Country winner, Country loser, double score)
     {
+        var D = Game.Diplomacy;
+        var rules = Game.Rules.Diplomacy;
         var offer = new PeaceOffer { War = war, From = winner, To = loser, FromIsWinner = true };
         var winnerSide = war.SideOf(winner).ToHashSet();
         var loserSide = war.SideOf(loser);
-        var candidates = loserSide.SelectMany(l => l.OwnedStates)
-            .Select(s => (State: s, Held: s.Locations.Count(l => l.Controller != null && winnerSide.Contains(l.Controller)) / (double)Math.Max(1, s.Locations.Count)))
-            .Where(x => x.Held >= 0.5)
-            .OrderByDescending(x => x.Held).ThenByDescending(x => x.State.Tax).ToList();
+        double budget = Math.Min(score, D.MaxDemands(war, winner));
         double used = 0;
-        bool annexCovered = false;
-        if (loser.OwnedStates.Count > 0 && candidates.Count(x => x.State.Owner == loser) == loser.OwnedStates.Count)
+        bool Try(PeaceTerm t)
+        {
+            var (wn, ls) = (winner, t.State?.Owner ?? loser);
+            double cost = rules.PeaceTermCost(Game, war, t, wn, ls);
+            if (used + cost > budget) return false;
+            offer.Terms.Add(t);
+            if (D.InvalidReason(offer) != null) { offer.Terms.Remove(t); return false; }
+            used += cost;
+            return true;
+        }
+        var goals = war.Goals.Where(g => winnerSide.Contains(g.Holder)).ToList();
+        // freeing subjects of the losing side that fight with us for independence
+        foreach (var g in goals.Where(g => g.CasusBelli.WarGoal == WarGoalType.Independence))
+            Try(new PeaceTerm { Type = PeaceTermType.Independence, Beneficiary = g.Holder });
+        // annexation when everything is held
+        var held = loserSide.SelectMany(l => l.OwnedStates)
+            .Select(s => (State: s, Held: s.Locations.Count(l => l.Controller != null && winnerSide.Contains(l.Controller)) / (double)Math.Max(1, s.Locations.Count)))
+            .Where(x => x.Held >= 0.5).ToList();
+        if (loser.OwnedStates.Count > 0 && held.Count(x => x.State.Owner == loser) == loser.OwnedStates.Count)
         {
             var annex = new PeaceTerm { Type = PeaceTermType.Annex, Beneficiary = winner };
-            if (Game.Rules.Diplomacy.PeaceTermCost(Game, war, annex, winner, loser) <= score) { offer.Terms.Add(annex); return offer; }
+            if (Try(annex)) return offer;
         }
-        foreach (var (state, _) in candidates)
+        // regime change for ideological wars
+        if (Game.Politics.Enabled && goals.Any(g => g.CasusBelli.WarGoal == WarGoalType.Ideology) && Game.Politics.Of(loser).Ruling != Game.Politics.Of(winner).Ruling)
+            Try(new PeaceTerm { Type = PeaceTermType.RegimeChange, Beneficiary = winner, Ideology = Game.Politics.Of(winner).Ruling });
+        // liberating peoples
+        if (Game.Population.Enabled && goals.Any(g => g.CasusBelli.WarGoal == WarGoalType.Liberation))
+            foreach (var g in goals.Where(g => g.CasusBelli.WarGoal == WarGoalType.Liberation))
+                foreach (var st in D.GoalStates(g).Where(s => held.Any(h => h.State == s)).Take(3))
+                    if (Game.Population.MajorityCulture(st) is { } mc && !offer.Terms.Any(t => t.Type == PeaceTermType.ReleaseCountry && t.Culture == mc))
+                        Try(new PeaceTerm { Type = PeaceTermType.ReleaseCountry, State = st, Culture = mc, Beneficiary = winner });
+        // land: goal states first (to whoever fights for them), then the rest of the held land
+        Country BeneficiaryOf(State s)
         {
-            if (annexCovered) break;
-            var t = new PeaceTerm { Type = PeaceTermType.TransferState, State = state, Beneficiary = winner };
-            double cost = Game.Rules.Diplomacy.PeaceTermCost(Game, war, t, winner, state.Owner!);
-            if (used + cost > score) continue;
-            // never take a country's last state through cession - that is annexation
-            if (state.Owner!.OwnedStates.Count - offer.Terms.Count(x => x.State?.Owner == state.Owner) <= 1) continue;
-            offer.Terms.Add(t);
-            used += cost;
+            foreach (var g in goals) if (D.GoalStates(g).Contains(s)) return g.Holder;
+            var claimant = winnerSide.FirstOrDefault(x => s.Cores.Contains(x)) ?? winnerSide.FirstOrDefault(x => s.Claims.Contains(x));
+            return claimant ?? winner;
         }
-        if (offer.Terms.Count == 0 && score >= Game.Data.Defines.SubjugateCost && Game.World.Relations.OverlordOf(loser) == null)
-            offer.Terms.Add(new PeaceTerm { Type = PeaceTermType.Subjugate, Beneficiary = winner, SubjectType = Game.Data.SubjectTypes.Keys.First() });
+        bool IsGoal(State s) => goals.Any(g => D.GoalStates(g).Contains(s));
+        foreach (var (state, _) in held.OrderByDescending(x => IsGoal(x.State)).ThenByDescending(x => x.Held).ThenByDescending(x => x.State.Tax))
+        {
+            if (offer.Terms.Any(t => t.State == state)) continue;
+            // never take a country's last state through cession - that is annexation
+            if (state.Owner!.OwnedStates.Count - offer.Terms.Count(x => x.Type == PeaceTermType.TransferState && x.State?.Owner == state.Owner) <= 1) continue;
+            Try(new PeaceTerm { Type = PeaceTermType.TransferState, State = state, Beneficiary = BeneficiaryOf(state) });
+        }
+        if (offer.Terms.Count == 0 && Game.World.Relations.OverlordOf(loser) == null)
+            Try(new PeaceTerm { Type = PeaceTermType.Subjugate, Beneficiary = winner, SubjectType = Game.Data.SubjectTypes.Keys.First() });
+        if (offer.Terms.Count == 0) Try(new PeaceTerm { Type = PeaceTermType.Humiliate, Beneficiary = winner });
         if (offer.Terms.Count == 0 && loser.Gold > 10)
-            offer.Terms.Add(new PeaceTerm { Type = PeaceTermType.Gold, Beneficiary = winner, Amount = Math.Min(loser.Gold, Math.Max(1, loser.LastIncome) * score / 4) });
+            Try(new PeaceTerm { Type = PeaceTermType.Gold, Beneficiary = winner, Amount = Math.Min(loser.Gold, Math.Max(1, loser.LastIncome) * score / 4) });
         return offer;
     }
 }

@@ -1,0 +1,6 @@
+# Hooks of the politics feature.
+#   on_election_campaign   ROOT = a country that holds elections, election_campaign_days (60) before its election
+on_election_campaign = {
+	events = { election.1 }
+	random_events = { 75 = 0 25 = election.2 }
+}

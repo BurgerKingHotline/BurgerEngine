@@ -1,0 +1,5 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Population (pops & cultures)"
+category = "Population"
+order = 70
+description = "Imperator-style population: every state has pops of a culture that grow towards the state's room (capacity), assimilate to the owner's culture and migrate to emptier states. People scale tax and manpower; unaccepted cultures give less and lower stability. Countries can accept cultures. Adds a People menu, People and Culture map modes. Cultures: common/cultures (else one per country), pops: history/pops (else made from manpower)."

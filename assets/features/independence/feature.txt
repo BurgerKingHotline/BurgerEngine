@@ -1,0 +1,6 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Independence movements"
+category = "Population"
+order = 74
+description = "People of a culture the country does not accept, who are the majority in some of its states, form an independence movement. It grows faster at low stability and in lost wars, and slower in colonies than in conquered land; at 100% they declare independence (a new country, or a fallen one of that culture comes back) and, with armies and wars, fight for it. Suppress it, release the states, or accept the culture to end it."
+requires = { population }

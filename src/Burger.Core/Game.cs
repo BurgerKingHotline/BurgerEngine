@@ -59,6 +59,8 @@ public sealed class GameRules
     public Burger.Core.Warfare.SupportRules Support = new();
     /// <summary>Popularity drift, coalitions, movements and civil wars (politics features).</summary>
     public Burger.Core.Politics.PoliticsRules Politics = new();
+    /// <summary>Population growth, assimilation, conversion, migration, output, cores and colonies (population features).</summary>
+    public Burger.Core.Population.PopulationRules Population = new();
 }
 
 /// <summary>
@@ -97,6 +99,8 @@ public sealed class Game
     public Burger.Core.Warfare.SupportSystem Support { get; }
     /// <summary>Ideologies, elections, laws, ministers, movements and civil wars (politics features).</summary>
     public Burger.Core.Politics.PoliticsSystem Politics { get; }
+    /// <summary>Pops, cultures, religions, social classes, cores and claims, colonies (population features).</summary>
+    public Burger.Core.Population.PopulationSystem Population { get; }
     /// <summary>Named formulas from common/script_values (some replace engine formulas).</summary>
     public ScriptValueSystem ScriptValues { get; }
     /// <summary>Modifiers from common/modifiers (timed, permanent and conditional).</summary>
@@ -105,6 +109,8 @@ public sealed class Game
     public ResourceSystem Resources { get; }
     /// <summary>Decisions from common/decisions.</summary>
     public DecisionSystem Decisions { get; }
+    /// <summary>Monthly statistics per country for the Ledger charts.</summary>
+    public StatisticsSystem Statistics { get; }
     /// <summary>Custom panels and map modes from interface/ (or added from C#).</summary>
     public InterfaceRegistry Interface { get; } = new();
     public ModManager Mods { get; }
@@ -143,17 +149,22 @@ public sealed class Game
         Air = new Burger.Core.Air.AirSystem(this);
         Support = new Burger.Core.Warfare.SupportSystem(this);
         Politics = new Burger.Core.Politics.PoliticsSystem(this);
+        Population = new Burger.Core.Population.PopulationSystem(this);
         ScriptValues = new ScriptValueSystem(this);
         Modifiers = new ModifierSystem(this);
         Resources = new ResourceSystem(this);
         Decisions = new DecisionSystem(this);
+        Statistics = new StatisticsSystem(this);
         Mods = new ModManager(this);
         Ai = new AiSystem(this);
         Clock = new GameClock(this);
         Commands = new ConsoleCommands(this);
         Builtins.RegisterAll(this);
         Modifiers.Register();
-        Modifiers.Extra = (scope, key) => Politics.ModifierValue(scope, key);
+        Modifiers.Providers.Add((scope, key) => Politics.ModifierValue(scope, key));
+        Modifiers.Providers.Add((scope, key) => Population.ModifierValue(scope, key));
+        Modifiers.Providers.Add((scope, key) => Diplomacy.ExhaustionModifierValue(scope, key));
+        Diplomacy.RegisterScript();
         Politics.RegisterCommands(Commands);
     }
 
@@ -292,6 +303,11 @@ public sealed class Game
 
     private void MonthlyTick()
     {
+        if (Features.Has(F.Population))
+        {
+            P("Population.Ai", () => Population.AiFallback());
+            P("Population.MonthlyTick", () => Population.MonthlyTick());
+        }
         if (Features.Has(F.Economy) || Features.Has(F.Military)) P("Economy.MonthlyTick", () => Economy.MonthlyTick()); // gold (economy) and manpower (military)
         if (Features.Has(F.LendLease)) P("Support.MonthlyTick", () => Support.MonthlyTick());
         P("Resources.MonthlyTick", () => Resources.MonthlyTick());
@@ -302,6 +318,7 @@ public sealed class Game
         P("Events.MonthlyTick", () => Events.MonthlyTick());
         if (Features.Has(F.Ai)) P("Ai.MonthlyTick", () => Ai.MonthlyTick());
         Mods.Invoke(m => m.OnMonthlyTick());
+        P("Statistics", () => Statistics.MonthlyTick());
         if (World.Date.Month == 1)
         {
             if (Features.Has(F.Characters)) Characters.YearlyTick();

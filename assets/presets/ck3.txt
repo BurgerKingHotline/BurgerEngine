@@ -2,5 +2,5 @@
 name = "Crusader Kings style"
 order = 5
 description = "Characters, dynasties and interactions first; armies with Imperator-style combat and long sieges, diplomacy, gold, AI."
-features = { characters character_interactions military combat_imperator supply_range diplomacy economy ai }
+features = { characters character_interactions military combat_imperator supply_range diplomacy economy population religion cores_claims buildings_classic ai }
 defines = { combat_model = imperator occupation_hours = 72 }

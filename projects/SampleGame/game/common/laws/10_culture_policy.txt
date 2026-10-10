@@ -1,0 +1,37 @@
+# Culture policy (population feature; used when the laws feature is installed too).
+# Modifier keys: minority_output (people of unaccepted cultures count as this share of accepted ones for tax and
+# manpower), culture_tension (how much unaccepted cultures lower stability: -0.5 = half, 1 = double),
+# assimilation, independence_speed (independence feature), stability_target.
+
+culture_policy = {
+	name = "Culture Policy"
+	potential = { has_feature = population }
+	default = tolerance
+	equal_rights = {
+		name = "Equal Rights"
+		desc = "Every culture has the same rights: minorities pay and serve almost like our own people and are less restless, but they keep their ways."
+		cost = 100
+		modifier = { minority_output = 0.4 culture_tension = -0.5 assimilation = -0.5 independence_speed = -0.4 }
+		ai_will_do = { base = 0.3 modifier = { add = 1 ruling_ideology = democratic accepted_share < 0.8 } }
+	}
+	tolerance = {
+		name = "Tolerance"
+		desc = "Minorities are left alone."
+		ai_will_do = { base = 1 }
+	}
+	discrimination = {
+		name = "Discrimination"
+		desc = "Our own people come first: faster assimilation and a little stability from the majority, but minorities give less and grow restless."
+		cost = 50
+		modifier = { minority_output = -0.2 culture_tension = 0.5 assimilation = 0.5 independence_speed = 0.3 stability_target = 2 }
+		ai_will_do = { base = 0.2 modifier = { add = 0.8 OR = { ruling_ideology = fascist ruling_ideology = neutrality } } }
+	}
+	forced_assimilation = {
+		name = "Forced Assimilation"
+		desc = "Minorities must take our language and customs: much faster assimilation, but much more unrest and separatism."
+		cost = 100
+		allow = { OR = { ruling_ideology = fascist ruling_ideology = communist } }
+		modifier = { minority_output = -0.4 culture_tension = 1.0 assimilation = 1.5 independence_speed = 0.8 }
+		ai_will_do = { base = 0 modifier = { add = 1.2 ruling_ideology = fascist accepted_share < 0.9 } }
+	}
+}

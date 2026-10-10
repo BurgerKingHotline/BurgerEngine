@@ -51,6 +51,8 @@ public sealed class LawGroup
     public string Default = "";
     public List<LawDef> Laws = new();
     public int Order;
+    /// <summary>The group is shown (and used) only while true (country scope), e.g. has_feature = population.</summary>
+    public Node? Potential;
 }
 
 public sealed class LawDef
@@ -116,6 +118,8 @@ public sealed class CountryPolitics
     public Dictionary<string, Character> Ministers = new(StringComparer.OrdinalIgnoreCase);
     /// <summary>Party names that replace the ideology's default party name.</summary>
     public Dictionary<string, string> PartyNames = new(StringComparer.OrdinalIgnoreCase);
+    /// <summary>Day number until which no coup or civil war can start (after one just happened).</summary>
+    public int CalmUntilDay = int.MinValue;
 }
 
 public enum MovementDemand

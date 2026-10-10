@@ -1,7 +1,9 @@
 # The look of the in-game interface. Delete any line to use the engine default.
 # Colors are { red green blue } or { red green blue alpha } (0-255).
-# Panels and buttons can also use images: panel_texture / button_texture / top_bar_texture are
-# 9-slice images (the outer texture_border pixels are kept, the middle is stretched).
+# Every interface element is drawn from an image in gfx/interface/ui (textures below) - edit the images to change
+# the look. They are 9-slice images: the outer pixels (texture_borders) stay as they are, the middle is stretched.
+# Delete a texture line to draw that element with the colors below instead. Menu icons are gfx/interface/ui/menu_*.png
+# (white parts take the button's text color).
 # C# scripts can change all of this at runtime: Game.Interface.Theme.SetColor("panel", 20, 20, 30, 240)
 theme = {
 	font = "gfx/fonts/PTSans-Regular.ttf"          # body text
@@ -10,9 +12,30 @@ theme = {
 	font_scale = 1.0
 	ui_scale = 1.0
 	ornate = yes                                   # gradients, double borders and corner studs; no = flat panels
-	# panel_texture = "gfx/interface/panel.png"
-	# button_texture = "gfx/interface/button.png"
-	# texture_border = 12
+
+	textures = {
+		panel = "gfx/interface/ui/panel.png"                    # windows
+		panel_header = "gfx/interface/ui/panel_header.png"      # window title strip
+		menu_bar = "gfx/interface/ui/menu_bar.png"              # left menu and map mode bar
+		top_bar = "gfx/interface/ui/top_bar.png"
+		tooltip = "gfx/interface/ui/tooltip.png"
+		button = "gfx/interface/ui/button.png"
+		button_hover = "gfx/interface/ui/button_hover.png"
+		button_selected = "gfx/interface/ui/button_selected.png"
+		button_disabled = "gfx/interface/ui/button_disabled.png"
+		close_button = "gfx/interface/ui/close_button.png"
+		close_button_hover = "gfx/interface/ui/close_button_hover.png"
+		bar = "gfx/interface/ui/bar.png"                        # progress bar background
+		bar_fill = "gfx/interface/ui/bar_fill.png"              # progress bar fill (white parts take the bar's color)
+		text_field = "gfx/interface/ui/text_field.png"
+		text_field_focused = "gfx/interface/ui/text_field_focused.png"
+		scrollbar = "gfx/interface/ui/scrollbar.png"
+		scroll_thumb = "gfx/interface/ui/scroll_thumb.png"
+		card = "gfx/interface/ui/card.png"                      # list rows (tinted with the row color)
+		card_selected = "gfx/interface/ui/card_selected.png"
+		section_line = "gfx/interface/ui/section_line.png"      # line under section titles
+	}
+	texture_borders = { panel = 12 menu_bar = 12 panel_header = 6 top_bar = 6 tooltip = 6 button = 6 button_hover = 6 button_selected = 6 button_disabled = 6 bar = 3 bar_fill = 3 text_field = 4 text_field_focused = 4 card = 4 card_selected = 4 }
 
 	colors = {
 		panel = { 26 28 32 246 }

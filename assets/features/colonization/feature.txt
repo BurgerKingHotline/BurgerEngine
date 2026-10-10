@@ -1,0 +1,6 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Colonization"
+category = "Population"
+order = 74
+description = "EU-style colonists settle unowned land near your territory: the colony grows each month (natives slow it and sometimes attack) and becomes your state. One colonist by default (modifier: colonists); with the economy, sending one costs gold and colonies cost gold every month."
+requires = { population }

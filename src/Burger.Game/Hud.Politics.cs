@@ -86,34 +86,27 @@ public sealed partial class Hud
         // popularity
         Gui.Section("Popularity", x, y, w);
         y += 26 * S;
-        var bar = new Rectangle(x, y, w, 18 * S);
-        float bx = bar.X;
-        foreach (var i in P.Ideologies)
-        {
-            float bw = (float)(p.Popularity.GetValueOrDefault(i.Key) * bar.Width);
-            if (bw <= 0) continue;
-            Raylib.DrawRectangleRec(new Rectangle(bx, bar.Y, bw, bar.Height), C(i.Color));
-            bx += bw;
-        }
-        Raylib.DrawRectangleLinesEx(bar, 1, new Color(0, 0, 0, 180));
-        y += 26 * S;
-        foreach (var i in P.Ideologies.OrderByDescending(i => p.Popularity.GetValueOrDefault(i.Key)))
+        float pr = 50 * S, lx = x + 2 * pr + 14 * S, lw = w - (lx - x);
+        float pieTop = y;
+        var ordered = P.Ideologies.OrderByDescending(i => p.Popularity.GetValueOrDefault(i.Key)).ToList();
+        Pie(new Vector2(x + pr, y + pr), pr, ordered.Select(i => (i.Name, p.Popularity.GetValueOrDefault(i.Key), i.Color)).ToList(), "Popularity");
+        foreach (var i in ordered)
         {
             double pop = p.Popularity.GetValueOrDefault(i.Key);
-            Raylib.DrawRectangleRec(new Rectangle(x, y + 4 * S, 11 * S, 11 * S), C(i.Color));
+            Raylib.DrawRectangleRec(new Rectangle(lx, y + 4 * S, 11 * S, 11 * S), C(i.Color));
             bool banned = P.IsBanned(c, i.Key);
             string label = $"{P.PartyName(c, i.Key)} ({i.Name})" + (banned ? " - banned" : "") + (P.InGovernment(c, i.Key) ? " - in government" : "");
-            Gui.Label(Gui.Fit(label, w - 70 * S, 14), x + 18 * S, y, 14, banned ? Gui.TextDim : Gui.Text);
+            Gui.Label(Gui.Fit(label, lw - 70 * S, 13), lx + 17 * S, y, 13, banned ? Gui.TextDim : Gui.Text);
             string pct = $"{pop:P1}";
-            Gui.Label(pct, x + w - Gui.Measure(pct, 14).X, y, 14, Gui.Gold);
-            var row = new Rectangle(x, y, w, 20 * S);
+            Gui.Label(pct, x + w - Gui.Measure(pct, 13).X, y, 13, Gui.Gold);
+            var row = new Rectangle(lx, y, lw, 20 * S);
             if (Gui.Hover(row))
                 Gui.Tooltip($"{i.Name}: {pop:P1} support" + (i.Elections ? "\nHolds elections when in power" : "\nHolds no elections when in power") +
                             (i.Extremist ? "\nExtremist: gains support when stability is low or wars are lost" : "") +
                             (i.Modifier.Count > 0 ? "\nWhile ruling: " + string.Join(", ", i.Modifier.Select(kv => ModifierText(kv.Key, kv.Value))) : ""));
             y += 21 * S;
         }
-        y += 8 * S;
+        y = Math.Max(y, pieTop + 2 * pr) + 10 * S;
 
         // parliament
         Gui.Section(P.HoldsElections(c) ? "Parliament" : "Parliament (no elections)", x, y, w);
@@ -123,7 +116,7 @@ public sealed partial class Hud
         y += ph + 8 * S;
         int total = Math.Max(1, p.Seats.Values.Sum());
         int govSeats = p.Seats.Where(kv => p.Government.Contains(kv.Key, StringComparer.OrdinalIgnoreCase)).Sum(kv => kv.Value);
-        string seatsLine = string.Join("   ", p.Seats.Where(kv => kv.Value > 0).OrderByDescending(kv => kv.Value).Select(kv => $"{P.Ideology(kv.Key)?.Name} {kv.Value}"));
+        string seatsLine = string.Join("   ", p.Seats.Where(kv => kv.Value > 0).OrderByDescending(kv => kv.Value).Select(kv => $"{P.PartyLabel(kv.Key)} {kv.Value}"));
         y += Gui.Wrapped(seatsLine, x, y, w, 13) + 2 * S;
         Gui.Label($"Government: {govSeats} of {total} seats" + (govSeats * 2 > total ? " (majority)" : " (minority)"), x, y, 13, govSeats * 2 > total ? Gui.Good : Gui.Bad);
         y += 26 * S;
@@ -167,15 +160,18 @@ public sealed partial class Hud
         seats.Sort((s1, s2) => s2.Angle.CompareTo(s1.Angle));
         float dot = Math.Max(1.5f, Math.Min((outer - inner) / rows * 0.42f, outer * MathF.PI / Math.Max(1, counts[^1]) * 0.42f));
         int si = 0;
-        foreach (var i in P.Ideologies)
+        // ideologies in order, then parties of minorities and faiths
+        var order = P.Ideologies.Select(i => i.Key).Concat(p.Seats.Keys.Where(Burger.Core.Politics.PoliticsSystem.IsMinorityParty).OrderBy(k => k)).ToList();
+        foreach (var key in order)
         {
-            int cnt = p.Seats.GetValueOrDefault(i.Key);
-            var col = C(i.Color);
+            int cnt = p.Seats.GetValueOrDefault(key);
+            var col = C(P.PartyColor(key));
             for (int k = 0; k < cnt && si < seats.Count; k++, si++) Raylib.DrawCircleV(seats[si].Pos, dot, col);
         }
         if (Gui.Hover(area))
             Gui.Tooltip(string.Join("\n", p.Seats.Where(kv => kv.Value > 0).OrderByDescending(kv => kv.Value).Select(kv => $"{P.PartyName(c, kv.Key)}: {kv.Value} seats")) +
-                        $"\n\n{n} seats. The biggest party that can find a majority governs (alone or in a coalition).");
+                        $"\n\n{n} seats. The biggest party that can find a majority governs (alone or in a coalition)." +
+                        (p.Seats.Keys.Any(Burger.Core.Politics.PoliticsSystem.IsMinorityParty) ? "\nParties of minorities and faiths win seats but never govern; national parties speed up independence movements." : ""));
     }
 
     // ------------------------------------------------------------------------------------- laws
@@ -185,10 +181,11 @@ public sealed partial class Hud
         Gui.Label($"{P.PowerName}: {P.PowerOf(c):0}", x, y, 15, Gui.Gold);
         y += 26 * S;
         float rowsH = 0;
-        foreach (var g in P.LawGroups) rowsH += 30 * S + LawButtonsHeight(c, g, w) + 10 * S;
+        var groups = P.LawGroups.Where(g => P.IsGroupVisible(c, g)).ToList();
+        foreach (var g in groups) rowsH += 30 * S + LawButtonsHeight(c, g, w) + 10 * S;
         float top = Gui.BeginScroll("laws", new Rectangle(x, y, w, r.Y + r.Height - y - 12 * S), rowsH);
         float ly = top;
-        foreach (var g in P.LawGroups)
+        foreach (var g in groups)
         {
             var current = P.LawOf(c, g);
             Gui.Section(g.Name, x, ly, w - 10 * S);
@@ -325,17 +322,21 @@ public sealed partial class Hud
         Raylib.DrawRectangleRec(new Rectangle(x, y + 3 * S, 12 * S, 12 * S), C(ruling?.Color ?? Rgb.Gray));
         Gui.Label(Gui.Fit($"{P.PartyName(c, p.Ruling)} ({ruling?.Name})" + (p.Government.Count > 1 ? " + coalition" : ""), w - 20 * S, 14), x + 18 * S, y, 14);
         y += 20 * S;
-        var bar = new Rectangle(x, y, w, 12 * S);
-        float bx = bar.X;
-        foreach (var i in P.Ideologies)
         {
-            float bw = (float)(p.Popularity.GetValueOrDefault(i.Key) * bar.Width);
-            if (bw > 0) Raylib.DrawRectangleRec(new Rectangle(bx, bar.Y, bw, bar.Height), C(i.Color));
-            bx += bw;
+            float pr = 26 * S;
+            var ordered = P.Ideologies.OrderByDescending(i => p.Popularity.GetValueOrDefault(i.Key)).ToList();
+            Pie(new Vector2(x + pr, y + pr), pr, ordered.Select(i => (i.Name, p.Popularity.GetValueOrDefault(i.Key), i.Color)).ToList(), "Popularity");
+            float ly = y;
+            foreach (var i in ordered.Take(4))
+            {
+                Raylib.DrawRectangleRec(new Rectangle(x + 2 * pr + 10 * S, ly + 3 * S, 9 * S, 9 * S), C(i.Color));
+                Gui.Label(Gui.Fit($"{i.Name} {p.Popularity.GetValueOrDefault(i.Key):P0}", w - 2 * pr - 26 * S, 12), x + 2 * pr + 24 * S, ly, 12);
+                ly += 13 * S;
+            }
+            y += Math.Max(2 * pr, ly - y) + 4 * S;
+            Gui.Label(P.HoldsElections(c) && p.NextElection is { } ne ? $"Next election: {ne.ToDisplay()}" : "No elections", x, y, 12, Gui.TextDim);
+            y += 18 * S;
         }
-        if (Gui.Hover(bar)) Gui.Tooltip(string.Join("\n", P.Ideologies.Select(i => $"{i.Name}: {p.Popularity.GetValueOrDefault(i.Key):P0}")) +
-                                        (P.HoldsElections(c) && p.NextElection is { } ne ? $"\nNext election: {ne.ToDisplay()}" : "\nNo elections"));
-        y += 18 * S;
         double op = P.IdeologyOpinion(G.World.Player ?? c, c);
         if (G.World.Player != null && G.World.Player != c && Math.Abs(op) > 0.01)
         {

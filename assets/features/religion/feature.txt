@@ -1,0 +1,6 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Religion"
+category = "Population"
+order = 71
+description = "Pops follow a religion (grouped in families); every country has a state religion. People of other faiths pay a little less, lower stability and slowly convert (faster with temples). Religion changes opinion between countries. Religion map mode."
+requires = { population }

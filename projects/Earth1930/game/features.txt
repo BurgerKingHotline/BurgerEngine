@@ -16,4 +16,9 @@ features = {
 	politics
 	laws
 	civil_wars
+	population
+	religion
+	cores_claims
+	buildings_modern
+	independence
 }

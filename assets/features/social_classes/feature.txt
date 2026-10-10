@@ -1,0 +1,6 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Social classes"
+category = "Population"
+order = 72
+description = "Imperator-style classes for older eras: nobles, clergy, burghers, peasants and serfs. Each class changes its state's tax and manpower by its share; peasants rise into burghers over time (markets help). Not meant for modern games."
+requires = { population }

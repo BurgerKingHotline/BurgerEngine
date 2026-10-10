@@ -6,7 +6,7 @@ using Raylib_cs;
 
 namespace Burger.Runtime;
 
-public enum MapMode { Political, Terrain, States, Diplomacy, Locations, Supply, Air, Ideology }
+public enum MapMode { Political, Terrain, States, Diplomacy, Locations, Supply, Air, Ideology, Population, Culture, Religion }
 
 /// <summary>
 /// Builds and draws the 3D map from the province map, heightmap, terrain, tree and river inputs.
@@ -40,7 +40,7 @@ public sealed unsafe class MapRenderer : IDisposable
     private int _hw, _hh;
 
     private int _locMapData, _locLut, _locLutSize, _locBlockRows, _locMapSize, _locWorldSize, _locAtlasGrid, _locTileScale,
-        _locWater, _locRiver, _locTime, _locBorderScale, _locShowBorders, _locTint, _locViewPos, _locFog;
+        _locWater, _locRiver, _locTime, _locBorderScale, _locStateBorders, _locShowBorders, _locTint, _locViewPos, _locFog;
     private int _visibilityVersion = -1;
 
     public float WorldWidth { get; }
@@ -236,6 +236,7 @@ public sealed unsafe class MapRenderer : IDisposable
         _locRiver = Raylib.GetShaderLocation(_shader, "riverColor");
         _locTime = Raylib.GetShaderLocation(_shader, "time");
         _locBorderScale = Raylib.GetShaderLocation(_shader, "borderScale");
+        _locStateBorders = Raylib.GetShaderLocation(_shader, "stateBorders");
         _locShowBorders = Raylib.GetShaderLocation(_shader, "showProvinceBorders");
         _locTint = Raylib.GetShaderLocation(_shader, "tintStrength");
         _locViewPos = Raylib.GetShaderLocation(_shader, "viewPos");
@@ -438,6 +439,21 @@ public sealed unsafe class MapRenderer : IDisposable
                 case MapMode.Ideology:
                     if (owner != null && l.IsLand && _game.Politics.RulingIdeology(owner) is { } ide) col = C(ide.Color, 225);
                     break;
+                case MapMode.Population:
+                    if (l.IsLand && l.State != null && _game.Population.HasPops(l.State))
+                    {
+                        // people per location of the state, on a log scale from sparse (dark green) to crowded (red)
+                        double per = _game.Population.TotalOf(l.State) / Math.Max(1, l.State.Locations.Count(x => x.IsLand));
+                        float t = (float)Math.Clamp((Math.Log10(Math.Max(1, per)) - 3) / 3.5, 0, 1);
+                        col = t < 0.5f ? new Color((int)(40 + 400 * t), (int)(90 + 200 * t), 50, 220) : new Color(240, (int)(190 - 300 * (t - 0.5f)), 50, 220);
+                    }
+                    break;
+                case MapMode.Culture:
+                    if (l.IsLand && l.State != null && _game.Population.Culture(_game.Population.MajorityCulture(l.State)) is { } cul) col = C(cul.Color, 225);
+                    break;
+                case MapMode.Religion:
+                    if (l.IsLand && l.State != null && _game.Population.Religion(_game.Population.MajorityReligion(l.State)) is { } rel) col = C(rel.Color, 225);
+                    break;
                 case MapMode.Terrain:
                     break;
                 case MapMode.Supply:
@@ -531,6 +547,10 @@ public sealed unsafe class MapRenderer : IDisposable
         Raylib.SetShaderValue(_shader, _locFog, fog, ShaderUniformDataType.Float);
         Raylib.SetShaderValue(_shader, _locBorderScale, Math.Clamp(camH / 40f, 0.6f, 4f), ShaderUniformDataType.Float);
         Raylib.SetShaderValue(_shader, _locShowBorders, camH < 120 ? 1.0f : 0.0f, ShaderUniformDataType.Float);
+        // state borders fade out when zoomed out (country borders stay)
+        float stateFade = Math.Clamp((StrategicZoom * 0.6f - camH) / (StrategicZoom * 0.25f), 0f, 1f);
+        if (HighlightState != null) stateFade = Math.Max(stateFade, 0.6f);
+        Raylib.SetShaderValue(_shader, _locStateBorders, stateFade, ShaderUniformDataType.Float);
         // endless sea around the map, drawn with the map shader so it matches the water at the edges
         float seaY = _map.Settings.SeaLevel / 255f * _map.Settings.HeightScale - 0.03f;
         Raylib.DrawMesh(_seaMesh, _material, Raymath.MatrixTranslate(WorldWidth / 2, seaY, WorldHeight / 2));

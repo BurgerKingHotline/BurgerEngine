@@ -85,6 +85,7 @@ public static class DataLoader
         game.Modifiers.Load(data);
         game.Resources.Load(data);
         game.Politics.Load(data);
+        game.Population.Load(data);
         game.Decisions.Load(data);
         game.Interface.Load(data);
     }
@@ -423,8 +424,14 @@ public static class DataLoader
                     PeaceCostMultiplier = n.GetDouble("peace_cost_multiplier", 1),
                     OthersOpinion = n.GetDouble("others_opinion", 0),
                     AiWeight = n.GetDouble("ai_weight", 1),
+                    WarGoal = Enum.TryParse<WarGoalType>(n.GetString("war_goal") ?? "conquest", true, out var wg) ? wg : WarGoalType.Conquest,
+                    GoalCostMultiplier = n.GetDouble("goal_cost_multiplier", 0.5),
+                    TickingWarScore = n.GetBool("ticking_war_score"),
+                    MaxDemands = n.GetDouble("max_demands", 100),
                     Definition = n,
                 };
+                if (n.GetString("war_goal") is { } wgs && !Enum.TryParse<WarGoalType>(wgs, true, out _))
+                    Log.Error($"Casus belli '{n.Key}': unknown war_goal '{wgs}' (conquest, claims, cores, culture, religion, liberation, ideology, independence, subjugation, humiliation)", n.Location);
             }
         if (data.CasusBelli.Count == 0)
         {
@@ -445,6 +452,7 @@ public static class DataLoader
                     IncomeShare = n.GetDouble("income_share", 0.1),
                     JoinsOverlordWars = n.GetBool("joins_overlord_wars", true),
                     CanDeclareWar = n.GetBool("can_declare_war", false),
+                    LibertyDesire = n.GetDouble("liberty_desire", 0),
                     Definition = n,
                 };
             }

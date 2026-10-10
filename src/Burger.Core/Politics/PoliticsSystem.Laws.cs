@@ -36,7 +36,10 @@ public sealed partial class PoliticsSystem
 
     public bool HasLaw(Country c, string law) => LawsEnabled && Laws.TryGetValue(law, out var l) && Of(c).Laws.GetValueOrDefault(l.Group.Key) == l.Key;
 
-    public bool IsLawVisible(Country c, LawDef law) => law.Potential == null || _game.Script.EvalTrigger(law.Potential, _game.Context(c));
+    public bool IsLawVisible(Country c, LawDef law) => IsGroupVisible(c, law.Group) && (law.Potential == null || _game.Script.EvalTrigger(law.Potential, _game.Context(c)));
+
+    /// <summary>True if the law group applies to this country (its potential, if any, is met).</summary>
+    public bool IsGroupVisible(Country c, LawGroup g) => g.Potential == null || _game.Script.EvalTrigger(g.Potential, _game.Context(c));
 
     /// <summary>Days before a law group can change again (0 = now).</summary>
     public int LawCooldownLeft(Country c, LawGroup g)

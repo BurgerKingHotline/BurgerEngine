@@ -1,3 +1,8 @@
-# Subject relationships (Imperator style). income_share: part of the subject's income paid to the overlord.
-client_state = { name = "Client State" income_share = 0.10 joins_overlord_wars = yes }
-tributary = { name = "Tributary" income_share = 0.25 joins_overlord_wars = no }
+# Subject relationships (Imperator style).
+#   income_share         part of the subject's income paid to the overlord
+#   joins_overlord_wars  the subject fights in its overlord's wars (only while its liberty desire is below 50)
+#   liberty_desire       base liberty desire (EU style, 0-100). Liberty desire also grows with the subject's strength and
+#                        size compared to the overlord, a bad opinion of it, a different ideology or culture group, the
+#                        overlord losing a war and the tribute; at 50 the subject may fight a War of Independence.
+client_state = { name = "Client State" income_share = 0.10 joins_overlord_wars = yes liberty_desire = 0 }
+tributary = { name = "Tributary" income_share = 0.25 joins_overlord_wars = no liberty_desire = 10 }

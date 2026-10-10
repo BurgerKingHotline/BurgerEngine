@@ -10,16 +10,12 @@ namespace Burger.Runtime;
 /// <summary>The left menu bar (military, recruit, characters, decisions, custom panels), the recruit menu and the world overview.</summary>
 public sealed partial class Hud
 {
-    private enum MenuIcon { Military, Recruit, Characters, Decisions, Production, Designer, Navy, Air, Politics }
+    private enum MenuIcon { Military, Recruit, Characters, Decisions, Production, Designer, Navy, Air, Politics, Population }
 
     private float LeftMenuW => 66 * S;
 
     /// <summary>Card background for list rows inside panels.</summary>
-    private void Card(Rectangle r, Color bg, bool highlight = false)
-    {
-        Gui.Gradient(r, Gui.Lighter(bg, 0.06f), Gui.Darker(bg, 0.15f));
-        Raylib.DrawRectangleLinesEx(r, 1, highlight ? Gui.PanelBorder : new Color(0, 0, 0, 150));
-    }
+    private void Card(Rectangle r, Color bg, bool highlight = false) => Gui.Card(r, bg, highlight);
 
     private void DrawLeftMenu()
     {
@@ -39,6 +35,8 @@ public sealed partial class Hud
         }
         if (Has(FeatureSet.Production))
             items.Add(("Production", "Factories, production lines, construction and the equipment stockpile (P)", Ui.Left == LeftPanel.Production, () => ToggleLeft(LeftPanel.Production), MenuIcon.Production, null, player.Construction.Count));
+        if (G.Population.Enabled)
+            items.Add(("People", "Population, cultures, religions and colonies (U)", Ui.Left == LeftPanel.Population, () => ToggleLeft(LeftPanel.Population), MenuIcon.Population, null, 0));
         if (G.Politics.Enabled)
             items.Add(("Politics", "Government, parliament, laws, cabinet and political movements (O)", Ui.Left == LeftPanel.Politics, () => ToggleLeft(LeftPanel.Politics), MenuIcon.Politics, null, G.Politics.MovementsOf(player).Count()));
         if (Has(FeatureSet.Characters))
@@ -59,7 +57,7 @@ public sealed partial class Hud
         float bs = LeftMenuW - 12 * S, gap = 4 * S;
         var bar = new Rectangle(4 * S, TopH + 8 * S, LeftMenuW, items.Count * (bs + gap) - gap + 12 * S);
         Gui.Block(bar);
-        Gui.Frame(bar, Gui.MenuBar);
+        Gui.Frame(bar, Gui.MenuBar, true, "menu_bar");
         float y = bar.Y + 6 * S;
         foreach (var it in items)
         {
@@ -101,6 +99,13 @@ public sealed partial class Hud
     private void DrawMenuIcon(MenuIcon icon, Rectangle r, Color col)
     {
         float s = Math.Min(r.Width, r.Height) * 0.78f;
+        // an image in gfx/interface/ui/menu_<name>.png replaces the drawn icon (white images take the button's text color)
+        if (Assets.Texture($"gfx/interface/ui/menu_{icon.ToString().ToLowerInvariant()}.png") is { } img)
+        {
+            float isz = Math.Min(r.Width, r.Height) * 0.9f;
+            Gui.Image(img, new Rectangle(r.X + (r.Width - isz) / 2, r.Y + (r.Height - isz) / 2, isz, isz), col);
+            return;
+        }
         var c = new Vector2(r.X + r.Width / 2, r.Y + r.Height / 2);
         float h = s / 2, t = Math.Max(2f, 2.4f * S);
         var dark = new Color(0, 0, 0, 160);
@@ -160,6 +165,15 @@ public sealed partial class Hud
                 Raylib.DrawLineEx(c + new Vector2(0, -h * 0.95f), c + new Vector2(0, h * 0.85f), t * 1.6f, col);
                 Raylib.DrawTriangle(c + new Vector2(0, -h * 0.35f), c + new Vector2(-h, h * 0.15f), c + new Vector2(h, h * 0.15f), col);
                 Raylib.DrawTriangle(c + new Vector2(0, h * 0.5f), c + new Vector2(-h * 0.45f, h * 0.85f), c + new Vector2(h * 0.45f, h * 0.85f), col);
+                break;
+            case MenuIcon.Population:
+                // three heads and shoulders
+                foreach (var (dx, sc) in new[] { (-0.55f, 0.75f), (0.55f, 0.75f), (0f, 1f) })
+                {
+                    var hc = c + new Vector2(h * dx, 0);
+                    Raylib.DrawCircleV(hc + new Vector2(0, -h * 0.35f * sc), h * 0.28f * sc, col);
+                    Raylib.DrawCircleSector(hc + new Vector2(0, h * 0.75f), h * 0.55f * sc, 180, 360, 16, col);
+                }
                 break;
             case MenuIcon.Politics:
                 // a parliament building: pediment, columns and steps

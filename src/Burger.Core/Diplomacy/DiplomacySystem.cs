@@ -4,12 +4,16 @@ using Burger.Core.Scripting;
 namespace Burger.Core.Diplomacy;
 
 /// <summary>Opinions, data-driven diplomatic actions, wars, war score and peace deals.</summary>
-public sealed class DiplomacySystem
+public sealed partial class DiplomacySystem
 {
     private readonly Game _game;
     private readonly HashSet<Country> _aliveLastCheck = new();
 
-    public DiplomacySystem(Game game) { _game = game; }
+    public DiplomacySystem(Game game)
+    {
+        _game = game;
+        game.SaveSections.Add(new Burger.Core.Modding.SaveSection { Name = "war_goals", Write = SaveWarGoals, Read = LoadWarGoals, Reset = ResetWarGoals });
+    }
 
     private Relations R => _game.World.Relations;
     private DiplomacyRules Rules => _game.Rules.Diplomacy;
@@ -22,7 +26,8 @@ public sealed class DiplomacySystem
     public double Opinion(Country from, Country to)
     {
         if (from == to) return 200;
-        return Math.Clamp(Rules.BaseOpinion(_game, from, to) + R.ModifierSum(from, to) + _game.Politics.IdeologyOpinion(from, to), -200, 200);
+        return Math.Clamp(Rules.BaseOpinion(_game, from, to) + R.ModifierSum(from, to) + _game.Politics.IdeologyOpinion(from, to) + _game.Population.ReligionOpinion(from, to)
+                          + _game.Population.ColonialOpinion(from, to), -200, 200);
     }
 
     public void AddOpinion(Country from, Country to, string name, double value, double decayPerMonth = -1, int? durationDays = null)
@@ -201,7 +206,7 @@ public sealed class DiplomacySystem
     {
         CasusBelli? best = null;
         foreach (var cb in _game.Data.CasusBelli.Values.OrderByDescending(c => c.AiWeight))
-            if (Rules.CannotDeclareWarReason(_game, attacker, defender, cb) == null) { best = cb; break; }
+            if (CanUse(attacker, defender, cb)) { best = cb; break; }
         return best;
     }
 
@@ -233,15 +238,21 @@ public sealed class DiplomacySystem
             Name = $"{attacker.Name} - {defender.Name} War",
         };
         w.Wars.Add(war);
+        InvalidateCasusBelli();
+        war.LastChangeDay = w.Date.TotalDays;
+        if (cb != null) war.Goals.Add(new WarGoal { Holder = attacker, Target = defender, CasusBelli = cb });
+        CasusBelliUsed[cb?.Key ?? "none"] = CasusBelliUsed.GetValueOrDefault(cb?.Key ?? "none") + 1;
         AddParticipant(war, attacker, true);
         AddParticipant(war, defender, false);
+        // the defender fights for its own claims too
+        AddJoinGoal(war, defender);
 
         foreach (var s in R.SubjectsOf(defender).ToList())
-            if (R.SubjectTypeOf(s)?.JoinsOverlordWars == true) JoinWar(s, war, false);
+            if (JoinsOverlord(s)) JoinWar(s, war, false);
         foreach (var s in R.SubjectsOf(attacker).ToList())
-            if (R.SubjectTypeOf(s)?.JoinsOverlordWars == true) JoinWar(s, war, true);
+            if (JoinsOverlord(s)) JoinWar(s, war, true);
         var defOverlord = R.OverlordOf(defender);
-        if (defOverlord != null && !war.Involves(defOverlord)) JoinWar(defOverlord, war, false);
+        if (defOverlord != null && !war.Involves(defOverlord) && defOverlord != attacker) JoinWar(defOverlord, war, false);
 
         foreach (var ally in R.AlliesOf(defender).Concat(R.GuarantorsOf(defender)).Distinct().ToList())
             CallToArms(war, defender, ally, false);
@@ -314,6 +325,7 @@ public sealed class DiplomacySystem
     {
         if (war.Involves(c)) return;
         AddParticipant(war, c, attackerSide);
+        AddJoinGoal(war, c);
         _game.NotifyPlayer($"{c.Name} joined the {war.Name}.", NotificationKind.War, war.Attackers.Concat(war.Defenders).ToArray());
         _game.RaiseMapChanged();
     }
@@ -327,6 +339,7 @@ public sealed class DiplomacySystem
         war.Defenders.Remove(c);
         var until = _game.World.Date.AddYears(_game.Data.Defines.TruceYears);
         foreach (var e in enemies) R.AddTruce(c, e, until);
+        InvalidateCasusBelli();
         CleanUpAfterPeace(new[] { c }, enemies);
         if (war.Attackers.Count == 0 || war.Defenders.Count == 0) { EndWar(war); return; }
         if (war.AttackerLeader == c) war.AttackerLeader = war.Attackers[0];
@@ -338,6 +351,7 @@ public sealed class DiplomacySystem
     public void EndWar(War war)
     {
         if (!_game.World.Wars.Remove(war)) return;
+        InvalidateCasusBelli();
         var until = _game.World.Date.AddYears(_game.Data.Defines.TruceYears);
         foreach (var a in war.Attackers)
             foreach (var d in war.Defenders)
@@ -369,6 +383,9 @@ public sealed class DiplomacySystem
         foreach (var war in _game.World.Wars) war.WarScore = ComputeWarScore(war);
     }
 
+    /// <summary>Peace cost of one term (for the peace window).</summary>
+    public double TermCost(War war, PeaceTerm t, Country winner, Country loser) => Rules.PeaceTermCost(_game, war, t, winner, loser);
+
     public double ComputeWarScore(War war)
     {
         double occAtt = 0, occDef = 0, totAtt = 0, totDef = 0;
@@ -395,6 +412,7 @@ public sealed class DiplomacySystem
         double score = (totDef > 0 ? 100 * occAtt / totDef : 0) - (totAtt > 0 ? 100 * occDef / totAtt : 0);
         double cap = _game.Data.Defines.WarScoreBattleCap;
         score += Math.Clamp(war.BattleScore, -cap, cap);
+        score += war.TickingScore;
         return Math.Clamp(score, -100, 100);
     }
 
@@ -438,8 +456,13 @@ public sealed class DiplomacySystem
                 case PeaceTermType.Gold:
                     if (t.Amount <= 0) return "Invalid amount";
                     break;
+                default:
+                    if (InvalidNewTerm(war, t, winner, loser) is { } why) return why;
+                    break;
             }
         }
+        if (o.FromIsWinner && o.Terms.Any(t => t.Type != PeaceTermType.WhitePeace) && OfferCost(o) > MaxDemands(war, winner) + 0.01)
+            return $"Demands are limited to {MaxDemands(war, winner):0} by the war goals";
         if (o.Terms.Count(t => t.Type is PeaceTermType.Annex) > 1) return "Only one annexation";
         return null;
     }
@@ -487,6 +510,8 @@ public sealed class DiplomacySystem
         var war = o.War;
         var (winner, loser) = WinnerLoser(o);
         if (o.Terms.Count == 0) o.Terms.Add(new PeaceTerm { Type = PeaceTermType.WhitePeace });
+        PeaceDeals++;
+        if (o.Terms.All(t => t.Type == PeaceTermType.WhitePeace)) WhitePeaces++;
         foreach (var t in o.Terms)
         {
             switch (t.Type)
@@ -511,6 +536,9 @@ public sealed class DiplomacySystem
                         (t.Beneficiary ?? winner).Gold += amount;
                         break;
                     }
+                default:
+                    ApplyNewTerm(t, winner, loser);
+                    break;
             }
         }
         _game.Notify($"Peace: {string.Join(", ", o.Terms)} ({winner.Name} / {loser.Name})", NotificationKind.War);
@@ -564,6 +592,10 @@ public sealed class DiplomacySystem
     public void MonthlyTick()
     {
         R.MonthlyUpdate(_game.World.Date);
+        MonthlyWars();
+        MonthlyExhaustion();
+        MonthlyLiberty();
+        _goalStates.Clear();
     }
 
     /// <summary>Removes countries that lost all their land from wars and relations.</summary>
@@ -573,7 +605,10 @@ public sealed class DiplomacySystem
         foreach (var c in w.Countries)
         {
             if (c.Exists) { _aliveLastCheck.Add(c); continue; }
-            if (!_aliveLastCheck.Remove(c)) continue;
+            // gone since the last check, or without land but still with forces, wars or a player (e.g. right after loading)
+            bool leftovers = c.IsPlayer || w.Wars.Any(x => x.Involves(c)) || w.Divisions.Any(d => d.Owner == c)
+                             || _game.Navy.FleetsOf(c).Any() || _game.Air.WingsOf(c).Any();
+            if (!_aliveLastCheck.Remove(c) && !leftovers) continue;
             // c just ceased to exist
             foreach (var war in w.Wars.Where(x => x.Involves(c)).ToList()) LeaveWar(c, war);
             R.RemoveCountry(c);
@@ -581,7 +616,19 @@ public sealed class DiplomacySystem
             foreach (var army in w.Armies.Where(a => a.Owner == c).ToList()) w.Armies.Remove(army);
             foreach (var l in w.Locations.Where(l => l.Controller == c)) l.Controller = l.Owner;
             c.Recruitment.Clear();
+            // nothing of it keeps acting: fleets, air wings, lend-lease, factories and building queues go too
+            foreach (var f in _game.Navy.FleetsOf(c).ToList()) _game.Navy.DisbandFleet(f);
+            foreach (var wing in _game.Air.WingsOf(c).ToList()) _game.Air.Disband(wing);
+            _game.Support.Deals.RemoveAll(d => d.From == c || d.To == c);
+            c.ProductionLines.Clear();
+            c.Construction.Clear();
             _game.Notify($"{c.Name} has ceased to exist.", NotificationKind.War);
+            if (c.IsPlayer)
+            {
+                // the player's country is gone: keep watching as an observer
+                _game.SetPlayer(null);
+                _game.Notify($"{c.Name} has fallen. You are now an observer.", NotificationKind.War);
+            }
             _game.Mods.Invoke(m => m.OnCountryEliminated(c));
             _game.Events.FireOnAction("on_country_eliminated", c);
         }

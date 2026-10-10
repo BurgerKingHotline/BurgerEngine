@@ -46,6 +46,7 @@ public sealed partial class PoliticsSystem
         {
             if (!c.Exists || CivilWars.Any(cw => cw.Origin == c || cw.Rebel == c)) continue;
             var p = Of(c);
+            bool calm = _game.World.Date.TotalDays < p.CalmUntilDay;
             foreach (var i in Ideologies)
             {
                 double pop = p.Popularity.GetValueOrDefault(i.Key);
@@ -63,20 +64,22 @@ public sealed partial class PoliticsSystem
                 else { m.Demand = demand.Value.Demand; m.TargetLaw = demand.Value.Law; }
                 m.Progress = Math.Clamp(m.Progress + Rules.MovementProgress(_game, c, m, pop), 0, 100);
                 if (m.Progress <= 0 && pop < threshold) { Movements.Remove(m); continue; }
-                if (m.Progress >= 100)
+                if (m.Progress >= 100 && !calm)
                 {
                     Movements.Remove(m);
                     Revolt(c, i.Key, pop, "revolution");
                     break; // one revolt per country per month
                 }
             }
-            if (!c.Exists || CivilWars.Any(cw => cw.Origin == c)) continue;
-            // HOI4 style: a shut-out ideology with majority support may start a civil war at any time
-            foreach (var i in Ideologies)
+            if (!c.Exists || CivilWars.Any(cw => cw.Origin == c) || calm || _game.World.Date.TotalDays < p.CalmUntilDay) continue;
+            // a popular shut-out ideology may seize power in a coup, or (HOI4 style) start a civil war
+            foreach (var i in Ideologies.OrderByDescending(i => p.Popularity.GetValueOrDefault(i.Key)))
             {
                 if (InGovernment(c, i.Key)) continue;
                 double pop = p.Popularity.GetValueOrDefault(i.Key);
                 if (DemandOf(c, p, i.Key) == null) continue; // it can simply win the next election
+                double coup = Rules.CoupChance(_game, c, i, pop);
+                if (coup > 0 && _game.Rng.NextDouble() < coup) { Coup(c, i.Key); break; }
                 double chance = Rules.CivilWarChance(_game, c, i, pop);
                 if (chance > 0 && _game.Rng.NextDouble() < chance) { Revolt(c, i.Key, pop, "civil war"); break; }
             }
@@ -132,12 +135,32 @@ public sealed partial class PoliticsSystem
     /// <summary>A revolt: a civil war if the game has armies and wars, otherwise a coup.</summary>
     private void Revolt(Country c, string ideology, double popularity, string kind)
     {
-        bool war = _game.Features.Has(FeatureSet.Military) && _game.Features.Has(FeatureSet.Diplomacy) && c.OwnedStates.Count >= 2;
+        bool war = _game.Features.Has(FeatureSet.Military) && _game.Features.Has(FeatureSet.Diplomacy) && c.OwnedStates.Count >= 2
+                   && Rules.RevoltIsCivilWar(_game, c, ideology, popularity);
         if (war && StartCivilWar(c, ideology, Rules.CivilWarShare(_game, c, ideology, popularity)) != null) return;
-        // a coup: the ideology takes over without a war
-        SetRulingParty(c, ideology, "coup");
-        Revolutions++;
+        Coup(c, ideology);
     }
+
+    /// <summary>The ideology takes power without a war; its supporters are heartened and things calm down for a while.</summary>
+    public void Coup(Country c, string ideology)
+    {
+        Movements.RemoveAll(m => m.Country == c && m.Ideology == ideology);
+        SetRulingParty(c, ideology, "coup");
+        AddPopularity(c, ideology, 0.05);
+        Calm(c);
+        Revolutions++;
+        Coups++;
+        CountRevolt(c);
+    }
+
+    private readonly Dictionary<Country, int> _revolts = new();
+
+    /// <summary>Coups and civil wars a country has had in this game (for the Ledger; saved).</summary>
+    public int RevoltsOf(Country c) => _revolts.GetValueOrDefault(c);
+
+    private void CountRevolt(Country c) => _revolts[c] = _revolts.GetValueOrDefault(c) + 1;
+
+    private void Calm(Country c) => Of(c).CalmUntilDay = _game.World.Date.TotalDays + (int)(Rules.CalmYears(_game, c) * 365);
 
     /// <summary>
     /// Splits <paramref name="c"/>: a share of its home states and divisions forms a new country ruled by
@@ -221,12 +244,18 @@ public sealed partial class PoliticsSystem
             var mine = w.Divisions.Where(d => d.Owner == c && d.VolunteerFrom == null).ToList();
             int want = (int)Math.Round(mine.Count * share);
             int defected = 0;
-            foreach (var d in mine.Where(d => rebelLand.Contains(d.Location)).ToList()) { Defect(d, rebel, false); defected++; }
-            foreach (var d in mine.Where(d => d.Owner == c && !d.InBattle).OrderBy(d => d.Id).Skip(1).ToList())
+            // divisions in rebel land defect first; loyal ones left there fall back to the capital
+            foreach (var d in mine.Where(d => rebelLand.Contains(d.Location)).OrderBy(d => d.Id).ToList())
             {
-                if (defected >= want) break;
-                if (_game.Rng.NextDouble() < 0.5) continue;
-                Defect(d, rebel, true);
+                if (defected < want) { Defect(d, rebel, false); defected++; }
+                else if (d.Battle == null && c.Capital != null) { _game.Warfare.StopDivision(d); _game.Warfare.Teleport(d, c.Capital); }
+            }
+            // then others, spread over the army, until the rebels have their share
+            var rest = mine.Where(d => d.Owner == c && !d.InBattle).OrderBy(d => d.Id).ToList();
+            for (int k = 0; defected < want && k < rest.Count; k++)
+            {
+                if (rest.Count - k > want - defected && _game.Rng.NextDouble() < 0.5) continue;
+                Defect(rest[k], rebel, true);
                 defected++;
             }
         }
@@ -238,6 +267,7 @@ public sealed partial class PoliticsSystem
         war.Vars.SetFlag("civil_war");
         CivilWars.Add(new CivilWar { War = war, Origin = c, Rebel = rebel, Ideology = ideology });
         CivilWarsStarted++;
+        CountRevolt(c);
         _game.Notify($"Civil war in {c.Name}! The {PartyName(c, ideology)} rose up and formed {rebel.Name}.", c.IsPlayer ? NotificationKind.War : NotificationKind.Info);
         _game.Events.FireOnAction("on_civil_war_started", c, new Dictionary<string, IScope?>(StringComparer.OrdinalIgnoreCase) { ["rebel"] = rebel });
         _game.RaiseMapChanged();
@@ -285,6 +315,10 @@ public sealed partial class PoliticsSystem
         if (originWon)
         {
             _game.Diplomacy.Annex(origin, rebel);
+            // the rebels' cause is discredited for a while
+            var op0 = Of(origin);
+            AddPopularity(origin, cw.Ideology, -op0.Popularity.GetValueOrDefault(cw.Ideology) * 0.5);
+            AddPopularity(origin, op0.Ruling, 0.1);
             _game.Notify($"The {origin.Name} Civil War is over: {origin.Name} crushed the {rebel.Name} rebels.", origin.IsPlayer ? NotificationKind.Good : NotificationKind.Info);
         }
         else
@@ -311,6 +345,7 @@ public sealed partial class PoliticsSystem
             _game.Notify($"The {origin.Name} Civil War is over: the revolution won and the {PartyName(origin, cw.Ideology)} rules {origin.Name}.", origin.IsPlayer ? NotificationKind.War : NotificationKind.Info);
         }
         Movements.RemoveAll(m => m.Country == rebel);
+        Calm(origin);
         _game.Events.FireOnAction("on_civil_war_ended", origin);
         _game.RaiseMapChanged();
     }

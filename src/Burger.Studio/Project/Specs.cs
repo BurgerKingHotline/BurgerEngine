@@ -81,6 +81,9 @@ public static class Specs
             new FieldSpec("flag", "Flag", FieldKind.Image, "Image shown as the flag. Choose a PNG/JPG; it is copied into gfx/flags.") { ImageFolder = "gfx/flags", DefaultImage = "gfx/flags/{id}.png" },
             F("capital", "Capital", FieldKind.Location, "Location key"),
             F("government", "Government", FieldKind.Word, "Any word; scripts can check it with government = monarchy"),
+            F("culture", "Culture", FieldKind.Word, "Population feature: the country's culture (common/cultures)"),
+            F("religion", "Religion", FieldKind.Word, "Religion feature: the state religion (common/religions)"),
+            F("accepted_cultures", "Accepted cultures", FieldKind.List, "Population feature: cultures that count as the country's own"),
             F("playable", "Playable", FieldKind.Bool, "Can the player choose this country?"),
             F("gold", "Starting gold", FieldKind.Number),
             F("manpower", "Starting manpower", FieldKind.Number),
@@ -366,6 +369,49 @@ public static class Specs
             F("cost", "Cost (political power)", FieldKind.Number),
         },
         Template = "{id} = {\n\tname = \"New Post\"\n\tstat = charisma\n\tper_point = { stability_target = 0.5 }\n}\n",
+    };
+
+    public static readonly BlockSpec CultureGroups = new()
+    {
+        Title = "Culture groups",
+        Source = "common/cultures",
+        DefaultFile = "common/cultures/00_cultures.txt",
+        Help = "Culture groups and their cultures (population feature). Each culture is a block inside its group: name, color, religion. Cultures of one group accept each other (define culture_group_accepted). Countries set culture, religion and accepted_cultures in common/countries.",
+        ValidateId = IdRule,
+        Fields = { F("name", "Name", FieldKind.Text), F("color", "Color", FieldKind.Color) },
+        Template = "{id} = {\n\tname = \"New Culture Group\"\n\tcolor = { 150 150 150 }\n\tnew_culture = { name = \"New Culture\" }\n}\n",
+        ScriptFirst = true,
+    };
+
+    public static readonly BlockSpec ReligionGroups = new()
+    {
+        Title = "Religion groups",
+        Source = "common/religions",
+        DefaultFile = "common/religions/00_religions.txt",
+        Help = "Religion groups and their religions (religion feature). Each religion is a block inside its group: name, color.",
+        ValidateId = IdRule,
+        Fields = { F("name", "Name", FieldKind.Text), F("color", "Color", FieldKind.Color) },
+        Template = "{id} = {\n\tname = \"New Faith Group\"\n\tcolor = { 150 150 150 }\n\tnew_religion = { name = \"New Religion\" }\n}\n",
+        ScriptFirst = true,
+    };
+
+    public static readonly BlockSpec PopTypes = new()
+    {
+        Title = "Social classes",
+        Source = "common/pop_types",
+        DefaultFile = "common/pop_types/00_pop_types.txt",
+        Help = "Social classes (social_classes feature): share of new pops, growth, promotion, and state tax/manpower modifiers at 100% of the people.",
+        ValidateId = IdRule,
+        Fields =
+        {
+            F("name", "Name", FieldKind.Text),
+            F("color", "Color", FieldKind.Color),
+            F("share", "Share of new pops", FieldKind.Number, "0-1"),
+            F("growth", "Extra yearly growth", FieldKind.Number),
+            F("promote_to", "Promotes to", FieldKind.Word),
+            F("promote_rate", "Yearly promotion", FieldKind.Number),
+        },
+        Template = "{id} = {\n\tname = \"New Class\"\n\tshare = 0.1\n\tmodifier = { tax = 0.5 }\n}\n",
     };
 
     public static readonly BlockSpec Modifiers = new()

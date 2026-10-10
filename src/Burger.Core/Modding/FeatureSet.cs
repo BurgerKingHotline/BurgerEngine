@@ -36,6 +36,15 @@ public sealed class FeatureSet
     public const string Cabinet = "cabinet";
     public const string CivilWars = "civil_wars";
 
+    public const string Population = "population";
+    public const string Religion = "religion";
+    public const string SocialClasses = "social_classes";
+    public const string CoresClaims = "cores_claims";
+    public const string Colonization = "colonization";
+    public const string Independence = "independence";
+    public const string BuildingsClassic = "buildings_classic";
+    public const string BuildingsModern = "buildings_modern";
+
     /// <summary>The features games had before features existed (all on for a game without features.txt).</summary>
     public static readonly string[] BuiltIn = { Military, Diplomacy, Characters, CharacterInteractions, Economy, FogOfWar, Ai };
 

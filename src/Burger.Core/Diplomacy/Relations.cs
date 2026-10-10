@@ -13,6 +13,13 @@ public sealed class Relations
     public readonly HashSet<(Country Guarantor, Country Guaranteed)> Guarantees = new();
     public readonly Dictionary<Country, (Country Overlord, SubjectType Type)> Subjects = new();
     public readonly Dictionary<(Country, Country), GameDate> Truces = new();
+    /// <summary>Non-aggression pacts (pair) and when they run out.</summary>
+    public readonly Dictionary<(Country, Country), GameDate> Pacts = new();
+
+    // ------------------------------------------------------------------ non-aggression pacts
+    public bool HasPact(Country a, Country b, GameDate now) => a != b && Pacts.TryGetValue(Pair(a, b), out var until) && until > now;
+    public void AddPact(Country a, Country b, GameDate until) { if (a != b) Pacts[Pair(a, b)] = until; }
+    public void RemovePact(Country a, Country b) => Pacts.Remove(Pair(a, b));
 
     public static (Country, Country) Pair(Country a, Country b) => a.Index <= b.Index ? (a, b) : (b, a);
 
@@ -95,6 +102,7 @@ public sealed class Relations
             }
         }
         foreach (var k in Truces.Where(t => t.Value <= now).Select(t => t.Key).ToList()) Truces.Remove(k);
+        foreach (var k in Pacts.Where(t => t.Value <= now).Select(t => t.Key).ToList()) Pacts.Remove(k);
     }
 
     /// <summary>Removes everything involving a country (used when it ceases to exist).</summary>
@@ -103,6 +111,7 @@ public sealed class Relations
         Alliances.RemoveWhere(p => p.Item1 == c || p.Item2 == c);
         MilitaryAccess.RemoveWhere(p => p.Granter == c || p.Receiver == c);
         Guarantees.RemoveWhere(p => p.Guarantor == c || p.Guaranteed == c);
+        foreach (var k in Pacts.Keys.Where(k => k.Item1 == c || k.Item2 == c).ToList()) Pacts.Remove(k);
         Subjects.Remove(c);
         foreach (var s in Subjects.Where(kv => kv.Value.Overlord == c).Select(kv => kv.Key).ToList()) Subjects.Remove(s);
     }

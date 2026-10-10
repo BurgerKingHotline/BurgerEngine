@@ -296,12 +296,32 @@ missing candidates are generated. They step down when their party leaves the gov
 **Movements and civil wars** (`civil_wars`): an ideology shut out of power (banned, or no elections it could win) with
 at least `movement_threshold` (0.25) support forms a movement demanding to legalise its party or to take power. It
 grows each month (faster with low stability, `movement_speed`) and revolts at 100%: give in (its demand happens) or
-suppress it (`suppress_movement_cost` political power, some stability). A shut-out ideology above
-`civil_war_threshold` (0.5) may also start a civil war at any time (`civil_war_chance` per month). A civil war splits
-off part of the country's home states and army as a new country ruled by that ideology (tags R00, R01...). It ends
+suppress it (`suppress_movement_cost` political power, some stability). A shut-out ideology above `coup_threshold`
+(0.4) may seize power in a coup (`coup_chance` a month, likelier the more popular it is and the less popular the
+government and stability are); above `civil_war_threshold` (0.5) it may also start a civil war (`civil_war_chance`).
+A revolt is a coup instead of a civil war when the government's parties have less than `civil_war_loyal_share` (0.2)
+support or the rebels more than `coup_above` (0.75). After a coup or civil war, `revolt_calm_years` (5) pass before the
+next. A ruling party without elections keeps at least about `ruling_party_floor` (0.15) support. A civil war splits
+off a share of the country's home states, army, treasury and manpower equal to the ideology's support (10-90%) as a new
+country ruled by that ideology (tags R00, R01...); the Ledger counts the rebels as part of the country meanwhile. It ends
 when one side has lost its capital and most of its land (`civil_war_defeat_share`, 0.3): if the rebels win, the
 country keeps its name and tag but takes their government, laws and army. Civil wars cannot end with a peace deal.
 Without armies and wars (no `military`/`diplomacy`), revolts are coups.
+
+**Parties of minorities and faiths** (with population): in elections, people of an unaccepted culture vote for its
+national party (`minority_party_turnout`, 70%, of them, if they are at least `minority_party_min_share`, 3%) and people of
+another faith that make up `religious_party_min_share` (10%) for a religious party (`religious_party_turnout`, 40%). Only
+people outside colonies vote. These parties (seat keys `culture:KEY`, `religion:KEY`) win seats but never govern; national
+parties speed up independence movements. Rule `MinorityVotes` in backend/Politics.cs.
+
+**Election campaigns**: `election_campaign_days` (60) before an election the engine fires `on_election_campaign`; the
+politics feature ships campaign events (`events/politics_elections.txt`: rally the voters, promise reforms, a quiet campaign,
+scandals). `add_popularity = { ideology = ruling value = 0.05 }` changes the ruling party's support.
+
+**Culture policy** (population + laws): the law group `culture_policy` (`common/laws/10_culture_policy.txt`, shown only
+with population: law groups can have `potential`) - Equal Rights, Tolerance, Discrimination, Forced Assimilation. Modifier
+keys `minority_output` (unaccepted people count as this share of accepted ones for tax and manpower), `culture_tension`
+(how much unaccepted cultures lower stability), `assimilation`, `independence_speed`.
 
 **Scripts**: triggers `ruling_ideology = X` (or `has_government`), `in_government = X`, `same_ideology = scope:recipient`,
 `holds_elections = yes`, `party_banned = X`, `has_law = L`, `has_movement = yes|X`, `in_civil_war = yes`,
@@ -314,15 +334,119 @@ Console: `politics [TAG]`, `popularity X 0.1`, `ideology X`, `election [TAG]`, `
 
 ---------------------------------------------------------------------------------------------------
 
+## 4c. Population (Imperator style)
+
+Features: `population` (pops, cultures), `religion`, `social_classes`, `cores_claims`, `colonization`, `independence`, and the content
+packages `buildings_classic` (older eras) and `buildings_modern`. In the game: the People menu (U), the People,
+Culture and Religion map modes, the people of a state in its window, and the Ledger (F9).
+
+**Cultures** - `common/cultures/*.txt`: culture groups with their cultures inside (`name`, `color`, `religion` of new
+pops). Cultures of one group accept each other (define `culture_group_accepted = no` to turn off). A country sets
+`culture = german`, `religion = protestant` and `accepted_cultures = { ... }` in common/countries; without them it takes
+the biggest culture/faith of its states (a game without cultures gets one culture per country automatically).
+
+**Pops** - `history/pops/*.txt`:
+```
+berlin_state = {
+    pop = { culture = german religion = protestant size = 4200000 }
+    pop = { culture = jewish religion = judaism size = 160000 }    # type = burghers with social_classes
+    owned_since = 1871.1.18                                         # for cores (optional)
+}
+```
+States without an entry get people of the owner's culture (`pops_per_manpower` x manpower). Every month pops grow
+(`pop_growth`, slowing as the state fills its room: `pop_capacity_factor` x the starting people), people of unaccepted
+cultures assimilate (`assimilation_rate`), people of other faiths convert (`conversion_rate`) - except in colonies (states with
+`category = colony`, or non-core states not connected by land to the capital) - people move from crowded
+states to emptier ones of the same country (`migration_rate`). A state's tax and manpower are its base values times its
+people compared to the start, less for unaccepted cultures, other faiths and non-core states (`noncore_output`).
+Unaccepted cultures and other faiths lower stability (`culture_stability`, `religion_stability`). Countries can accept
+a culture that makes up at least `accept_culture_share` of their people (People menu; political power or gold).
+People in colonies (states with `category = colony`, or non-core states not connected by land to the capital) do not count
+for the culture and religion figures, stability or accepting cultures: a people that lives only in colonies cannot be accepted.
+
+Modifier keys: `pop_growth` (yearly, state or country), `pop_capacity` (+share), `assimilation`, `conversion`,
+`promotion` (+share of speed), `colonists`, `colony_speed`, `colony_range`.
+
+**Social classes** - `common/pop_types/*.txt`: `share` of new pops, `growth`, `promote_to` / `promote_rate`, and a
+`modifier` block (state `tax` / `manpower` at 100% of the people in that class, scaled by its share).
+
+**Religion** - `common/religions/*.txt`: groups with religions inside. Opinion: same religion `same_religion_opinion`
+(10), same group `same_religion_group_opinion` (0), other `other_religion_opinion` (-10).
+
+**Cores and claims** (`cores_claims`): an owner can only core a state where at least `core_culture_share` (half) of the
+people are of cultures it accepts: at once if its own culture is the majority, otherwise after `core_years` (25) of
+ownership (rule `CanCore` in backend/Population.cs); former owners lose a core after `core_loss_years` (50) unless their culture lives there
+(a claim remains). Every January countries claim neighbouring states where their culture is the majority; the action
+`claim_fellow_believers` claims states of fellow believers (religion).
+
+**Colonization** (`colonization`): send colonists to an unowned state within `colony_range_km` (1200 km) of your land
+(`colonize_cost` gold, `colony_upkeep` gold a month with the economy); it grows `colony_speed` (4%) a month, natives
+slow it and attack now and then (`native_resistance`), and at 100% it becomes your state with `colony_settlers` people.
+
+**Independence** (`independence`): people of an unaccepted culture that is the majority in some states (never the capital
+state) form a movement once they are `independence_min_share` (2%) of the country. It grows each month (rule
+`IndependenceProgress`: `independence_speed`, 0.4; slower in colonies than in conquered land - `colonial_independence_factor` 0.6 - faster at low stability and
+in lost wars; modifier `independence_speed`). The owner can suppress it (`suppress_independence_cost`, more each time),
+release the states, or accept the culture. At 100% the states declare independence: a fallen country of that culture comes
+back, or a new one forms (culture `country_name`, default "<Culture> Republic"); with armies and wars it raises a militia
+(`independence_people_per_division`), part of the garrison defects (`independence_garrison_defect`) and it wins if it still
+holds half its land after `independence_war_months` (24). On actions: `on_independence_movement`, `on_independence_declared`,
+`on_independence` (scope: the new country, `scope:origin`).
+
+**Buildings**: any building can have `modifier = { ... }` (its state, per level) and `country_modifier = { ... }` (its
+owner, per level). Without production they are bought with gold in the state window (`gold_cost`, `build_months`); with
+production they are built with civilian factories (`cost`).
+
+**Scripts**: triggers `culture = X` / `culture_group = X` / `religion = X` / `religion_group = X` (country: its own;
+state or location: the majority), `has_accepted_culture = X`, `same_culture` / `same_religion = scope:recipient`,
+`has_fellow_believers_in = scope:recipient`, `is_colonizing = yes`; values `population` (country, state), `accepted_share`,
+`faithful_share`, `num_of_colonies`; effects `add_pops = { culture = X religion = Y size = 1000 }` (state; negative
+removes), `set_culture`, `add_accepted_culture`, `remove_accepted_culture`, `set_state_religion`,
+`convert_pops = { religion = X share = 0.5 }`, `assimilate_pops = { culture = X share = 0.5 }`,
+`add_religious_claims = scope:recipient`. On action: `on_colony_founded` (scope:state).
+
+---------------------------------------------------------------------------------------------------
+
 ## 5. Diplomacy (Imperator style)
 
 - **Opinion**: modifiers that decay (`add_opinion`, `reverse_add_opinion`) plus a base from the relationship.
 - **Relations**: alliances, guarantees, military access, subjects (`common/subject_types.txt`), truces, claims.
   The number of alliances, guarantees and subjects is limited (`base_diplomatic_relations` + ruler charisma).
-- **Wars**: declared with a casus belli (`common/casus_belli.txt`); defenders' allies and guarantors are called in,
-  and allies can refuse (which breaks the alliance). **War score** comes from occupation and battles.
-- **Peace**: demand states, subjugation, annexation or gold. Each costs war score. The AI accepts if your war
-  score covers the cost. The AI also sends offers, which you accept or decline in a popup.
+- **Wars**: declared with a casus belli (`common/casus_belli.txt`, EU style; the player picks one in the Declare War window).
+  A casus belli has a `war_goal` (conquest, claims, cores, culture, religion, liberation, ideology, independence,
+  subjugation, humiliation): claims/cores/culture/religion/liberation are valid only if the target has such states.
+  Demands that match the goal cost `goal_cost_multiplier`, a deal can cost at most `max_demands`, and with
+  `ticking_war_score` holding the goal states adds war score every month (up to `max_ticking_war_score`, 25; not holding
+  any after a year takes it away). The defender and every ally that joins add their own goal (their best land casus belli
+  against an enemy): **faction war goals** - their states are cheap for them and go to them in peace deals.
+  Defenders' allies and guarantors are called in; allies can refuse (which breaks the alliance).
+  **War score** comes from occupation, battles and the ticking goal.
+- **War exhaustion** (0-`max_war_exhaustion`, 20): grows while at war (`war_exhaustion_monthly`), with enemy occupation
+  (`war_exhaustion_occupation`), men lost in battle compared to the army (`war_exhaustion_casualties`) and fronts that do
+  not move for a year (`war_exhaustion_stalemate`); falls at peace (`war_exhaustion_recovery`). It lowers stability,
+  manpower and political power, keeps exhausted allies at home and makes countries accept peace sooner (rules
+  `MonthlyWarExhaustion`, `WarExhaustionModifier`, `PeaceWillingness`).
+- **Peace**: demand states, subjugation, annexation, gold, freeing the loser's subjects (independence), releasing a people of
+  the loser as a country, regime change (the winner's ideology takes power) or humiliation. Each costs war score. The AI
+  accepts if your war score (plus its war exhaustion, a long war or a stalemate) covers the cost. AI winners demand their
+  war goals first; the AI offers peace when losing, worn out, or when a war goes nowhere. The old ruler in a war of
+  independence accepts a white peace only when losing or exhausted.
+- **Liberty desire** (subjects, 0-100, EU style): from the subject's strength and size compared to its overlord, its opinion
+  of it, a different ideology or culture group, the overlord losing a war, the tribute, `liberty_desire` of the subject type
+  and the modifier `liberty_desire`. At 50 (`liberty_desire_rebel`) the subject stops joining its overlord's wars and may
+  fight a War of Independence (casus belli `independence`); the AI overlord releases subjects that want out and could win.
+- **Non-aggression pacts**: no war between the two for 10 years; breaking one angers everyone (`break_pact_opinion`).
+- **Diplomatic plays**: the action Demand State asks for a state we claim (or have a core on); a refusal means war.
+- **The end of a country**: when a country loses its last state its armies, fleets, air wings, lend-lease and factory
+  queues go too; if it was the player's, the player becomes an observer.
+- **Opinion of colonial empires** (independence feature): countries with few colonies dislike countries with many
+  (`colonial_opinion_per_colony`, up to `max_colonial_opinion`), more so as decolonisation pressure grows with every country
+  that gains its independence; granting independence is applauded.
+
+Scripts: triggers `has_casus_belli = { target = scope:recipient type = reclaim_cores }` (no type: any but conquest),
+`has_non_aggression_pact = scope:recipient`, `ideological_enemy = scope:recipient`, `same_religion_group = scope:recipient`;
+values `war_exhaustion`, `liberty_desire`; effects `create_non_aggression_pact = { target = scope:recipient years = 10 }`,
+`break_non_aggression_pact = scope:recipient`, `add_war_exhaustion = 2`, `cede_claimed_state = scope:recipient`.
 
 ### Diplomatic actions: `common/diplomatic_actions/*.txt`
 
@@ -515,7 +639,7 @@ Add and remove them in Burger Studio (*Project > Features*) or with `burger feat
 | Script value | `common/script_values/*.txt` | a named formula usable anywhere a number is (`value`, `add`, `multiply`, `if`, `every_...`, `min`, `max`, `round`) |
 | Window | `interface/*.txt` `panel = { }` | a button in the left menu bar (`icon = "gfx/...png"`, or its first letters) + a window on the left with `header`, `text`, `bar`, `button`, `separator`, `list` |
 | Map mode | `interface/*.txt` `map_mode = { }` | locations colored by a value between `low_color` and `high_color` |
-| Look of the interface | `interface/theme.txt` `theme = { }` | fonts (`font`, `bold_font`, `header_font`), `font_scale`, `ui_scale`, `ornate`, colors, optional 9-slice `panel_texture` / `button_texture` / `top_bar_texture` |
+| Look of the interface | `interface/theme.txt` `theme = { }` | fonts (`font`, `bold_font`, `header_font`), `font_scale`, `ui_scale`, `ornate`, colors, `textures = { panel = "gfx/interface/ui/panel.png" ... }`: an image per element (panel, panel_header, menu_bar, top_bar, tooltip, button, button_hover, button_selected, button_disabled, close_button(_hover), bar, bar_fill, text_field(_focused), scrollbar, scroll_thumb, card, card_selected, section_line), `texture_borders = { panel = 12 }` (9-slice edges); menu icons `gfx/interface/ui/menu_<name>.png`. New projects ship editable default images (made by tools/assets/make_ui_gfx.py) |
 
 **Theme.** Every color the interface uses has a name: `panel panel_border panel_inner_border panel_header top_bar
 text text_dim title good bad button button_hover button_selected button_disabled button_border tooltip menu_bar`.

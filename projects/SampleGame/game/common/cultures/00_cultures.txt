@@ -1,0 +1,30 @@
+# Cultures (population feature), in culture groups. Cultures of the same group count as accepted by each other
+# (define culture_group_accepted = no to turn that off). A country's culture and religion are set in common/countries.
+#   name, color, religion (religion of new pops of this culture)
+
+westerling = {
+	name = "Westerling"
+	color = { 70 100 170 }
+	valorian = { name = "Valorian" color = { 60 90 180 } religion = catholic }
+	ostmarker = { name = "Ostmarker" color = { 90 110 150 } religion = catholic }
+	brennish = { name = "Brennish" color = { 170 110 160 } religion = catholic }
+	ulmari = { name = "Ulmari" color = { 140 160 60 } religion = catholic }
+}
+kestrine = {
+	name = "Kestrine"
+	color = { 190 80 60 }
+	kestrine = { name = "Kestrine" color = { 200 70 50 } religion = protestant }
+	marrowman = { name = "Marrowman" color = { 70 170 170 } religion = protestant }
+	thalorian = { name = "Thalorian" color = { 60 150 90 } religion = protestant }
+}
+easterling = {
+	name = "Easterling"
+	color = { 130 80 150 }
+	dravian = { name = "Dravian" color = { 110 70 150 } religion = orthodox }
+	zemlyan = { name = "Zemlyan" color = { 160 100 60 } religion = orthodox }
+}
+sundari = {
+	name = "Sundari"
+	color = { 210 170 70 }
+	sundari = { name = "Sundari" color = { 220 180 60 } religion = sunni }
+}

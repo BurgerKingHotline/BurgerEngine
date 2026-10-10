@@ -3,9 +3,9 @@ using Burger.Core.Model;
 namespace Burger.Runtime;
 
 /// <summary>Panels on the left: your own country's menus (left menu bar) and the location/country you clicked.</summary>
-public enum LeftPanel { None, Location, Country, Military, Recruit, Characters, Decisions, Custom, Production, Designer, Navy, Air, Politics }
+public enum LeftPanel { None, Location, Country, Military, Recruit, Characters, Decisions, Custom, Production, Designer, Navy, Air, Politics, Population }
 /// <summary>Panels on the right: world-wide overviews opened from the top right.</summary>
-public enum RightPanel { None, Wars, Peace, World }
+public enum RightPanel { None, Wars, Peace, World, Ledger }
 /// <summary>Battle plan drawing tools: front segment, offensive arrow, fallback line.</summary>
 public enum PlanTool { None, Front, Arrow, Fallback }
 
@@ -19,6 +19,10 @@ public sealed class PeaceDraft
     public bool Annex;
     public double Gold;
     public bool Concede; // offer to give things up instead of demanding
+    public bool FreeSubjects;   // independence for the loser's subjects that fight with the winner
+    public bool RegimeChange;   // put the winner's ideology in power
+    public bool Humiliate;
+    public HashSet<string> Release = new(); // peoples of the loser to free (cultures)
 }
 
 /// <summary>Everything the player has selected or opened.</summary>

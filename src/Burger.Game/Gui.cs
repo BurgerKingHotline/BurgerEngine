@@ -19,6 +19,25 @@ public static class Gui
     public static bool Ornate = true;
     private static Texture2D? _panelTex, _buttonTex, _topBarTex;
     private static int _texBorder = 12;
+    // interface images by element name (theme textures = { ... }), with their 9-slice borders
+    private static readonly Dictionary<string, (Texture2D Tex, int Border)> _skins = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly Dictionary<string, int> DefaultBorders = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["panel"] = 12, ["menu_bar"] = 12, ["panel_header"] = 6, ["top_bar"] = 6, ["tooltip"] = 6, ["button"] = 6, ["button_hover"] = 6,
+        ["button_selected"] = 6, ["button_disabled"] = 6, ["close_button"] = 0, ["close_button_hover"] = 0, ["bar"] = 3, ["bar_fill"] = 3,
+        ["text_field"] = 4, ["text_field_focused"] = 4, ["scrollbar"] = 2, ["scroll_thumb"] = 2, ["card"] = 4, ["card_selected"] = 4, ["section_line"] = 0,
+    };
+
+    /// <summary>True if the theme gives an image for this element.</summary>
+    public static bool HasSkin(string name) => _skins.ContainsKey(name);
+
+    /// <summary>Draws the element's image (9-slice) if the theme has one; false = draw it with colors instead.</summary>
+    public static bool Skin(string name, Rectangle r, Color? tint = null)
+    {
+        if (!_skins.TryGetValue(name, out var sk)) return false;
+        NinePatch(sk.Tex, r, tint ?? Color.White, sk.Border);
+        return true;
+    }
     private static float _fontScale = 1f;
     private static float _uiScale = 1f;
     private static int _themeVersion = -1;
@@ -90,9 +109,20 @@ public static class Gui
         _fontScale = theme.FontScale;
         _uiScale = theme.UiScale;
         _texBorder = Math.Max(1, theme.TextureBorder);
-        _panelTex = Assets.Texture(theme.PanelTexture);
-        _buttonTex = Assets.Texture(theme.ButtonTexture);
-        _topBarTex = Assets.Texture(theme.TopBarTexture);
+        _skins.Clear();
+        foreach (var name in ThemeDef.KnownTextures.Concat(theme.Textures.Keys).Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            var path = theme.TextureOf(name);
+            if (path == null) continue;
+            var tex = Assets.Texture(path);
+            if (tex == null) { Burger.Core.Log.Warn($"Interface image for '{name}' not found: {path}"); continue; }
+            bool legacy = name is "panel" or "button" or "top_bar" && !theme.Textures.ContainsKey(name);
+            int border = theme.TextureBorders.TryGetValue(name, out var b) ? b : legacy ? _texBorder : DefaultBorders.GetValueOrDefault(name, 4);
+            _skins[name] = (tex.Value, border);
+        }
+        _panelTex = _skins.TryGetValue("panel", out var pt) ? pt.Tex : null;
+        _buttonTex = _skins.TryGetValue("button", out var bt) ? bt.Tex : null;
+        _topBarTex = _skins.TryGetValue("top_bar", out var tt) ? tt.Tex : null;
         Assets.LoadFonts(theme);
     }
 
@@ -118,6 +148,7 @@ public static class Gui
         _prevBlockers.AddRange(_blockers);
         _blockers.Clear();
         MouseOverUi = _prevBlockers.Any(r => Raylib.CheckCollisionPointRec(Mouse, r));
+        _clips.Clear();
         _tooltip = null;
         LeftClickConsumed = false;
         _wheelUsed = false;
@@ -134,7 +165,10 @@ public static class Gui
     /// <summary>Registers a rectangle as UI so map clicks below it are ignored.</summary>
     public static void Block(Rectangle r) => _blockers.Add(r);
 
-    public static bool Hover(Rectangle r) => Raylib.CheckCollisionPointRec(Mouse, r);
+    /// <summary>True if the mouse is over the rectangle (and inside the scroll area being drawn, so rows scrolled out of view cannot be clicked).</summary>
+    public static bool Hover(Rectangle r) => Raylib.CheckCollisionPointRec(Mouse, r) && (_clips.Count == 0 || Raylib.CheckCollisionPointRec(Mouse, _clips.Peek()));
+
+    private static readonly Stack<Rectangle> _clips = new();
 
     public static bool Clicked(Rectangle r)
     {
@@ -237,9 +271,11 @@ public static class Gui
     public static void Gradient(Rectangle r, Color top, Color bottom)
         => Raylib.DrawRectangleGradientV((int)MathF.Round(r.X), (int)MathF.Round(r.Y), (int)MathF.Round(r.Width), (int)MathF.Round(r.Height), top, bottom);
 
-    private static void NinePatch(Texture2D tex, Rectangle r, Color tint)
+    private static void NinePatch(Texture2D tex, Rectangle r, Color tint, int border = -1)
     {
-        int b = Math.Min(_texBorder, Math.Min(tex.Width, tex.Height) / 2 - 1);
+        if (border < 0) border = _texBorder;
+        if (border == 0) { Raylib.DrawTexturePro(tex, new Rectangle(0, 0, tex.Width, tex.Height), r, Vector2.Zero, 0, tint); return; }
+        int b = Math.Max(1, Math.Min(border, Math.Min(tex.Width, tex.Height) / 2 - 1));
         var info = new NPatchInfo { Source = new Rectangle(0, 0, tex.Width, tex.Height), Left = b, Top = b, Right = b, Bottom = b, Layout = NPatchLayout.NinePatch };
         Raylib.DrawTextureNPatch(tex, info, r, Vector2.Zero, 0, tint);
     }
@@ -247,10 +283,11 @@ public static class Gui
     private static void Diamond(Vector2 c, float radius, Color col) => Raylib.DrawPoly(c, 4, radius, 45, col);
 
     /// <summary>The decorated frame used by panels: gradient, dark outer line, gold inner line and corner studs.</summary>
-    public static void Frame(Rectangle r, Color bg, bool shadow = true)
+    public static void Frame(Rectangle r, Color bg, bool shadow = true, string skin = "panel")
     {
         if (shadow) Raylib.DrawRectangleRec(new Rectangle(r.X + 4, r.Y + 5, r.Width, r.Height), new Color(0, 0, 0, 80));
-        if (_panelTex != null) { NinePatch(_panelTex.Value, r, Color.White); return; }
+        if (Skin(skin, r)) return;
+        if (skin != "panel" && Skin("panel", r)) return;
         if (!Ornate)
         {
             Raylib.DrawRectangleRec(r, bg);
@@ -273,7 +310,7 @@ public static class Gui
     /// <summary>The top bar background.</summary>
     public static void TopBarBackground(Rectangle r)
     {
-        if (_topBarTex != null) { NinePatch(_topBarTex.Value, r, Color.White); return; }
+        if (Skin("top_bar", r)) return;
         Gradient(r, Lighter(TopBar, 0.08f), Darker(TopBar, 0.45f));
         Raylib.DrawLineEx(new Vector2(r.X, r.Y + r.Height - 1), new Vector2(r.X + r.Width, r.Y + r.Height - 1), 2, PanelBorder);
         Raylib.DrawLineEx(new Vector2(r.X, r.Y + r.Height + 1), new Vector2(r.X + r.Width, r.Y + r.Height + 1), 1, new Color(0, 0, 0, 160));
@@ -284,6 +321,7 @@ public static class Gui
     {
         Label(text, x, y, 17, Gold, FontKind.Header);
         float ly = y + FontSize(17) * 1.12f;
+        if (Skin("section_line", new Rectangle(x, ly - 1.5f * Scale, width, 3 * Scale))) return;
         Raylib.DrawLineEx(new Vector2(x, ly), new Vector2(x + width, ly), 1, new Color(PanelInner.R, PanelInner.G, PanelInner.B, (byte)200));
     }
 
@@ -298,8 +336,11 @@ public static class Gui
         {
             float i = 4 * Scale;
             var hr = new Rectangle(r.X + i, r.Y + i, r.Width - 2 * i, HeaderHeight - i);
-            if (_panelTex == null) Gradient(hr, Lighter(PanelHeader, 0.10f), Darker(PanelHeader, 0.25f));
-            Raylib.DrawLineEx(new Vector2(hr.X, hr.Y + hr.Height), new Vector2(hr.X + hr.Width, hr.Y + hr.Height), 1.5f, PanelBorder);
+            if (!Skin("panel_header", hr))
+            {
+                if (_panelTex == null) Gradient(hr, Lighter(PanelHeader, 0.10f), Darker(PanelHeader, 0.25f));
+                Raylib.DrawLineEx(new Vector2(hr.X, hr.Y + hr.Height), new Vector2(hr.X + hr.Width, hr.Y + hr.Height), 1.5f, PanelBorder);
+            }
             string t = Fit(title, hr.Width - 44 * Scale, 19, FontKind.Header);
             var m = Measure(t, 19, FontKind.Header);
             LabelShadow(t, hr.X + 9 * Scale, hr.Y + (hr.Height - m.Y) / 2, 19, Gold, FontKind.Header);
@@ -312,11 +353,14 @@ public static class Gui
         float s = 20 * Scale;
         var r = new Rectangle(panel.X + panel.Width - s - 8 * Scale, panel.Y + 4 * Scale + (HeaderHeight - 4 * Scale - s) / 2, s, s);
         bool hover = Hover(r);
-        Gradient(r, hover ? Lighter(Bad, 0.1f) : Lighter(ButtonBg, 0.1f), hover ? Darker(Bad, 0.3f) : Darker(ButtonBg, 0.2f));
-        Raylib.DrawRectangleLinesEx(r, 1, hover ? Gold : ButtonBorder);
-        float p = 6 * Scale;
-        Raylib.DrawLineEx(new Vector2(r.X + p, r.Y + p), new Vector2(r.X + r.Width - p, r.Y + r.Height - p), 2 * Scale, Text);
-        Raylib.DrawLineEx(new Vector2(r.X + r.Width - p, r.Y + p), new Vector2(r.X + p, r.Y + r.Height - p), 2 * Scale, Text);
+        if (!(hover && Skin("close_button_hover", r)) && !Skin("close_button", r, hover ? new Color(255, 200, 190, 255) : null))
+        {
+            Gradient(r, hover ? Lighter(Bad, 0.1f) : Lighter(ButtonBg, 0.1f), hover ? Darker(Bad, 0.3f) : Darker(ButtonBg, 0.2f));
+            Raylib.DrawRectangleLinesEx(r, 1, hover ? Gold : ButtonBorder);
+            float p = 6 * Scale;
+            Raylib.DrawLineEx(new Vector2(r.X + p, r.Y + p), new Vector2(r.X + r.Width - p, r.Y + r.Height - p), 2 * Scale, Text);
+            Raylib.DrawLineEx(new Vector2(r.X + r.Width - p, r.Y + p), new Vector2(r.X + p, r.Y + r.Height - p), 2 * Scale, Text);
+        }
         if (hover) Tooltip("Close (Esc)");
         return Clicked(r);
     }
@@ -324,6 +368,8 @@ public static class Gui
     public static void ButtonFrame(Rectangle r, bool enabled, bool hover, bool selected)
     {
         var bg = !enabled ? ButtonDisabled : selected ? Accent : hover ? ButtonHover : ButtonBg;
+        string state = !enabled ? "button_disabled" : selected ? "button_selected" : hover ? "button_hover" : "button";
+        if (state != "button" && Skin(state, r)) return;
         if (_buttonTex != null)
         {
             NinePatch(_buttonTex.Value, r, !enabled ? new Color(140, 140, 140, 255) : selected ? Lighter(Accent, 0.4f) : hover ? new Color(255, 240, 210, 255) : Color.White);
@@ -373,8 +419,11 @@ public static class Gui
             if ((Raylib.IsKeyPressed(KeyboardKey.Backspace) || Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace)) && value.Length > 0) value = value[..^1];
             if (Raylib.IsKeyPressed(KeyboardKey.Enter) || Raylib.IsKeyPressed(KeyboardKey.KpEnter) || Raylib.IsKeyPressed(KeyboardKey.Escape)) _focusedField = null;
         }
-        Raylib.DrawRectangleRec(r, new Color(12, 12, 14, 230));
-        Raylib.DrawRectangleLinesEx(r, 1, focused ? Gold : hover ? Lighter(ButtonBorder, 0.3f) : ButtonBorder);
+        if (!(focused && Skin("text_field_focused", r)) && !Skin("text_field", r, focused ? new Color(255, 236, 190, 255) : null))
+        {
+            Raylib.DrawRectangleRec(r, new Color(12, 12, 14, 230));
+            Raylib.DrawRectangleLinesEx(r, 1, focused ? Gold : hover ? Lighter(ButtonBorder, 0.3f) : ButtonBorder);
+        }
         string shown = value.Length == 0 && !focused ? hint : value;
         var m = Measure(shown, 16);
         float tx = r.X + 6 * Scale, ty = r.Y + (r.Height - m.Y) / 2;
@@ -389,10 +438,20 @@ public static class Gui
 
     public static void Bar(Rectangle r, float fraction, Color fill, Color? back = null)
     {
-        Raylib.DrawRectangleRec(r, back ?? new Color(14, 14, 16, 230));
+        bool skinned = back == null && Skin("bar", r);
+        if (!skinned) Raylib.DrawRectangleRec(r, back ?? new Color(14, 14, 16, 230));
         var f = new Rectangle(r.X, r.Y, r.Width * Math.Clamp(fraction, 0, 1), r.Height);
-        if (f.Width >= 1) Gradient(f, Lighter(fill, 0.25f), Darker(fill, 0.2f));
-        Raylib.DrawRectangleLinesEx(r, 1, new Color(0, 0, 0, 160));
+        if (f.Width >= 1 && !Skin("bar_fill", f, fill)) Gradient(f, Lighter(fill, 0.25f), Darker(fill, 0.2f));
+        if (!skinned) Raylib.DrawRectangleLinesEx(r, 1, new Color(0, 0, 0, 160));
+    }
+
+    /// <summary>Card background for list rows inside panels (theme images card / card_selected, tinted with the row color).</summary>
+    public static void Card(Rectangle r, Color bg, bool highlight = false)
+    {
+        if (highlight && Skin("card_selected", r)) return;
+        if (Skin("card", r, new Color((byte)Math.Min(255, bg.R * 2.2f + 30), (byte)Math.Min(255, bg.G * 2.2f + 30), (byte)Math.Min(255, bg.B * 2.2f + 30), (byte)255))) return;
+        Gradient(r, Lighter(bg, 0.06f), Darker(bg, 0.15f));
+        Raylib.DrawRectangleLinesEx(r, 1, highlight ? PanelBorder : new Color(0, 0, 0, 150));
     }
 
     public static void Image(Texture2D tex, Rectangle dst, Color? tint = null)
@@ -422,17 +481,24 @@ public static class Gui
         off = Math.Clamp(off, 0, max);
         _scroll[id] = off;
         Raylib.BeginScissorMode((int)area.X, (int)area.Y, (int)area.Width, (int)area.Height);
+        _clips.Push(area);
         if (max > 0)
         {
             float h = area.Height * area.Height / contentHeight;
             float y = area.Y + (area.Height - h) * (off / max);
-            Raylib.DrawRectangle((int)(area.X + area.Width - 5), (int)area.Y, 4, (int)area.Height, new Color(0, 0, 0, 90));
-            Raylib.DrawRectangle((int)(area.X + area.Width - 5), (int)y, 4, (int)h, new Color(PanelBorder.R, PanelBorder.G, PanelBorder.B, (byte)190));
+            var track = new Rectangle(area.X + area.Width - 5 * Scale, area.Y, 4 * Scale, area.Height);
+            var thumb = new Rectangle(track.X, y, track.Width, h);
+            if (!Skin("scrollbar", track)) Raylib.DrawRectangleRec(track, new Color(0, 0, 0, 90));
+            if (!Skin("scroll_thumb", thumb)) Raylib.DrawRectangleRec(thumb, new Color(PanelBorder.R, PanelBorder.G, PanelBorder.B, (byte)190));
         }
         return area.Y - off;
     }
 
-    public static void EndScroll() => Raylib.EndScissorMode();
+    public static void EndScroll()
+    {
+        Raylib.EndScissorMode();
+        if (_clips.Count > 0) _clips.Pop();
+    }
 
     public static void ResetScroll(string id) => _scroll.Remove(id);
 
@@ -449,8 +515,11 @@ public static class Gui
         if (y + h > Raylib.GetScreenHeight()) y = Mouse.Y - h - 6;
         var r = new Rectangle(x, y, w, h);
         Raylib.DrawRectangleRec(new Rectangle(x + 3, y + 4, w, h), new Color(0, 0, 0, 90));
-        Raylib.DrawRectangleRec(r, TooltipBg);
-        Raylib.DrawRectangleLinesEx(r, 1, PanelBorder);
+        if (!Skin("tooltip", r))
+        {
+            Raylib.DrawRectangleRec(r, TooltipBg);
+            Raylib.DrawRectangleLinesEx(r, 1, PanelBorder);
+        }
         Wrapped(text, x + 10 * Scale, y + 6 * Scale, w - 20 * Scale, 16);
     }
 }

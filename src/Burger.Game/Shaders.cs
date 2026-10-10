@@ -41,6 +41,7 @@ uniform vec3 waterColor;
 uniform vec3 riverColor;
 uniform float time;
 uniform float borderScale;
+uniform float stateBorders; // 1 up close, fades to 0 when zoomed out
 uniform float showProvinceBorders;
 uniform float tintStrength;
 uniform float fogStrength;   // 0 when zoomed far out (strategic view)   // how strongly map mode colors cover the terrain (stronger when zoomed out)
@@ -242,7 +243,7 @@ void main()
             col = mix(col, lut(loc, 2).rgb, s * 0.6);
         }
         col = mix(col, vec3(0.06), line(dProv, 0.6) * 0.30 * showProvinceBorders);
-        col = mix(col, vec3(0.08), line(dState, 0.9) * 0.55);
+        col = mix(col, vec3(0.08), line(dState, 0.9) * 0.55 * stateBorders);
         col = mix(col, vec3(0.03), line(dCountry, 1.1 + 0.5 * borderScale) * 0.92);
         col = mix(col, vec3(0.14, 0.12, 0.10), line(dCoast, 0.9) * 0.6);
     }

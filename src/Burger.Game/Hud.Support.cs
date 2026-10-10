@@ -33,11 +33,43 @@ public sealed partial class Hud
         var anchor = LeftRect(2000);
         float w = 420 * S;
         var r = new Rectangle(anchor.X + anchor.Width + 8 * S, anchor.Y, w, Math.Min(anchor.Height, 620 * S));
-        Gui.Panel(r, _supportDialog == "volunteers" ? $"Volunteers for {_supportTarget.Name}" : $"Equipment for {_supportTarget.Name}");
+        Gui.Panel(r, _supportDialog switch { "volunteers" => $"Volunteers for {_supportTarget.Name}", "declare_war" => $"War on {_supportTarget.Name}", _ => $"Equipment for {_supportTarget.Name}" });
         if (Gui.CloseButton(r)) { _supportDialog = null; return; }
         float x = r.X + 12 * S, y = r.Y + Gui.HeaderHeight + 10 * S, iw = w - 24 * S;
         if (_supportDialog == "volunteers") DrawVolunteerDialog(player, _supportTarget, r, x, y, iw);
+        else if (_supportDialog == "declare_war") DrawDeclareWarDialog(player, _supportTarget, r, x, y, iw);
         else DrawEquipmentDialog(player, _supportTarget, r, x, y, iw);
+    }
+
+    /// <summary>Choose a casus belli: what the war is about, its goal states, cheaper demands and infamy.</summary>
+    private void DrawDeclareWarDialog(Country player, Country c, Rectangle r, float x, float y, float w)
+    {
+        var D = G.Diplomacy;
+        y += Gui.Wrapped("The casus belli decides what the war is about: demands that match it cost less war score, and the world's opinion of us suffers less with a good reason.", x, y, w, 13, Gui.TextDim) + 8 * S;
+        float top = Gui.BeginScroll("cbs", new Rectangle(x, y, w, r.Y + r.Height - y - 10 * S), G.Data.CasusBelli.Count * 64 * S);
+        float cy = top;
+        foreach (var cb in G.Data.CasusBelli.Values.OrderByDescending(cb => cb.AiWeight))
+        {
+            var reason = G.Rules.Diplomacy.CannotDeclareWarReason(G, player, c, cb);
+            if (reason != null && cb.Allow != null && cb.WarGoal != WarGoalType.Conquest && reason.StartsWith("Casus belli")) { continue; } // hide reasons we simply do not have
+            var box = new Rectangle(x, cy, w - 10 * S, 58 * S);
+            Card(box, reason == null ? new Color(52, 40, 30, 255) : new Color(32, 33, 38, 255));
+            Gui.Label(Localisation.Get(cb.Name), box.X + 8 * S, box.Y + 4 * S, 15, reason == null ? Gui.Gold : Gui.TextDim, FontKind.Bold);
+            int goalStates = reason == null && G.Rules.Diplomacy.NeedsGoalStates(cb.WarGoal) ? G.Rules.Diplomacy.WarGoalStates(G, player, c, cb).Count : 0;
+            string info = reason ?? ($"Goal: {cb.WarGoal}" + (goalStates > 0 ? $" ({goalStates} states)" : "") + $"   demands {cb.GoalCostMultiplier:P0}" +
+                                     (cb.OthersOpinion != 0 ? $"   world opinion {cb.OthersOpinion:+0;-0}" : "") + (cb.TickingWarScore ? "   ticking" : ""));
+            Gui.Label(Gui.Fit(info, box.Width - 110 * S, 12), box.X + 8 * S, box.Y + 26 * S, 12, reason == null ? Gui.Text : Gui.Bad);
+            if (Gui.Button(new Rectangle(box.X + box.Width - 96 * S, box.Y + 14 * S, 88 * S, 28 * S), "Declare", reason == null, reason ?? $"Declare war on {c.Name} with this casus belli", false, 14))
+            {
+                var war = D.DeclareWar(player, c, cb);
+                Ui.SetStatus(war != null ? $"War declared: {war.Name}" : "War could not be declared");
+                _supportDialog = null;
+                Gui.EndScroll();
+                return;
+            }
+            cy += 64 * S;
+        }
+        Gui.EndScroll();
     }
 
     private void DrawVolunteerDialog(Country player, Country c, Rectangle r, float x, float y, float w)

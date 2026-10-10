@@ -47,6 +47,13 @@ public sealed partial class Studio
                 foreach (var k in new[] { Specs.Ideologies, Specs.Governments, Specs.LawGroups, Specs.CabinetPosts }.Where(KindAvailable))
                     DrawKindTree(k, f);
         }
+        if (new[] { Specs.CultureGroups, Specs.ReligionGroups, Specs.PopTypes }.Any(KindAvailable))
+        {
+            ImGui.SetNextItemOpen(true, ImGuiCond.FirstUseEver);
+            if (ImGui.CollapsingHeader("Population"))
+                foreach (var k in new[] { Specs.CultureGroups, Specs.ReligionGroups, Specs.PopTypes }.Where(KindAvailable))
+                    DrawKindTree(k, f);
+        }
         ImGui.SetNextItemOpen(true, ImGuiCond.FirstUseEver);
         if (ImGui.CollapsingHeader("Military & Terrain"))
         {
@@ -190,6 +197,7 @@ public sealed partial class Studio
         "Windows & map modes" => "window",
         "On actions" => "on action",
         "Ideologies" => "ideology",
+        "Social classes" => "social class",
         _ => kind.Title.ToLowerInvariant().TrimEnd('s'),
     };
 }

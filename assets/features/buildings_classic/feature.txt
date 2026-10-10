@@ -1,0 +1,6 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Buildings: pre-modern"
+category = "Population"
+order = 75
+description = "Farms, aqueducts, markets, temples and barracks for older eras: more room and growth, tax, conversion and stability, manpower. Bought with gold (without production) or built with factories."
+requires = { population }

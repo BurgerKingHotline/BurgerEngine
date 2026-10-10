@@ -1,0 +1,10 @@
+# Social classes (social_classes feature). New pops are split by 'share'.
+#   modifier      state tax / manpower change at 100% of the state's people in this class (scaled by its share)
+#   growth        extra yearly growth          promote_to / promote_rate   yearly share that rises into another class
+# Modifier key 'promotion' (buildings, laws) speeds up promotion.
+
+nobles = { name = "Nobles" color = { 170 90 200 } share = 0.02 growth = -0.003 modifier = { tax = 3 manpower = -1 } }
+clergy = { name = "Clergy" color = { 230 230 230 } share = 0.03 growth = -0.002 modifier = { tax = 1 } }
+burghers = { name = "Burghers" color = { 220 180 60 } share = 0.12 modifier = { tax = 1.5 } }
+peasants = { name = "Peasants" color = { 120 170 80 } share = 0.75 growth = 0.002 promote_to = burghers promote_rate = 0.004 modifier = { manpower = 0.2 } }
+serfs = { name = "Serfs" color = { 120 100 80 } share = 0.08 promote_to = peasants promote_rate = 0.01 modifier = { tax = -0.5 manpower = -0.5 } }

@@ -469,6 +469,63 @@ stability = {
 }
 """)
 
+text('politics', 'game/events/politics_elections.txt', """# Election campaigns (politics feature). The engine fires on_election_campaign (common/on_actions/20_politics.txt)
+# for every country that holds elections, election_campaign_days (60) before the vote.
+namespace = election
+
+country_event = {
+	id = election.1
+	title = "Election Campaign"
+	desc = "The election is two months away. The governing party asks how hard it should campaign - and what it may promise."
+	is_triggered_only = yes
+	trigger = { holds_elections = yes }
+	option = {
+		name = "Rally the voters across the country"
+		trigger = { political_power >= 50 }
+		add_political_power = -50
+		add_popularity = { ideology = ruling value = 0.06 }
+		ai_chance = { factor = 1 modifier = { factor = 2 ruling_popularity < 0.4 } }
+	}
+	option = {
+		name = "Promise generous reforms"
+		add_popularity = { ideology = ruling value = 0.03 }
+		add_stability = -3
+		ai_chance = { factor = 1 }
+	}
+	option = {
+		name = "Run a quiet campaign"
+		add_political_power = 20
+		ai_chance = { factor = 1 modifier = { factor = 2 ruling_popularity > 0.55 } }
+	}
+}
+
+country_event = {
+	id = election.2
+	title = "Campaign Scandal"
+	desc = "A newspaper has uncovered bribes paid by the governing party's campaign managers."
+	is_triggered_only = yes
+	trigger = { holds_elections = yes }
+	option = {
+		name = "Deny everything"
+		add_popularity = { ideology = ruling value = -0.04 }
+		ai_chance = { factor = 1 }
+	}
+	option = {
+		name = "Sack the managers"
+		trigger = { political_power >= 30 }
+		add_political_power = -30
+		add_popularity = { ideology = ruling value = -0.01 }
+		ai_chance = { factor = 1 }
+	}
+}
+""")
+text('politics', 'game/common/on_actions/20_politics.txt', """# Hooks of the politics feature.
+#   on_election_campaign   ROOT = a country that holds elections, election_campaign_days (60) before its election
+on_election_campaign = {
+	events = { election.1 }
+	random_events = { 75 = 0 25 = election.2 }
+}
+""")
 manifest('laws', 'Laws', 'Politics', 61,
          'Groups of laws (conscription, economy, press, political parties) of which a country has one each. Changing a law costs political power and may need requirements; laws give modifiers, can ban parties or suspend elections. The AI picks laws that suit its ideology and wars.',
          requires=['politics'])
@@ -642,6 +699,178 @@ manifest('civil_wars', 'Political movements & civil wars', 'Politics', 63,
          'Ideologies shut out of power gather in movements with a demand (legalise their party or put them in power) that grow until they revolt unless you give in or suppress them (Victoria 3 style). A shut-out ideology with majority support can also start a civil war at any time (HOI4 style). Civil wars split the country: the rebels get part of the land and army, and if they win they take over the country. Without armies and wars, revolts are coups.',
          requires=['politics'])
 
+# ------------------------------------------------------------------ population group
+manifest('population', 'Population (pops & cultures)', 'Population', 70,
+         'Imperator-style population: every state has pops of a culture that grow towards the state\'s room (capacity), assimilate to the owner\'s culture and migrate to emptier states. People scale tax and manpower; unaccepted cultures give less and lower stability. Countries can accept cultures. Adds a People menu, People and Culture map modes. Cultures: common/cultures (else one per country), pops: history/pops (else made from manpower).')
+text('population', 'game/common/laws/10_culture_policy.txt', """# Culture policy (population feature; used when the laws feature is installed too).
+# Modifier keys: minority_output (people of unaccepted cultures count as this share of accepted ones for tax and
+# manpower), culture_tension (how much unaccepted cultures lower stability: -0.5 = half, 1 = double),
+# assimilation, independence_speed (independence feature), stability_target.
+
+culture_policy = {
+	name = "Culture Policy"
+	potential = { has_feature = population }
+	default = tolerance
+	equal_rights = {
+		name = "Equal Rights"
+		desc = "Every culture has the same rights: minorities pay and serve almost like our own people and are less restless, but they keep their ways."
+		cost = 100
+		modifier = { minority_output = 0.4 culture_tension = -0.5 assimilation = -0.5 independence_speed = -0.4 }
+		ai_will_do = { base = 0.3 modifier = { add = 1 ruling_ideology = democratic accepted_share < 0.8 } }
+	}
+	tolerance = {
+		name = "Tolerance"
+		desc = "Minorities are left alone."
+		ai_will_do = { base = 1 }
+	}
+	discrimination = {
+		name = "Discrimination"
+		desc = "Our own people come first: faster assimilation and a little stability from the majority, but minorities give less and grow restless."
+		cost = 50
+		modifier = { minority_output = -0.2 culture_tension = 0.5 assimilation = 0.5 independence_speed = 0.3 stability_target = 2 }
+		ai_will_do = { base = 0.2 modifier = { add = 0.8 OR = { ruling_ideology = fascist ruling_ideology = neutrality } } }
+	}
+	forced_assimilation = {
+		name = "Forced Assimilation"
+		desc = "Minorities must take our language and customs: much faster assimilation, but much more unrest and separatism."
+		cost = 100
+		allow = { OR = { ruling_ideology = fascist ruling_ideology = communist } }
+		modifier = { minority_output = -0.4 culture_tension = 1.0 assimilation = 1.5 independence_speed = 0.8 }
+		ai_will_do = { base = 0 modifier = { add = 1.2 ruling_ideology = fascist accepted_share < 0.9 } }
+	}
+}
+""")
+manifest('religion', 'Religion', 'Population', 71,
+         'Pops follow a religion (grouped in families); every country has a state religion. People of other faiths pay a little less, lower stability and slowly convert (faster with temples). Religion changes opinion between countries. Religion map mode.',
+         requires=['population'])
+text('religion', 'game/common/religions/00_religions.txt', """# Religions (religion feature), in religion groups. Countries set theirs with religion = ... in common/countries;
+# cultures give new pops a religion (common/cultures). Scripts: religion = catholic, religion_group = christian,
+# same_religion = scope:recipient, set_state_religion = protestant, convert_pops = { religion = sunni share = 0.5 }.
+# Opinion: same religion +10, same group 0, other group -10 (defines same_religion_opinion, ...).
+
+christian = {
+	name = "Christian"
+	color = { 200 200 220 }
+	catholic = { name = "Catholic" color = { 225 215 120 } }
+	protestant = { name = "Protestant" color = { 90 120 200 } }
+	orthodox = { name = "Orthodox" color = { 210 150 60 } }
+	oriental = { name = "Oriental Christian" color = { 180 90 150 } }
+}
+muslim = {
+	name = "Muslim"
+	color = { 40 150 70 }
+	sunni = { name = "Sunni" color = { 40 150 70 } }
+	shia = { name = "Shia" color = { 20 100 50 } }
+	ibadi = { name = "Ibadi" color = { 110 170 90 } }
+}
+jewish = {
+	name = "Jewish"
+	color = { 90 170 210 }
+	judaism = { name = "Judaism" color = { 90 170 210 } }
+}
+dharmic = {
+	name = "Dharmic"
+	color = { 220 120 40 }
+	hindu = { name = "Hindu" color = { 230 120 40 } }
+	sikh = { name = "Sikh" color = { 240 170 60 } }
+	jain = { name = "Jain" color = { 200 150 100 } }
+}
+eastern = {
+	name = "Eastern"
+	color = { 200 80 80 }
+	buddhist = { name = "Buddhist" color = { 240 200 60 } }
+	shinto = { name = "Shinto" color = { 220 60 60 } }
+	chinese_folk = { name = "Confucian & folk" color = { 190 80 50 } }
+}
+traditional = {
+	name = "Traditional"
+	color = { 140 110 80 }
+	animist = { name = "Traditional faiths" color = { 140 110 80 } }
+}
+secular = {
+	name = "Secular"
+	color = { 160 160 160 }
+	irreligious = { name = "Irreligious" color = { 170 170 170 } }
+}
+""")
+manifest('social_classes', 'Social classes', 'Population', 72,
+         'Imperator-style classes for older eras: nobles, clergy, burghers, peasants and serfs. Each class changes its state\'s tax and manpower by its share; peasants rise into burghers over time (markets help). Not meant for modern games.',
+         requires=['population'])
+text('social_classes', 'game/common/pop_types/00_pop_types.txt', """# Social classes (social_classes feature). New pops are split by 'share'.
+#   modifier      state tax / manpower change at 100% of the state's people in this class (scaled by its share)
+#   growth        extra yearly growth          promote_to / promote_rate   yearly share that rises into another class
+# Modifier key 'promotion' (buildings, laws) speeds up promotion.
+
+nobles = { name = "Nobles" color = { 170 90 200 } share = 0.02 growth = -0.003 modifier = { tax = 3 manpower = -1 } }
+clergy = { name = "Clergy" color = { 230 230 230 } share = 0.03 growth = -0.002 modifier = { tax = 1 } }
+burghers = { name = "Burghers" color = { 220 180 60 } share = 0.12 modifier = { tax = 1.5 } }
+peasants = { name = "Peasants" color = { 120 170 80 } share = 0.75 growth = 0.002 promote_to = burghers promote_rate = 0.004 modifier = { manpower = 0.2 } }
+serfs = { name = "Serfs" color = { 120 100 80 } share = 0.08 promote_to = peasants promote_rate = 0.01 modifier = { tax = -0.5 manpower = -0.5 } }
+""")
+manifest('cores_claims', 'Cores & claims', 'Population', 73,
+         'Countries gain cores on states where an accepted culture is the majority or that they have owned for 25 years, and slowly lose cores they no longer hold (a claim remains). Every year they claim neighbouring states where their culture is the majority; with religion, a diplomatic action claims states of fellow believers. States that are not cores give 60% tax and manpower.',
+         requires=['population'])
+text('cores_claims', 'game/common/diplomatic_actions/20_claims.txt', """# Claims from religion (cores_claims feature, with religion). Cultural claims are made automatically every year.
+claim_fellow_believers = {
+	name = "Claim Fellow Believers' Land"
+	desc = "Claim the neighbouring states of this country where our faith is the majority."
+	potential = {
+		has_feature = religion
+		has_fellow_believers_in = scope:recipient
+	}
+	cooldown_days = 365
+	on_accept = {
+		add_religious_claims = scope:recipient
+		reverse_add_opinion = { target = scope:recipient value = -25 name = "Claimed our land" }
+	}
+	ai_will_do = { base = 0.3 modifier = { add = 1 stronger_than = { target = scope:recipient ratio = 1.5 } } }
+}
+""")
+manifest('colonization', 'Colonization', 'Population', 74,
+         'EU-style colonists settle unowned land near your territory: the colony grows each month (natives slow it and sometimes attack) and becomes your state. One colonist by default (modifier: colonists); with the economy, sending one costs gold and colonies cost gold every month.',
+         requires=['population'])
+manifest('independence', 'Independence movements', 'Population', 74,
+         'People of a culture the country does not accept, who are the majority in some of its states, form an independence movement. It grows faster at low stability and in lost wars, and slower in colonies than in conquered land; at 100% they declare independence (a new country, or a fallen one of that culture comes back) and, with armies and wars, fight for it. Suppress it, release the states, or accept the culture to end it.',
+         requires=['population'])
+manifest('buildings_classic', 'Buildings: pre-modern', 'Population', 75,
+         'Farms, aqueducts, markets, temples and barracks for older eras: more room and growth, tax, conversion and stability, manpower. Bought with gold (without production) or built with factories.',
+         requires=['population'])
+text('buildings_classic', 'game/common/buildings/20_classic.txt', """# Pre-modern buildings (buildings_classic feature). Levels are stored per state.
+#   gold_cost / build_months   bought with gold in the state window (games without production)
+#   cost                       construction cost with the production feature
+#   modifier                   state modifiers per level: pop_growth (yearly), pop_capacity (+share), tax, assimilation, conversion, promotion
+#   country_modifier           owner's modifiers per level (stability_target, manpower, ...)
+
+farm = { name = "Farms" desc = "More food: the state can feed more people." gold_cost = 60 build_months = 12 cost = 3000 max_level = 5 category = civil
+	modifier = { pop_capacity = 0.08 pop_growth = 0.002 } }
+aqueduct = { name = "Aqueduct" desc = "Clean water lets towns grow." gold_cost = 100 build_months = 18 cost = 5000 max_level = 2 category = civil
+	modifier = { pop_capacity = 0.15 pop_growth = 0.001 } }
+market = { name = "Market" desc = "Trade brings tax and lets peasants become burghers." gold_cost = 80 build_months = 12 cost = 4000 max_level = 3 category = civil
+	modifier = { tax = 0.1 promotion = 0.5 } }
+temple = { name = "Temple" desc = "Converts people to the state religion and keeps them content." gold_cost = 70 build_months = 12 cost = 3500 max_level = 2 category = civil
+	modifier = { conversion = 1 assimilation = 0.3 } country_modifier = { stability_target = 0.3 } }
+barracks = { name = "Barracks" desc = "Trains soldiers: more manpower for the country." gold_cost = 80 build_months = 12 cost = 4000 max_level = 3 category = military
+	country_modifier = { manpower = 0.01 } }
+""")
+manifest('buildings_modern', 'Buildings: modern', 'Population', 76,
+         'Hospitals, housing, schools, radio stations and police stations for modern games: growth and room for people, assimilation, tax and stability. Built with factories (production) or bought with gold.',
+         requires=['population'])
+text('buildings_modern', 'game/common/buildings/20_modern.txt', """# Modern buildings (buildings_modern feature). Built with civilian factories (production), or bought with gold
+# (gold_cost / build_months) in games without production. Modifiers are per level - see 20_classic.txt of the
+# buildings_classic feature for the keys.
+
+hospital = { name = "Hospital" desc = "Fewer people die: faster growth." cost = 4000 gold_cost = 120 build_months = 12 max_level = 3 category = civil
+	modifier = { pop_growth = 0.003 pop_capacity = 0.05 } }
+housing = { name = "Housing" desc = "Apartment blocks: room for more people." cost = 3000 gold_cost = 80 build_months = 12 max_level = 5 category = civil
+	modifier = { pop_capacity = 0.06 } }
+school = { name = "Schools" desc = "Children learn the national language: assimilation and a little more tax." cost = 5000 gold_cost = 120 build_months = 18 max_level = 3 category = civil
+	modifier = { assimilation = 0.5 tax = 0.04 } }
+radio_station = { name = "Radio Station" desc = "National broadcasts: assimilation and support for the government." cost = 4000 gold_cost = 100 build_months = 12 max_level = 1 category = civil
+	modifier = { assimilation = 0.5 } country_modifier = { stability_target = 0.2 ruling_party_drift = 0.02 } }
+police_station = { name = "Police Station" desc = "Order in the streets." cost = 3000 gold_cost = 80 build_months = 12 max_level = 2 category = civil
+	country_modifier = { stability_target = 0.3 } }
+""")
+
 # ------------------------------------------------------------------ presets (mechanics bundles)
 P = os.path.join(A, 'presets'); os.makedirs(P)
 def preset(pid, order, name, desc, features, defines):
@@ -650,16 +879,16 @@ def preset(pid, order, name, desc, features, defines):
     if defines: s += 'defines = { ' + ' '.join(f'{k} = {v}' for k, v in defines.items()) + ' }\n'
     open(os.path.join(P, pid + '.txt'), 'w', newline='\n').write(s)
 preset('blank', 1, 'Blank slate', 'Only the core: map, countries, time, events, decisions, resources, windows and C# scripting. Add features one by one.', [], {})
-preset('hoi4', 2, 'Hearts of Iron IV style', 'Armies with HOI4 combat, factories and equipment, supply hubs and railways, a division designer, fleets and transports, air wings, battle plans, lend-lease and volunteers, fog of war, wars and diplomacy, ideologies with elections, laws and civil wars, AI. Locations are taken as soon as they are entered.',
-       ['military', 'combat_hoi4', 'production', 'supply_hubs', 'division_designer', 'navy', 'air', 'battle_plans', 'lend_lease', 'fog_of_war', 'diplomacy', 'politics', 'laws', 'civil_wars', 'ai'], {'combat_model': 'hoi4', 'occupation_hours': '0'})
-preset('eu5', 3, 'Europa Universalis style', 'Armies with EU-style combat and sieges, fleets, diplomacy, economy, rulers and heirs, AI.',
-       ['military', 'combat_eu4', 'supply_range', 'navy', 'diplomacy', 'economy', 'characters', 'ai'], {'combat_model': 'eu4', 'occupation_hours': '48'})
+preset('hoi4', 2, 'Hearts of Iron IV style', 'Armies with HOI4 combat, factories and equipment, supply hubs and railways, a division designer, fleets and transports, air wings, battle plans, lend-lease and volunteers, fog of war, wars and diplomacy, ideologies with elections, laws and civil wars, pops with cultures and religion, cores and claims, modern buildings, AI. Locations are taken as soon as they are entered.',
+       ['military', 'combat_hoi4', 'production', 'supply_hubs', 'division_designer', 'navy', 'air', 'battle_plans', 'lend_lease', 'fog_of_war', 'diplomacy', 'politics', 'laws', 'civil_wars', 'population', 'religion', 'cores_claims', 'independence', 'buildings_modern', 'ai'], {'combat_model': 'hoi4', 'occupation_hours': '0'})
+preset('eu5', 3, 'Europa Universalis style', 'Armies with EU-style combat and sieges, fleets, diplomacy, economy, rulers and heirs, pops with cultures, religion and classes, cores and claims, colonization, pre-modern buildings, AI.',
+       ['military', 'combat_eu4', 'supply_range', 'navy', 'diplomacy', 'economy', 'characters', 'population', 'religion', 'social_classes', 'cores_claims', 'colonization', 'independence', 'buildings_classic', 'ai'], {'combat_model': 'eu4', 'occupation_hours': '48'})
 preset('imperator', 4, 'Imperator style', 'Characters with interactions, armies with Imperator combat and sieges, diplomacy, economy, AI.',
-       ['military', 'combat_imperator', 'supply_range', 'diplomacy', 'economy', 'characters', 'character_interactions', 'ai'], {'combat_model': 'imperator', 'occupation_hours': '48'})
+       ['military', 'combat_imperator', 'supply_range', 'diplomacy', 'economy', 'characters', 'character_interactions', 'population', 'religion', 'social_classes', 'cores_claims', 'colonization', 'independence', 'buildings_classic', 'ai'], {'combat_model': 'imperator', 'occupation_hours': '48'})
 preset('ck3', 5, 'Crusader Kings style', 'Characters, dynasties and interactions first; armies with Imperator-style combat and long sieges, diplomacy, gold, AI.',
-       ['characters', 'character_interactions', 'military', 'combat_imperator', 'supply_range', 'diplomacy', 'economy', 'ai'], {'combat_model': 'imperator', 'occupation_hours': '72'})
+       ['characters', 'character_interactions', 'military', 'combat_imperator', 'supply_range', 'diplomacy', 'economy', 'population', 'religion', 'cores_claims', 'buildings_classic', 'ai'], {'combat_model': 'imperator', 'occupation_hours': '72'})
 preset('everything', 9, 'Everything', 'Every feature the engine has (supply: hubs & railways).', ['military', 'combat_hoi4', 'combat_eu4', 'combat_imperator', 'production', 'supply_hubs',
-       'division_designer', 'navy', 'air', 'battle_plans', 'lend_lease', 'fog_of_war', 'diplomacy', 'characters', 'character_interactions', 'economy', 'politics', 'laws', 'cabinet', 'civil_wars', 'ai'], {'combat_model': 'hoi4'})
+       'division_designer', 'navy', 'air', 'battle_plans', 'lend_lease', 'fog_of_war', 'diplomacy', 'characters', 'character_interactions', 'economy', 'politics', 'laws', 'cabinet', 'civil_wars', 'population', 'religion', 'social_classes', 'cores_claims', 'colonization', 'independence', 'buildings_classic', 'buildings_modern', 'ai'], {'combat_model': 'hoi4'})
 
 # ------------------------------------------------------------------ base maps
 B = os.path.join(A, 'bases')
@@ -667,7 +896,7 @@ isle = os.path.join(B, 'isle', 'game')
 os.makedirs(isle)
 open(os.path.join(B, 'isle', 'base.txt'), 'w', newline='\n').write(
     'name = "Island map (10 countries)"\ndescription = "The sample game\'s island: 251 locations, 48 states, 10 countries with flags. No mechanics - add them with features."\n')
-keep = ['game.txt', 'map', 'localisation', 'gfx/flags', 'gfx/fonts', 'gfx/terrain', 'common/countries', 'common/terrain.txt', 'interface/theme.txt']
+keep = ['game.txt', 'map', 'localisation', 'gfx/flags', 'gfx/fonts', 'gfx/terrain', 'gfx/interface/ui', 'common/countries', 'common/cultures', 'common/terrain.txt', 'interface/theme.txt']
 for rel in keep:
     src = os.path.join(SAMPLE, 'game', rel); dst = os.path.join(isle, rel)
     if os.path.isdir(src): shutil.copytree(src, dst)
@@ -761,7 +990,7 @@ files = {
 }
 for rel, text in files.items():
     p = os.path.join(tiny, rel); os.makedirs(os.path.dirname(p), exist_ok=True); open(p, 'w', newline='\n').write(text)
-for rel in ['gfx/fonts', 'gfx/terrain']:
+for rel in ['gfx/fonts', 'gfx/terrain', 'gfx/interface/ui']:
     shutil.copytree(os.path.join(isle, rel), os.path.join(tiny, rel))
 os.makedirs(os.path.join(tiny, 'interface')); shutil.copy(os.path.join(isle, 'interface/theme.txt'), os.path.join(tiny, 'interface/theme.txt'))
 for root, _, fs in os.walk(tiny):
@@ -779,7 +1008,7 @@ if os.path.isdir(src_earth):
     open(os.path.join(eb, 'base.txt'), 'w', newline='\n').write(
         'name = "Earth 1930"\ndescription = "The whole world on 1 January 1930: about 6400 locations, 1450 states and 74 countries with 1930 borders. '
         'Colonies belong to their empires; dominions and the British Raj are subjects of the United Kingdom (with the diplomacy feature)."\n')
-    for rel in ['gfx/fonts', 'interface/theme.txt']:
+    for rel in ['gfx/fonts', 'gfx/interface/ui', 'interface/theme.txt']:
         a, b = os.path.join(isle, rel), os.path.join(earth, rel)
         if os.path.isdir(a): shutil.copytree(a, b, dirs_exist_ok=True)
         else: os.makedirs(os.path.dirname(b), exist_ok=True); shutil.copy(a, b)

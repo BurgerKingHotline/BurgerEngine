@@ -110,6 +110,7 @@ public static class CombatMath
         target.Org = Math.Max(0, target.Org - org);
         double lost = before - target.Strength;
         if (b.Attackers.Contains(target)) b.AttackerLosses += lost; else b.DefenderLosses += lost;
+        if (lost > 0 && target.MaxStrength > 0) b.MenLost[target.Owner] = b.MenLost.GetValueOrDefault(target.Owner) + lost / target.MaxStrength * target.Template.Manpower;
     }
 
     /// <summary>Updates the UI progress bar from average organisation of both sides.</summary>

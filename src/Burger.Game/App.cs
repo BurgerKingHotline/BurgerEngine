@@ -214,6 +214,12 @@ public sealed class App
                 case "production": Ui.Left = LeftPanel.Production; Ui.ProductionTab = int.TryParse(parts.ElementAtOrDefault(1), out var pt) ? pt : 0; break;
                 case "designer": Ui.Left = LeftPanel.Designer; break;
                 case "air": Ui.Left = LeftPanel.Air; _hud!.AirTab = int.TryParse(parts.ElementAtOrDefault(1), out var at) ? at : 0; break;
+                case "population": Ui.Left = LeftPanel.Population; break;
+                case "ledger": // ledger[:world][:metric]
+                    Ui.Right = RightPanel.Ledger;
+                    _hud!.LedgerWorld = parts.Contains("world");
+                    if (parts.Length > 1 && parts[^1] != "world") _hud.LedgerMetric = parts[^1];
+                    break;
                 case "politics": Ui.Left = LeftPanel.Politics; _hud!.PoliticsTab = int.TryParse(parts.ElementAtOrDefault(1), out var pt2) ? pt2 : 0; break;
                 case "navy": Ui.Left = LeftPanel.Navy; _hud!.NavyTab = int.TryParse(parts.ElementAtOrDefault(1), out var nt) ? nt : 0; break;
                 case "wars": Ui.Right = RightPanel.Wars; break;
@@ -224,6 +230,11 @@ public sealed class App
                 case "country":
                     Ui.SelectedCountry = game.World.GetCountry(parts.ElementAtOrDefault(1)) ?? game.World.Player;
                     Ui.Left = LeftPanel.Country;
+                    break;
+                case "declare_war": // declare_war:TAG - the casus belli window
+                    Ui.SelectedCountry = game.World.GetCountry(parts.ElementAtOrDefault(1)) ?? game.World.Player;
+                    Ui.Left = LeftPanel.Country;
+                    if (Ui.SelectedCountry != null) _hud!.OpenSupportFromOutside("declare_war", Ui.SelectedCountry);
                     break;
                 case "support": // support:TAG:volunteers|lend_lease
                     Ui.SelectedCountry = game.World.GetCountry(parts.ElementAtOrDefault(1)) ?? game.World.Player;

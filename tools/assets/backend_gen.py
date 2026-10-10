@@ -139,4 +139,9 @@ put('politics', 'Politics.cs', file('Politics',
     'how fast political movements grow and when shut-out ideologies start civil wars.',
     [rules_class('Politics/PoliticsRules.cs', 'PoliticsRules', 'GamePoliticsRules')],
     'Installs the politics rules.', '        Game.Rules.Politics = new GamePoliticsRules();\n'))
+put('population', 'Population.cs', file('Population',
+    'Population rules: pop growth and state capacity, assimilation, religious conversion, migration, how people turn into\n'
+    'tax and manpower (accepted cultures, faith, social classes, cores), core gain/loss, colony speed and religious opinion.',
+    [rules_class('Population/PopulationRules.cs', 'PopulationRules', 'GamePopulationRules')],
+    'Installs the population rules.', '        Game.Rules.Population = new GamePopulationRules();\n'))
 print('ok')

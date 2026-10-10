@@ -1,0 +1,6 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Buildings: modern"
+category = "Population"
+order = 76
+description = "Hospitals, housing, schools, radio stations and police stations for modern games: growth and room for people, assimilation, tax and stability. Built with factories (production) or bought with gold."
+requires = { population }

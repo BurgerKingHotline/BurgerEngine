@@ -2,5 +2,5 @@
 name = "Everything"
 order = 9
 description = "Every feature the engine has (supply: hubs & railways)."
-features = { military combat_hoi4 combat_eu4 combat_imperator production supply_hubs division_designer navy air battle_plans lend_lease fog_of_war diplomacy characters character_interactions economy politics laws cabinet civil_wars ai }
+features = { military combat_hoi4 combat_eu4 combat_imperator production supply_hubs division_designer navy air battle_plans lend_lease fog_of_war diplomacy characters character_interactions economy politics laws cabinet civil_wars population religion social_classes cores_claims colonization independence buildings_classic buildings_modern ai }
 defines = { combat_model = hoi4 }

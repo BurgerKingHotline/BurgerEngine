@@ -1116,4 +1116,15 @@ stats = dict(locations=NLOC, land=sum(1 for v in kind.values() if v == 'land'), 
              lakes=sum(1 for v in kind.values() if v == 'lake'), states=len(states), countries=len(owners_present), straits=len(strait_pairs))
 with open(os.path.join(OUT, 'map', 'earth_stats.json'), 'w') as f:
     json.dump(stats, f, indent=1)
+# which admin-1 units (and how many people of each) make up every state - input of make_pops.py
+pop_units = []
+for si, st in enumerate(states):
+    per = collections.Counter()
+    for l_ in st['locs']:
+        per[loc_unit[l_]] += loc_unit_pop[l_]
+    pop_units.append(dict(key=state_keys[si], owner=st['owner'], pop=st['pop'],
+                          units=[dict(iso=units[u - 1]['iso'], adm0=units[u - 1]['adm0'], name=units[u - 1]['name'], region=units[u - 1]['region'], pop=v)
+                                 for u, v in per.most_common() if u > 0]))
+with open(os.path.join(OUT, 'pop_units.json'), 'w') as f:
+    json.dump(pop_units, f)
 log("done", stats)
