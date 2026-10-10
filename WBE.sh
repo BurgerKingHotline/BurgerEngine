@@ -1,0 +1,1 @@
+dotnet build src/Burger.Game/Burger.Game.csproj -c Release && __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia ./BurgerEngine.sh run Earth1930 --perf --log-dir logs
