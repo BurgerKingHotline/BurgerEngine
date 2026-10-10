@@ -420,6 +420,15 @@ public sealed partial class DiplomacySystem
     // Peace
     // =============================================================================================
 
+    /// <summary>Recent peace deals and subject changes (not saved; printed by <c>burger validate</c> with BURGER_PEACE_LOG set).</summary>
+    public readonly List<string> PeaceLog = new();
+
+    private void Record(string text)
+    {
+        PeaceLog.Add($"{_game.World.Date.ToDisplay()}: {text}");
+        if (PeaceLog.Count > 1000) PeaceLog.RemoveAt(0);
+    }
+
     public (Country Winner, Country Loser) WinnerLoser(PeaceOffer o) => o.FromIsWinner ? (o.From, o.To) : (o.To, o.From);
 
     public double OfferCost(PeaceOffer o)
@@ -452,6 +461,10 @@ public sealed partial class DiplomacySystem
                 case PeaceTermType.Subjugate:
                 case PeaceTermType.Annex:
                     if (t.Beneficiary == null || !war.SideOf(winner).Contains(t.Beneficiary)) return "Invalid overlord";
+                    if (t.Type == PeaceTermType.Subjugate && R.OverlordOf(loser) == t.Beneficiary) return $"{loser.Name} is already our subject";
+                    if (t.Type == PeaceTermType.Subjugate && R.OverlordOf(t.Beneficiary) != null) return $"{t.Beneficiary.Name} is a subject itself and cannot have subjects";
+                    if (t.Type == PeaceTermType.Subjugate && HoldsHomelandOf(t.Beneficiary, loser))
+                        return $"{t.Beneficiary.Name} already rules the homeland of {loser.Name}: annex them instead";
                     break;
                 case PeaceTermType.Gold:
                     if (t.Amount <= 0) return "Invalid amount";
@@ -523,7 +536,7 @@ public sealed partial class DiplomacySystem
                     if (t.Beneficiary != null)
                     {
                         var type = _game.Data.SubjectTypes.TryGetValue(t.SubjectType, out var st) ? st : _game.Data.SubjectTypes.Values.First();
-                        R.SetSubject(loser, t.Beneficiary, type);
+                        MakeSubject(loser, t.Beneficiary, type);
                     }
                     break;
                 case PeaceTermType.Annex:
@@ -542,6 +555,7 @@ public sealed partial class DiplomacySystem
             }
         }
         _game.Notify($"Peace: {string.Join(", ", o.Terms)} ({winner.Name} / {loser.Name})", NotificationKind.War);
+        Record($"peace {winner.Tag} > {loser.Tag}: {string.Join("; ", o.Terms)}");
         _game.Events.FireOnAction("on_peace", winner, new Dictionary<string, IScope?>(StringComparer.OrdinalIgnoreCase) { ["loser"] = loser, ["war"] = war });
         _game.Mods.Invoke(m => m.OnPeace(o));
 
@@ -595,6 +609,7 @@ public sealed partial class DiplomacySystem
         MonthlyWars();
         MonthlyExhaustion();
         MonthlyLiberty();
+        MonthlySubjects();
         _goalStates.Clear();
     }
 

@@ -23,6 +23,7 @@ public sealed class AppOptions
     public List<string> Exec = new();
     public string? MapMode;
     public float? Zoom;
+    public bool NoFogShading;
     public string? Open;
 }
 
@@ -56,6 +57,7 @@ public static class Program
                     case "--hidden": opt.Hidden = true; break;
                     case "--exec": opt.Exec.Add(Next()); break;
                     case "--mapmode": opt.MapMode = Next(); break;
+                    case "--no-fog-shading": opt.NoFogShading = true; break;
                     case "--zoom": opt.Zoom = float.Parse(Next(), System.Globalization.CultureInfo.InvariantCulture); break;
                     case "--open": opt.Open = Next(); break;
                     case "--speed": opt.Speed = int.Parse(Next()); break;

@@ -47,6 +47,7 @@ public sealed partial class Hud
         if (Raylib.IsKeyPressed(KeyboardKey.KpAdd) || Raylib.IsKeyPressed(KeyboardKey.Equal)) clock.Speed = Math.Min(5, clock.Speed + 1);
         if (Raylib.IsKeyPressed(KeyboardKey.KpSubtract) || Raylib.IsKeyPressed(KeyboardKey.Minus)) clock.Speed = Math.Max(1, clock.Speed - 1);
         if (Raylib.IsKeyPressed(KeyboardKey.Tab)) CycleMapMode();
+        if (Raylib.IsKeyPressed(KeyboardKey.F) && Has(FeatureSet.FogOfWar)) MapRenderer.FogShading = !MapRenderer.FogShading;
         if (G.World.Player != null)
         {
             if (Raylib.IsKeyPressed(KeyboardKey.F1) && Has(FeatureSet.Military)) ToggleLeft(LeftPanel.Military);
@@ -374,15 +375,16 @@ public sealed partial class Hud
             if (Gui.Clicked(r)) { clock.Speed = i; clock.Paused = false; }
         }
         rx -= 8 * S;
-        if (player != null && Has(FeatureSet.Diplomacy))
+        if (Has(FeatureSet.Diplomacy))
         {
-            int wars = G.World.WarsOf(player).Count();
+            // observers see the button too (all wars of the world)
+            int wars = player != null ? G.World.WarsOf(player).Count() : 0;
             int allWars = G.World.Wars.Count;
             string wl = allWars > 0 ? $"Wars ({allWars})" : "Wars";
             float ww = Math.Max(78 * S, Gui.Measure(wl, 15, FontKind.Bold).X + 18 * S);
             rx -= ww;
             if (Gui.Button(new Rectangle(rx, 8 * S, ww, 30 * S), wl, true,
-                    (wars > 0 ? $"You are in {wars} war(s)." : "You are at peace.") + $"\n{allWars} war(s) in the world.\nWars and peace deals (F4)", Ui.Right is RightPanel.Wars or RightPanel.Peace, 15))
+                    (player == null ? "" : wars > 0 ? $"You are in {wars} war(s).\n" : "You are at peace.\n") + $"{allWars} war(s) in the world.\nWars and peace deals (F4)", Ui.Right is RightPanel.Wars or RightPanel.Peace, 15))
                 ToggleRight(RightPanel.Wars);
             if (wars > 0) Badge(new Vector2(rx + ww - 2 * S, 9 * S), wars.ToString(), Gui.Bad);
             rx -= 4 * S;
@@ -439,7 +441,8 @@ public sealed partial class Hud
         if (G.Population.ReligionEnabled) modes.Add(("Religion", MapMode.Religion));
         modes.Add(("Locations", MapMode.Locations));
         var custom = G.Interface.MapModes;
-        int total = modes.Count + custom.Count;
+        bool fogToggle = Has(FeatureSet.FogOfWar);
+        int total = modes.Count + custom.Count + (fogToggle ? 1 : 0);
         float bw = 84 * S, gap = 3 * S, pad = 6 * S;
         float maxW = Raylib.GetScreenWidth() * 0.5f;
         if (total * (bw + gap) + 2 * pad > maxW) bw = Math.Max(54 * S, (maxW - 2 * pad) / total - gap);
@@ -448,6 +451,13 @@ public sealed partial class Hud
         Gui.Block(r);
         Gui.Frame(r, Gui.MenuBar, false, "menu_bar");
         float x = r.X + pad, y = r.Y + 5 * S, h = r.Height - 10 * S;
+        if (fogToggle)
+        {
+            // map shading only: units you cannot see stay hidden either way
+            if (Gui.Button(new Rectangle(x, y, bw, h), "Fog", true, "Fog of war shading on the map (F)\nTurning it off only clears the map: enemy units you cannot see stay hidden.", MapRenderer.FogShading, 14))
+                MapRenderer.FogShading = !MapRenderer.FogShading;
+            x += bw + gap;
+        }
         foreach (var (name, mode) in modes)
         {
             if (Gui.Button(new Rectangle(x, y, bw, h), name, true, $"{name} map mode (Tab cycles)", Map.CustomMode == null && Map.Mode == mode, 14))

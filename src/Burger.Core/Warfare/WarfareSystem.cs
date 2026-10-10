@@ -180,6 +180,8 @@ public sealed class WarfareSystem
     /// <summary>Gives an army a front against an enemy (HOI4 battle plan). Null enemy clears the front.</summary>
     public void SetFront(Army army, Country? enemy, ArmyMode mode)
     {
+        // a new (or no) front: the old plan's drawn front and attack arrow go with it
+        if (enemy != army.FrontEnemy) ClearPlan(army);
         army.FrontEnemy = enemy;
         army.Mode = mode;
         army.MoveTarget = null;
@@ -385,6 +387,7 @@ public sealed class WarfareSystem
     /// <summary>Moves a whole army (cancels its front).</summary>
     public void MoveArmy(Army army, Location target)
     {
+        if (army.FrontEnemy != null) ClearPlan(army);
         army.FrontEnemy = null;
         army.MoveTarget = target;
         foreach (var d in army.Divisions) { d.FrontPost = null; OrderMove(d, target); }
@@ -720,6 +723,13 @@ public sealed class WarfareSystem
     // Fronts (HOI4 battle plans)
     // =============================================================================================
 
+    /// <summary>Removes an army's drawn front segment and attack arrow (the fallback line stays: it is on our own land).</summary>
+    public void ClearPlan(Army army)
+    {
+        army.FrontLimit.Clear();
+        army.Objective = null;
+    }
+
     /// <summary>Recomputes the front of an army and sends its divisions to their posts.</summary>
     public void UpdateFront(Army army)
     {
@@ -728,6 +738,7 @@ public sealed class WarfareSystem
         if (army.FrontEnemy == null) return;
         if (!army.FrontEnemy.Exists || army.FrontEnemy == army.Owner)
         {
+            ClearPlan(army);
             army.FrontEnemy = null;
             foreach (var d in army.Divisions) d.FrontPost = null;
             return;
@@ -751,6 +762,8 @@ public sealed class WarfareSystem
             if (limited.Count > 0) pairs = limited;
         }
         army.FrontPairs = new List<(Location Own, Location Enemy)>(pairs); // own copy: the border list is shared between armies
+        // no front line left (the enemy no longer borders us): its attack arrow goes away
+        if (pairs.Count == 0) army.Objective = null;
 
         int hash = pairs.Count;
         foreach (var p in pairs) hash = HashCode.Combine(hash, p.Own.Index, p.Enemy.Index);

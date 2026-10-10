@@ -278,6 +278,12 @@ public static class Program
             Console.WriteLine($"  diplomacy: casus belli used {string.Join(", ", D.CasusBelliUsed.OrderByDescending(kv => kv.Value).Select(kv => $"{kv.Key} {kv.Value}"))}; " +
                               $"{D.PeaceDeals} peace deals ({D.WhitePeaces} white), {R.Pacts.Count} pacts, {subj.Count} subjects (liberty {(subj.Count > 0 ? subj.Average(D.LibertyDesire) : 0):0}% avg), " +
                               $"war exhaustion avg {(alive.Count > 0 ? alive.Average(D.WarExhaustion) : 0):0.0} (max {(alive.Count > 0 ? alive.Max(D.WarExhaustion) : 0):0.0}), {D.MenLost.Values.Sum() / 1e6:0.0}M war dead");
+            if (Environment.GetEnvironmentVariable("BURGER_PEACE_LOG") != null)
+            {
+                foreach (var line in D.PeaceLog) Console.WriteLine("    " + line);
+                foreach (var s in subj)
+                    Console.WriteLine($"    subject {s.Tag} {s.Name} ({(game.Politics.Enabled ? game.Politics.Of(s).Ruling : "")}, {s.OwnedStates.Count} states) of {R.OverlordOf(s)!.Tag} ({(game.Politics.Enabled ? game.Politics.Of(R.OverlordOf(s)!).Ruling : "")})");
+            }
         }
     }
 

@@ -193,7 +193,12 @@ Battles happen when units move into a location held by enemy units. Units retrea
 **Battle plans** (`battle_plans` feature): in the Military menu an army can also get a *drawn front* (click border
 locations: the front covers only that part of the border), an *offensive arrow* (click an objective: attacks prefer
 steps towards it) and a *fallback line* (click your own locations). The mode button cycles **Hold**, **Attack** and
-**Fallback** (hold the fallback line). Plans are saved with the army.
+**Fallback** (hold the fallback line). Plans are saved with the army. To give an army a front, click its **Front**
+button, then click the country on the map (an enemy, or a neighbour at peace); clicking your own land removes the front.
+A changed or vanished front takes its drawn front segment and attack arrow with it.
+
+**Fog of war** (`fog_of_war` feature): land you cannot see is greyed out. The **Fog** button on the map mode bar (or the
+F key; `--no-fog-shading` on the command line) turns the shading off; enemy units you cannot see stay hidden.
 
 **Supply** (`supply_range` or `supply_hubs`): every day each country gets a supply map. *Range*: supply spreads
 from the capital and your own land, weaker with each step (rough terrain costs more, infrastructure less) and only
@@ -259,7 +264,8 @@ ruling party of one ideology. Keys: `name`, `adjective` (rebel names: "Nationali
 `elections = yes` (countries it rules hold elections), `extremist = yes` (gains support from low stability and lost
 wars), `coalition = { ... }` (parties it governs with - both must list each other), `opinion = { fascist = -20 }`
 (how its rulers see countries ruled by each ideology), `modifier = { ... }` (for countries it rules), `government`
-(optional government word set when it takes power).
+(optional government word set when it takes power), `peace_puppets = yes/no` (AI winners ruled by it set up subjects of
+the peoples they defeat instead of taking foreign land; default: ideologies with elections, i.e. democracies).
 
 **Starting politics** - `history/politics/*.txt` per country, else `common/governments/*.txt` by the country's
 `government` word (`default` for any other word):
@@ -393,6 +399,18 @@ back, or a new one forms (culture `country_name`, default "<Culture> Republic");
 holds half its land after `independence_war_months` (24). On actions: `on_independence_movement`, `on_independence_declared`,
 `on_independence` (scope: the new country, `scope:origin`).
 
+**Backend rules** (`backend/Population.cs`, class `GamePopulationRules`): the engine keeps the bookkeeping (pops, saves,
+when things run) and asks these rules for every decision, so a game can change them without touching the engine.
+Pops: `StartingPops`, `YearlyGrowth`, `MonthlyGrowth` (the capacity curve), `Capacity`, `YearlyAssimilation`,
+`YearlyConversion`, `YearlyPromotion`, `MigrationTarget`, `MonthlyMigration`, `OutputFactors`, `StabilityPenalty`.
+Cultures and cores: `IsAccepted`, `AcceptCultureCost`, `CannotAcceptCulture`, `CanCore`, `CoreLossYears`,
+`ClaimsNeighbour`, `IsColony`. Colonization: `MaxColonies`, `ColonizeCost`, `ColonyRangeKm`, `ColonyUpkeep`,
+`ColonyProgress`, `NativeAttack`, `ColonySettlers`, `ColonyBaseOutput`, `AiColonyScore`. Independence:
+`SeparatistCulture` (which states want to leave, and with whom), `IndependenceMinShare`, `IndependenceProgress`,
+`SuppressIndependenceCost`, `SuppressIndependenceEffect`, `DecolonisationPressure`, `ColonialOpinion`,
+`IndependentCountryName`, `GarrisonDefectChance`, `IndependenceDivisions`, `IndependenceWarOutcome`,
+`AiIndependenceResponse`. Religion: `ReligionOpinion`. A project whose Population.cs predates a rule uses the engine default for it.
+
 **Buildings**: any building can have `modifier = { ... }` (its state, per level) and `country_modifier = { ... }` (its
 owner, per level). Without production they are bought with gold in the state window (`gold_cost`, `build_months`); with
 production they are built with civilian factories (`cost`).
@@ -430,7 +448,14 @@ removes), `set_culture`, `add_accepted_culture`, `remove_accepted_culture`, `set
   the loser as a country, regime change (the winner's ideology takes power) or humiliation. Each costs war score. The AI
   accepts if your war score (plus its war exhaustion, a long war or a stalemate) covers the cost. AI winners demand their
   war goals first; the AI offers peace when losing, worn out, or when a war goes nowhere. The old ruler in a war of
-  independence accepts a white peace only when losing or exhausted.
+  independence accepts a white peace only when losing or exhausted. Allies and subjects of the winner only get land that
+  touches their own; the rest goes to the war leader. Democracies (`peace_puppets`, rule `PrefersPuppets`) make the loser
+  a subject when they hold much of its people's land, release other peoples of the land they hold as subjects, and take
+  only land of their own peoples, cores and claims.
+- **Subjects** follow their overlord's ideology (set when they become subjects and kept monthly). A country is never made
+  a subject of an overlord that already rules its homeland (same primary culture, or half of its core states): it is
+  annexed instead, and such existing subjects are annexed. Subjects cannot have subjects of their own.
+  `BURGER_PEACE_LOG=1 burger validate <project> --days N` prints every peace deal and the subjects at the end.
 - **Liberty desire** (subjects, 0-100, EU style): from the subject's strength and size compared to its overlord, its opinion
   of it, a different ideology or culture group, the overlord losing a war, the tribute, `liberty_desire` of the subject type
   and the modifier `liberty_desire`. At 50 (`liberty_desire_rebel`) the subject stops joining its overlord's wars and may

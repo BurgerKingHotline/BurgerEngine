@@ -67,14 +67,11 @@ public sealed partial class Hud
             if (Gui.Button(new Rectangle(bx, by, 72 * S * k, bh), "General", chars, chars ? "Choose the general leading this army" : "Generals need the characters feature", Ui.ChoosingGeneralFor == army, 13))
                 Ui.ChoosingGeneralFor = Ui.ChoosingGeneralFor == army ? null : army;
             bx += 72 * S * k + 4 * S;
-            string frontLabel = army.FrontEnemy == null ? "Front: none" : "Front: " + army.FrontEnemy.Tag;
+            bool picking = Ui.PlanArmy == army && Ui.Tool == PlanTool.PickFront;
+            string frontLabel = picking ? "Pick on map" : army.FrontEnemy == null ? "Front: none" : "Front: " + army.FrontEnemy.Tag;
             if (Gui.Button(new Rectangle(bx, by, 96 * S * k, bh), frontLabel, enemies.Count > 0,
-                    enemies.Count > 0 ? "Click to cycle the country this army holds a front against (enemies first, then neighbours at peace)" : "You have no neighbours or enemies", false, 13))
-            {
-                int idx = army.FrontEnemy == null ? 0 : enemies.IndexOf(army.FrontEnemy) + 1;
-                var next = idx >= enemies.Count ? null : enemies[idx];
-                G.Warfare.SetFront(army, next, army.Mode);
-            }
+                    enemies.Count > 0 ? "Click, then click the country on the map this army holds a front against (an enemy or a neighbour at peace).\nClick your own land to remove the front." : "You have no neighbours or enemies", picking, 13))
+                TogglePlanTool(army, PlanTool.PickFront);
             bx += 96 * S * k + 4 * S;
             string modeLabel = army.Mode switch { ArmyMode.Offensive => "Attack", ArmyMode.Fallback => "Fallback", _ => "Hold" };
             bool canFallback = plans && army.Fallback.Count > 0;
@@ -149,6 +146,21 @@ public sealed partial class Hud
         if (Ui.ChoosingGeneralFor != null) DrawGeneralChooser(Ui.ChoosingGeneralFor, r);
     }
 
+    /// <summary>
+    /// The country a click on <paramref name="loc"/> gives an army a front against: an enemy (also one holding our land) or a
+    /// neighbour; the army's own country means "no front"; null when the location belongs to neither.
+    /// </summary>
+    public Country? FrontTargetOf(Army army, Location loc)
+    {
+        var me = army.Owner;
+        if (loc.Controller is { } ctl && ctl != me && G.World.AtWar(me, ctl)) return ctl;
+        var owner = loc.Owner;
+        if (owner == null) return null;
+        if (owner == me) return me;
+        if (G.World.AtWar(me, owner)) return owner;
+        return Burger.Core.Scripting.Builtins.NeighborCountries(G, me).Contains(owner) ? owner : null;
+    }
+
     private void TogglePlanTool(Army army, PlanTool tool)
     {
         if (Ui.PlanArmy == army && Ui.Tool == tool) { Ui.Tool = PlanTool.None; Ui.PlanArmy = null; Ui.SetStatus("Done drawing"); return; }
@@ -159,6 +171,7 @@ public sealed partial class Hud
         {
             PlanTool.Front => "Click border locations to draw the front (click again to remove). Right-click or Esc when done.",
             PlanTool.Arrow => "Click the objective of the offensive. Right-click or Esc to cancel.",
+            PlanTool.PickFront => $"Click the country {army.Name} should hold a front against (your own land: no front). Right-click or Esc to cancel.",
             _ => "Click your locations to draw the fallback line (click again to remove). Right-click or Esc when done.",
         });
     }
@@ -181,6 +194,25 @@ public sealed partial class Hud
                 Ui.PlanArmy = null;
                 Ui.SetStatus(army.Mode == ArmyMode.Offensive ? $"{army.Name} attacks towards {loc.DisplayName}" : $"Objective: {loc.DisplayName}. Set the army to Attack to execute the plan.");
                 break;
+            case PlanTool.PickFront:
+                {
+                    if (!loc.IsLand) return;
+                    var target = FrontTargetOf(army, loc);
+                    if (target == null) { Ui.SetStatus($"{loc.Owner?.Name ?? loc.DisplayName} is not an enemy or a neighbour"); return; }
+                    Ui.Tool = PlanTool.None;
+                    Ui.PlanArmy = null;
+                    if (target == army.Owner)
+                    {
+                        G.Warfare.SetFront(army, null, ArmyMode.Hold);
+                        Ui.SetStatus($"{army.Name} has no front");
+                    }
+                    else
+                    {
+                        G.Warfare.SetFront(army, target, army.Mode == ArmyMode.Fallback ? ArmyMode.Hold : army.Mode);
+                        Ui.SetStatus($"{army.Name} holds a front against {target.Name}");
+                    }
+                    break;
+                }
             case PlanTool.Fallback:
                 if (!loc.IsLand || loc.Controller != army.Owner && (loc.Controller == null || G.World.AtWar(army.Owner, loc.Controller))) { Ui.SetStatus("The fallback line must be on land you hold"); return; }
                 G.Warfare.ToggleFallbackLocation(army, loc);

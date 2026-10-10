@@ -31,28 +31,24 @@ public sealed partial class PopulationSystem
             foreach (var former in s.Cores.Where(c => c != owner).ToList())
             {
                 bool cultureThere = major != null && Of(former).Culture != null && IsAccepted(former, major);
-                if (!former.Exists && owned >= 1 && !cultureThere) { s.Cores.Remove(former); CoresLost++; continue; }
-                if (!cultureThere && owned >= Rules.CoreLossYears(_game, s, former))
-                {
-                    s.Cores.Remove(former);
-                    s.Claims.Add(former); // the memory remains as a claim
-                    CoresLost++;
-                    if (former.IsPlayer) _game.Notify($"We lost our core on {s.DisplayName}; a claim remains.", NotificationKind.Bad);
-                }
+                if (cultureThere || owned < Rules.CoreLossYears(_game, s, former)) continue;
+                s.Cores.Remove(former);
+                CoresLost++;
+                if (!former.Exists) continue;
+                s.Claims.Add(former); // the memory remains as a claim
+                if (former.IsPlayer) _game.Notify($"We lost our core on {s.DisplayName}; a claim remains.", NotificationKind.Bad);
             }
         }
         if (w.Date.Month != 1) return;
-        // irredentism: claims on neighbouring states where our culture is the majority
+        // irredentism: claims on neighbouring states (rule ClaimsNeighbour: where our culture is the majority)
         foreach (var c in w.Countries.Where(c => c.Exists))
         {
-            string? own = Of(c).Culture;
-            if (own == null) continue;
             var seen = new HashSet<State>();
             foreach (var s in c.OwnedStates)
                 foreach (var n in NeighbourStates(s))
                 {
                     if (n.Owner == null || n.Owner == c || !seen.Add(n) || n.Cores.Contains(c) || n.Claims.Contains(c)) continue;
-                    if (MajorityCulture(n) == own) { n.Claims.Add(c); ClaimsMade++; }
+                    if (Rules.ClaimsNeighbour(_game, c, n)) { n.Claims.Add(c); ClaimsMade++; }
                 }
         }
     }
@@ -65,16 +61,10 @@ public sealed partial class PopulationSystem
     }
 
     /// <summary>
-    /// A colony: a state marked <c>category = colony</c>, or (with cores) a state the owner has no core on that is not
-    /// connected by land to its capital. Colonies are not assimilated or converted.
+    /// A colony (rule IsColony): a state marked <c>category = colony</c>, or (with cores) a state the owner has no core on
+    /// that is not connected by land to its capital. Colonies are not assimilated or converted.
     /// </summary>
-    public bool IsColony(State s)
-    {
-        if (s.Owner == null) return false;
-        if (string.Equals(s.Category, "colony", StringComparison.OrdinalIgnoreCase)) return true;
-        if (!CoresEnabled || s.Cores.Contains(s.Owner)) return false;
-        return !HomeOf(s.Owner).Contains(s);
-    }
+    public bool IsColony(State s) => Rules.IsColony(_game, s);
 
     private readonly Dictionary<Country, (int Day, HashSet<State> States)> _home = new();
 
@@ -116,27 +106,13 @@ public sealed partial class PopulationSystem
     // =============================================================================================
 
     /// <summary>Cost of accepting a culture: political power with politics, else gold with the economy, else free.</summary>
-    public (double Amount, string Currency) AcceptCost(Country c)
-    {
-        double cost = _game.Data.Defines.Get("accept_culture_cost", 100);
-        if (_game.Politics.PowerResource is { } pr) return (cost, pr.Name);
-        if (_game.Features.Has(FeatureSet.Economy)) return (cost, "gold");
-        return (0, "");
-    }
+    public (double Amount, string Currency) AcceptCost(Country c) => Rules.AcceptCultureCost(_game, c);
 
     public string? CannotAccept(Country c, string culture)
     {
         if (!Enabled || !CultureByKey.ContainsKey(culture)) return "Unknown culture";
         if (IsAccepted(c, culture)) return "Already accepted";
-        // only people outside colonies count: a people that lives only in our colonies cannot be accepted
-        var home = HomeStates(c).ToList();
-        double homeTotal = home.Sum(TotalOf);
-        double share = Breakdown(home, p => p.Culture).Where(x => x.Key == culture).Sum(x => x.Size) / Math.Max(1, homeTotal);
-        double need = _game.Data.Defines.Get("accept_culture_share", 0.05);
-        if (share <= 0 && Breakdown(c.OwnedStates, p => p.Culture).Any(x => x.Key == culture)) return "They live only in our colonies";
-        if (share < need) return $"Needs at least {need:P0} of our people outside colonies ({share:P1} now)";
-        int max = (int)_game.Data.Defines.Get("max_accepted_cultures", 3);
-        if (Of(c).Accepted.Count >= max) return $"At most {max} accepted cultures";
+        if (Rules.CannotAcceptCulture(_game, c, culture) is { } why) return why;
         var (cost, cur) = AcceptCost(c);
         if (cost > 0 && (cur == "gold" ? c.Gold : _game.Politics.PowerOf(c)) < cost) return $"Needs {cost:0} {cur}";
         return null;
@@ -162,9 +138,9 @@ public sealed partial class PopulationSystem
     // Colonization (colonization feature)
     // =============================================================================================
 
-    public int MaxColonies(Country c) => Math.Max(0, (int)Math.Round(_game.Data.Defines.Get("colonists", 1) + _game.Modifiers.Sum(c, "colonists")));
+    public int MaxColonies(Country c) => Rules.MaxColonies(_game, c);
     public IEnumerable<State> ColoniesOf(Country c) => _states.Where(kv => kv.Value.Colonizer == c && kv.Key.Owner == null).Select(kv => kv.Key);
-    public double ColonizeCost => _game.Features.Has(FeatureSet.Economy) ? _game.Data.Defines.Get("colonize_cost", 50) : 0;
+    public double ColonizeCost => Rules.ColonizeCost(_game);
 
     /// <summary>Why <paramref name="c"/> cannot send a colonist to <paramref name="s"/> (null = it can).</summary>
     public string? CannotColonize(Country c, State s)
@@ -176,12 +152,13 @@ public sealed partial class PopulationSystem
         if (sp.Colonizer != null && sp.Colonizer.Exists) return sp.Colonizer == c ? "Our colonists are already there" : $"{sp.Colonizer.Name} is settling it";
         if (ColoniesOf(c).Count() >= MaxColonies(c)) return $"All our colonists are busy ({MaxColonies(c)})";
         if (ColonizeCost > 0 && c.Gold < ColonizeCost) return $"Needs {ColonizeCost:0} gold";
-        double range = _game.Data.Defines.Get("colony_range_km", 1200) * Math.Max(0.1, 1 + _game.Modifiers.Sum(c, "colony_range"));
+        double range = Rules.ColonyRangeKm(_game, c);
         if (DistanceKm(c, s) > range) return $"Too far from our land (more than {range:0} km)";
         return null;
     }
 
-    private double DistanceKm(Country c, State s)
+    /// <summary>Distance from the country's nearest land to the middle of a state.</summary>
+    public double DistanceKm(Country c, State s)
     {
         double kmPerPx = _game.Data.Defines.KmPerPixel;
         var (sx, sy) = Center(s);
@@ -224,20 +201,20 @@ public sealed partial class PopulationSystem
 
     private void MonthlyColonies()
     {
-        var d = _game.Data.Defines;
         foreach (var (s, sp) in _states.ToList())
         {
             var c = sp.Colonizer;
             if (c == null) continue;
             if (!c.Exists || s.Owner != null) { sp.Colonizer = null; sp.ColonyProgress = 0; continue; }
-            if (_game.Features.Has(FeatureSet.Economy)) c.Gold -= d.Get("colony_upkeep", 1);
+            c.Gold -= Rules.ColonyUpkeep(_game, s, c);
             double total = sp.Total;
             double natives = total > 0 ? sp.Pops.Where(p => !IsAccepted(c, p.Culture)).Sum(p => p.Size) / total : 0;
             sp.ColonyProgress += Rules.ColonyProgress(_game, s, c, natives);
             // natives fight back now and then
-            if (natives > 0.05 && _game.Rng.NextDouble() < d.Get("native_resistance", 0.05) * natives)
+            double setback = Rules.NativeAttack(_game, s, c, natives);
+            if (setback > 0)
             {
-                sp.ColonyProgress = Math.Max(0, sp.ColonyProgress - 15);
+                sp.ColonyProgress = Math.Max(0, sp.ColonyProgress - setback);
                 _game.NotifyPlayer($"Natives attacked our colonists in {s.DisplayName}.", NotificationKind.Bad, c);
             }
             if (sp.ColonyProgress < 100) continue;
@@ -246,12 +223,13 @@ public sealed partial class PopulationSystem
             sp.ColonyProgress = 0;
             _game.Diplomacy.TransferState(s, c);
             var cp = Of(c);
-            double settlers = d.Get("colony_settlers", 1000);
+            double settlers = Rules.ColonySettlers(_game, s, c);
             if (cp.Culture != null && settlers > 0)
                 sp.Pops.Add(new Pop { Culture = cp.Culture, Religion = ReligionEnabled ? cp.Religion : null, Type = ClassesEnabled ? PopTypes.OrderByDescending(t => t.Share).First().Key : null, Size = settlers });
             if (sp.InitialTotal <= 0) sp.InitialTotal = sp.Total;
-            if (sp.BaseTax <= 0) sp.BaseTax = d.Get("colony_tax", 1);
-            if (sp.BaseManpower <= 0) sp.BaseManpower = d.Get("colony_manpower", 20);
+            var (colonyTax, colonyManpower) = Rules.ColonyBaseOutput(_game, s, c);
+            if (sp.BaseTax <= 0) sp.BaseTax = colonyTax;
+            if (sp.BaseManpower <= 0) sp.BaseManpower = colonyManpower;
             sp.Owner = c;
             sp.OwnedSinceDay = _game.World.Date.TotalDays;
             ColoniesFounded++;
@@ -266,13 +244,13 @@ public sealed partial class PopulationSystem
         if (!ColonizationEnabled || ColoniesOf(c).Count() >= MaxColonies(c)) return;
         if (ColonizeCost > 0 && c.Gold < ColonizeCost * 3) return;
         State? best = null;
-        double bestScore = double.MaxValue;
+        double bestScore = double.NegativeInfinity;
         foreach (var s in _game.World.States)
         {
             if (s.Owner != null || (_states.TryGetValue(s, out var sp) && sp.Colonizer != null)) continue;
             if (CannotColonize(c, s) != null) continue;
-            double score = DistanceKm(c, s);
-            if (score < bestScore) { bestScore = score; best = s; }
+            double score = Rules.AiColonyScore(_game, c, s);
+            if (score > bestScore) { bestScore = score; best = s; }
         }
         if (best != null) Colonize(c, best);
     }

@@ -27,6 +27,12 @@ public sealed class IndependenceWar
     public int StartDay;
 }
 
+/// <summary>How a war of independence stands (rule IndependenceWarOutcome).</summary>
+public enum IndependenceWarResult { Ongoing, Crushed, Won }
+
+/// <summary>What the AI does about an independence movement (rule AiIndependenceResponse).</summary>
+public enum IndependenceResponse { None, Suppress, Grant }
+
 public sealed partial class PopulationSystem
 {
     // =============================================================================================
@@ -41,10 +47,10 @@ public sealed partial class PopulationSystem
     public int FreedTotal;
 
     /// <summary>
-    /// Decolonisation pressure (1 = none yet): grows with every country that won or was granted independence (decolonisation_step,
+    /// Decolonisation pressure (1 = none yet; rule DecolonisationPressure): grows with every country that won or was granted independence (decolonisation_step,
     /// 0.05 each, up to max_decolonisation_pressure 2). Speeds up independence movements and sharpens the world's dislike of colonial empires.
     /// </summary>
-    public double DecolonisationPressure => Math.Min(_game.Data.Defines.Get("max_decolonisation_pressure", 2), 1 + FreedTotal * _game.Data.Defines.Get("decolonisation_step", 0.05));
+    public double DecolonisationPressure => Rules.DecolonisationPressure(_game, FreedTotal);
 
     private readonly Dictionary<Country, int> _colonyCount = new();
     private int _colonyCountDay = -1;
@@ -67,23 +73,19 @@ public sealed partial class PopulationSystem
     public double ColonialOpinion(Country from, Country to)
     {
         if (!IndependenceEnabled || from == to) return 0;
-        int colonies = ColonyCount(to);
-        if (colonies == 0 || ColonyCount(from) >= _game.Data.Defines.Get("colonial_power_colonies", 5)) return 0;
-        var d = _game.Data.Defines;
-        return -Math.Min(d.Get("max_colonial_opinion", 25), colonies * d.Get("colonial_opinion_per_colony", 0.5)) * DecolonisationPressure;
+        return Rules.ColonialOpinion(_game, from, to, ColonyCount(from), ColonyCount(to));
     }
 
     public IEnumerable<IndependenceMovement> IndependenceOf(Country c) => Independence.Where(m => m.Country == c);
 
     public bool InIndependenceWar(Country c) => IndependenceWars.Any(w => w.Origin == c || w.Rebel == c);
 
-    /// <summary>States of <paramref name="c"/> where <paramref name="culture"/> is the biggest culture and is not accepted (never the capital state).</summary>
+    /// <summary>States of <paramref name="c"/> that <paramref name="culture"/> wants to break away with (rule SeparatistCulture: where it is the biggest culture and is not accepted, never the capital state).</summary>
     public List<State> SeparatistStates(Country c, string culture)
     {
         var result = new List<State>();
-        if (IsAccepted(c, culture)) return result;
         foreach (var s in c.OwnedStates)
-            if (s != c.Capital?.State && MajorityCulture(s) == culture) result.Add(s);
+            if (Rules.SeparatistCulture(_game, c, s) == culture) result.Add(s);
         return result;
     }
 
@@ -91,19 +93,17 @@ public sealed partial class PopulationSystem
     {
         CheckIndependenceWars();
         var w = _game.World;
-        double minShare = _game.Data.Defines.Get("independence_min_share", 0.02);
         foreach (var c in w.Countries.ToList())
         {
             if (!c.Exists || Of(c).Culture == null || InIndependenceWar(c) || _game.Politics.InCivilWar(c)) continue;
             double total = TotalOf(c);
             if (total <= 0) continue;
-            // cultures that are the majority somewhere in the country without being accepted
+            // cultures that want to leave with some of the country's states (rule SeparatistCulture)
             var cultures = new Dictionary<string, List<State>>(StringComparer.OrdinalIgnoreCase);
             foreach (var s in c.OwnedStates)
             {
-                if (s == c.Capital?.State) continue;
-                string? major = MajorityCulture(s);
-                if (major == null || IsAccepted(c, major)) continue;
+                string? major = Rules.SeparatistCulture(_game, c, s);
+                if (major == null) continue;
                 if (!cultures.TryGetValue(major, out var list)) cultures[major] = list = new List<State>();
                 list.Add(s);
             }
@@ -114,6 +114,7 @@ public sealed partial class PopulationSystem
             {
                 double people = states.Sum(s => Of(s).Pops.Where(p => p.Culture == culture).Sum(p => p.Size));
                 double share = people / total;
+                double minShare = Rules.IndependenceMinShare(_game, c, culture);
                 var m = Independence.FirstOrDefault(x => x.Country == c && x.Culture == culture);
                 if (m == null)
                 {
@@ -138,7 +139,7 @@ public sealed partial class PopulationSystem
     }
 
     /// <summary>Cost of suppressing: suppress_independence_cost (50), half again more for every earlier suppression.</summary>
-    public double SuppressIndependenceCost(IndependenceMovement m) => _game.Data.Defines.Get("suppress_independence_cost", 50) * (1 + 0.5 * m.Suppressed);
+    public double SuppressIndependenceCost(IndependenceMovement m) => Rules.SuppressIndependenceCost(_game, m);
 
     /// <summary>Political power with politics, gold with the economy.</summary>
     private string IndependenceCurrency => _game.Politics.PowerResource?.Name ?? (_game.Features.Has(FeatureSet.Economy) ? "gold" : "");
@@ -157,12 +158,13 @@ public sealed partial class PopulationSystem
         var reason = CannotSuppressIndependence(m);
         if (reason != null) return reason;
         double cost = SuppressIndependenceCost(m);
+        var (lost, unrest) = Rules.SuppressIndependenceEffect(_game, m);
         m.Suppressed++;
         if (IndependenceCurrency == "gold") m.Country.Gold -= cost;
         else if (_game.Politics.PowerResource is { } pr) _game.Resources.Set(m.Country, pr, _game.Resources.Get(m.Country, pr) - cost);
-        m.Progress = Math.Max(0, m.Progress - _game.Data.Defines.Get("suppress_independence_progress", 20));
+        m.Progress = Math.Max(0, m.Progress - lost);
         var stab = _game.Resources.Defs.FirstOrDefault(r => string.Equals(r.Key, "stability", StringComparison.OrdinalIgnoreCase));
-        if (stab != null) _game.Resources.Set(m.Country, stab, _game.Resources.Get(m.Country, stab) - _game.Data.Defines.Get("suppress_independence_stability", 3));
+        if (stab != null) _game.Resources.Set(m.Country, stab, _game.Resources.Get(m.Country, stab) - unrest);
         return null;
     }
 
@@ -219,7 +221,7 @@ public sealed partial class PopulationSystem
         // garrisons in the land partly go over; a militia rises from the people
         var land = states.SelectMany(s => s.Locations).Where(l => l.IsLand && l.IsPassable).ToList();
         var landSet = land.ToHashSet();
-        double defect = _game.Data.Defines.Get("independence_garrison_defect", 0.5);
+        double defect = Rules.GarrisonDefectChance(_game, origin, rebel);
         foreach (var d in _game.World.Divisions.Where(d => d.Owner == origin && d.VolunteerFrom == null && landSet.Contains(d.Location)).ToList())
             if (_game.Rng.NextDouble() < defect)
             {
@@ -233,8 +235,7 @@ public sealed partial class PopulationSystem
                        ?? _game.Data.Templates.Values.FirstOrDefault();
         if (template != null && land.Count > 0)
         {
-            double people = states.Sum(TotalOf);
-            int count = Math.Clamp((int)(people / _game.Data.Defines.Get("independence_people_per_division", 1500000)), Math.Min(states.Count, 12), 24);
+            int count = Rules.IndependenceDivisions(_game, origin, rebel, states);
             for (int i = 0; i < count; i++) _game.Warfare.CreateDivision(rebel, template, land[i * 7919 % land.Count]);
         }
         var w = _game.Diplomacy.DeclareWar(rebel, origin, null, null, force: true);
@@ -261,7 +262,7 @@ public sealed partial class PopulationSystem
         if (country == null)
         {
             string tag = FreeIndependenceTag();
-            string name = def?.CountryName ?? $"{def?.Name ?? Localisation.GetOrPretty(culture)} Republic";
+            string name = Rules.IndependentCountryName(_game, origin, culture, states);
             // a second country of the same people is named after its land
             if (w.Countries.Any(x => x.Exists && x.Name == name)) name = $"{name} of {states.MaxBy(TotalOf)!.DisplayName}";
             country = w.CreateCountry(tag, name, def?.Color ?? Rgb.Gray, origin.FlagPath, origin.Government);
@@ -319,9 +320,9 @@ public sealed partial class PopulationSystem
                 IndependenceWars.Remove(iw);
                 continue;
             }
-            double held = HeldShare(iw.Rebel);
-            bool capitalLost = iw.Rebel.Capital == null || iw.Rebel.Capital.Controller != iw.Rebel;
-            if (held <= 0.05 || (capitalLost && held <= 0.3))
+            double months = (today - iw.StartDay) / 30.4;
+            var result = Rules.IndependenceWarOutcome(_game, iw, HeldShare(iw.Rebel), HeldShare(iw.Origin), months);
+            if (result == IndependenceWarResult.Crushed)
             {
                 IndependenceWars.Remove(iw);
                 _game.Diplomacy.EndWar(iw.War);
@@ -331,8 +332,7 @@ public sealed partial class PopulationSystem
                 _game.RaiseMapChanged();
                 continue;
             }
-            double months = (today - iw.StartDay) / 30.4;
-            if (months >= _game.Data.Defines.Get("independence_war_months", 24) && held >= 0.5 || HeldShare(iw.Origin) <= 0.3)
+            if (result == IndependenceWarResult.Won)
             {
                 IndependenceWars.Remove(iw);
                 _game.Diplomacy.EndWar(iw.War);
@@ -354,15 +354,15 @@ public sealed partial class PopulationSystem
         return n == 0 ? 0 : held / (double)n;
     }
 
-    /// <summary>AI: suppress movements that get close, let small colonies go when it cannot.</summary>
+    /// <summary>AI: suppress movements that get close, let small colonies go when it cannot (rule AiIndependenceResponse).</summary>
     private void AiIndependence(Country c)
     {
         if (!IndependenceEnabled) return;
         foreach (var m in IndependenceOf(c).ToList())
         {
-            if (m.Progress < 70) continue;
-            if (CannotSuppressIndependence(m) == null && _game.Rng.NextDouble() < 0.35) SuppressIndependence(m);
-            else if (m.Progress > 90 && _game.Rng.NextDouble() < 0.1 && SeparatistStates(c, m.Culture).All(IsColony)) GrantIndependence(m);
+            var response = Rules.AiIndependenceResponse(_game, c, m);
+            if (response == IndependenceResponse.Suppress) SuppressIndependence(m);
+            else if (response == IndependenceResponse.Grant) GrantIndependence(m);
         }
     }
 

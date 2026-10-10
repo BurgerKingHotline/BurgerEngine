@@ -1,0 +1,289 @@
+NOR group 32 locs 16 ang -55 elong 4.34
+ angle -55: 6 lines
+  arc0.35 font 1.5 cov 0.02 on 0.00 REJECTED
+  ridge0.35 font 48.6 cov 0.35 on 0.96 bend 0.37 steep 0.13 score 18.42 (3351,583)-(3538,488)
+  arc0.18 font 37.0 cov 0.23 on 1.00 bend 0.22 steep 0.35 score 9.65 (3185,937)-(3254,818)
+  spine0.18 font 31.6 cov 0.20 on 1.00 bend 0.17 steep 0.36 score 7.27 (3191,929)-(3248,827)
+  ridge0.18 font 28.3 cov 0.37 on 1.00 bend 0.87 steep 0.29 score 9.72 (3199,918)-(3528,492)
+  ridgeAll font 28.3 cov 0.37 on 1.00 bend 0.87 steep 0.29 score 9.72 (3199,918)-(3528,492)
+ angle -60: 6 lines
+  arc0.35 font 1.5 cov 0.02 on 0.00 REJECTED
+  ridge0.35 font 52.6 cov 0.37 on 1.00 bend 0.40 steep 0.38 score 17.83 (3347,591)-(3537,488)
+  arc0.18 font 36.5 cov 0.23 on 1.00 bend 0.15 steep 1.00 score 5.48 (3184,937)-(3251,820)
+  spine0.18 font 31.2 cov 0.20 on 1.00 bend 0.19 steep 1.11 score 4.11 (3194,932)-(3243,827)
+  ridge0.18 font 28.3 cov 0.37 on 1.00 bend 0.84 steep 0.85 score 6.28 (3202,920)-(3527,492)
+  ridgeAll font 28.3 cov 0.37 on 1.00 bend 0.84 steep 0.85 score 6.28 (3202,920)-(3527,492)
+ angle -45: 5 lines
+  arc0.35 font 1.5 cov 0.02 on 0.00 REJECTED
+  ridge0.35 font 48.6 cov 0.38 on 0.96 bend 0.63 steep 0.33 score 15.46 (3345,587)-(3545,491)
+  arc0.18 font 50.7 cov 0.32 on 1.00 bend 0.00 steep 1.00 score 10.12 (3188,937)-(3283,774)
+  ridge0.18 font 32.4 cov 0.42 on 1.00 bend 1.06 steep 0.81 score 7.81 (3196,914)-(3535,495)
+  ridgeAll font 32.4 cov 0.42 on 1.00 bend 1.06 steep 0.81 score 7.81 (3196,914)-(3535,495)
+ angle -30: 6 lines
+  arc0.35 font 1.5 cov 0.02 on 0.00 REJECTED
+  ridge0.35 font 52.6 cov 0.40 on 1.00 bend 0.57 steep 0.29 score 19.37 (3348,584)-(3551,497)
+  arc0.18 font 40.9 cov 0.27 on 0.83 bend 0.57 steep 0.00 score 9.83 (3147,867)-(3297,869)
+  spine0.18 font 1.5 cov 0.02 on 0.29 REJECTED
+  ridge0.18 font 32.4 cov 0.45 on 1.00 bend 1.33 steep 0.78 score 7.94 (3194,902)-(3540,499)
+  ridgeAll font 32.4 cov 0.45 on 1.00 bend 1.33 steep 0.78 score 7.94 (3194,902)-(3540,499)
+ angle -15: 5 lines
+  arc0.35 font 36.5 cov 0.57 on 0.62 bend 0.00 steep 0.71 score 7.43 (3175,883)-(3389,661)
+  spine0.35 font 28.3 cov 0.44 on 1.00 bend 0.89 steep 1.05 score 6.22 (3190,900)-(3359,578)
+  ridge0.35 font 32.4 cov 0.51 on 1.00 bend 0.76 steep 1.05 score 8.14 (3190,901)-(3360,580)
+  arc0.18 font 14.2 cov 0.22 on 0.62 bend 0.57 steep 0.71 score 1.22 (3178,865)-(3546,484)
+  spine0.18 font 32.4 cov 0.51 on 1.00 bend 1.56 steep 0.76 score 8.51 (3194,895)-(3542,500)
+ angle 0: 4 lines
+  arc0.35 font 53.9 cov 0.50 on 0.62 bend 0.57 steep 0.42 score 10.81 (3175,876)-(3345,774)
+  spine0.35 font 32.4 cov 0.62 on 1.00 bend 0.78 steep 1.03 score 9.53 (3186,893)-(3340,612)
+  ridge0.35 font 32.4 cov 0.62 on 1.00 bend 0.74 steep 1.03 score 9.61 (3186,894)-(3340,614)
+  arc0.18 font 16.2 cov 0.31 on 0.46 REJECTED
+ angle 15: 5 lines
+  arc0.35 font 31.7 cov 0.41 on 0.75 bend 0.57 steep 0.18 score 8.23 (3195,849)-(3307,817)
+  spine0.35 font 44.5 cov 0.66 on 0.83 bend 0.45 steep 0.72 score 14.37 (3194,866)-(3324,728)
+  ridge0.35 font 28.3 cov 0.76 on 1.00 bend 0.51 steep 1.00 score 10.30 (3198,868)-(3346,613)
+  arc0.18 font 40.5 cov 0.63 on 0.33 REJECTED
+  spine0.18 font 4.0 cov 0.11 on 0.71 bend 1.07 steep 0.88 score 0.18 (3190,860)-(3423,534)
+ angle 30: 3 lines
+  arc0.35 font 1.5 cov 0.07 on 0.25 REJECTED
+  spine0.35 font 1.5 cov 0.07 on 0.21 REJECTED
+  arc0.18 font 1.5 cov 0.07 on 0.25 REJECTED
+ angle 45: 2 lines
+  arc0.35 font 1.5 cov 0.06 on 0.33 REJECTED
+  arc0.18 font 1.5 cov 0.06 on 0.21 REJECTED
+ angle 60: 2 lines
+  arc0.35 font 38.3 cov 0.50 on 0.88 bend 0.00 steep 1.00 score 8.98 (3181,802)-(3252,925)
+  arc0.18 font 1.5 cov 0.04 on 0.25 REJECTED
+ chosen ridge0.35 score 19.37
+ITA group 9 locs 8 ang -48 elong 4.69
+ angle -48: 7 lines
+  arc0.35 font 36.0 cov 0.92 on 1.00 bend 0.48 steep 0.25 score 28.52 (3779,2192)-(3933,2027)
+  spine0.35 font 36.0 cov 0.92 on 1.00 bend 1.50 steep 0.28 score 22.48 (3784,2194)-(3925,2024)
+  ridge0.35 font 36.0 cov 0.92 on 1.00 bend 1.50 steep 0.28 score 22.48 (3784,2195)-(3926,2024)
+  arc0.18 font 36.0 cov 0.92 on 1.00 bend 0.48 steep 0.25 score 28.52 (3779,2192)-(3933,2027)
+  spine0.18 font 36.0 cov 0.92 on 1.00 bend 1.50 steep 0.28 score 22.48 (3784,2194)-(3925,2024)
+  ridge0.18 font 36.0 cov 0.92 on 1.00 bend 1.50 steep 0.28 score 22.48 (3784,2195)-(3926,2024)
+  ridgeAll font 36.0 cov 0.92 on 1.00 bend 1.50 steep 0.28 score 22.48 (3784,2195)-(3926,2024)
+ angle -60: 7 lines
+  arc0.35 font 34.2 cov 0.88 on 1.00 bend 0.38 steep 0.74 score 18.16 (3779,2196)-(3934,2026)
+  spine0.35 font 32.4 cov 0.84 on 1.00 bend 1.30 steep 0.81 score 12.82 (3785,2196)-(3925,2024)
+  ridge0.35 font 34.2 cov 0.88 on 1.00 bend 1.30 steep 0.81 score 14.13 (3786,2197)-(3926,2024)
+  arc0.18 font 34.2 cov 0.88 on 1.00 bend 0.38 steep 0.74 score 18.16 (3779,2196)-(3934,2026)
+  spine0.18 font 32.4 cov 0.84 on 1.00 bend 1.30 steep 0.81 score 12.82 (3785,2196)-(3925,2024)
+  ridge0.18 font 34.2 cov 0.88 on 1.00 bend 1.30 steep 0.81 score 14.13 (3786,2197)-(3926,2024)
+  ridgeAll font 34.2 cov 0.88 on 1.00 bend 1.30 steep 0.81 score 14.13 (3786,2197)-(3926,2024)
+ angle -45: 7 lines
+  arc0.35 font 36.0 cov 0.93 on 1.00 bend 0.50 steep 0.73 score 19.63 (3779,2192)-(3932,2027)
+  spine0.35 font 36.0 cov 0.93 on 1.00 bend 1.48 steep 0.80 score 14.98 (3784,2194)-(3926,2024)
+  ridge0.35 font 36.0 cov 0.93 on 1.00 bend 1.48 steep 0.80 score 14.98 (3784,2195)-(3926,2024)
+  arc0.18 font 36.0 cov 0.93 on 1.00 bend 0.50 steep 0.73 score 19.63 (3779,2192)-(3932,2027)
+  spine0.18 font 36.0 cov 0.93 on 1.00 bend 1.48 steep 0.80 score 14.98 (3784,2194)-(3926,2024)
+  ridge0.18 font 36.0 cov 0.93 on 1.00 bend 1.48 steep 0.80 score 14.98 (3784,2195)-(3926,2024)
+  ridgeAll font 36.0 cov 0.93 on 1.00 bend 1.48 steep 0.80 score 14.98 (3784,2195)-(3926,2024)
+ angle -30: 7 lines
+  arc0.35 font 36.9 cov 0.97 on 1.00 bend 0.56 steep 0.71 score 20.89 (3779,2188)-(3931,2029)
+  spine0.35 font 36.0 cov 0.98 on 1.00 bend 1.40 steep 0.77 score 16.25 (3784,2193)-(3928,2027)
+  ridge0.35 font 36.0 cov 0.98 on 1.00 bend 1.40 steep 0.77 score 16.25 (3784,2193)-(3928,2027)
+  arc0.18 font 36.9 cov 0.97 on 1.00 bend 0.56 steep 0.71 score 20.89 (3779,2188)-(3931,2029)
+  spine0.18 font 36.0 cov 0.98 on 1.00 bend 1.40 steep 0.77 score 16.25 (3784,2193)-(3928,2027)
+  ridge0.18 font 36.0 cov 0.98 on 1.00 bend 1.40 steep 0.77 score 16.25 (3784,2193)-(3928,2027)
+  ridgeAll font 36.0 cov 0.98 on 1.00 bend 1.40 steep 0.77 score 16.25 (3784,2193)-(3928,2027)
+ angle -15: 7 lines
+  arc0.35 font 39.6 cov 1.00 on 1.00 bend 0.57 steep 0.70 score 23.05 (3782,2185)-(3931,2032)
+  spine0.35 font 36.0 cov 1.00 on 1.00 bend 1.34 steep 0.73 score 17.37 (3783,2186)-(3928,2030)
+  ridge0.35 font 37.8 cov 1.00 on 1.00 bend 1.34 steep 0.73 score 18.24 (3783,2186)-(3928,2031)
+  arc0.18 font 39.6 cov 1.00 on 1.00 bend 0.57 steep 0.70 score 23.05 (3782,2185)-(3931,2032)
+  spine0.18 font 36.0 cov 1.00 on 1.00 bend 1.34 steep 0.73 score 17.37 (3783,2186)-(3928,2030)
+  ridge0.18 font 37.8 cov 1.00 on 1.00 bend 1.34 steep 0.73 score 18.24 (3783,2186)-(3928,2031)
+  ridgeAll font 37.8 cov 1.00 on 1.00 bend 1.34 steep 0.73 score 18.24 (3783,2186)-(3928,2031)
+ angle 0: 7 lines
+  arc0.35 font 48.6 cov 1.00 on 0.88 bend 0.57 steep 0.42 score 28.15 (3782,2162)-(3930,2073)
+  spine0.35 font 37.8 cov 1.00 on 1.00 bend 1.24 steep 0.71 score 18.93 (3784,2182)-(3928,2032)
+  ridge0.35 font 37.8 cov 1.00 on 1.00 bend 1.24 steep 0.71 score 18.93 (3784,2182)-(3928,2033)
+  arc0.18 font 48.6 cov 1.00 on 0.88 bend 0.57 steep 0.42 score 28.15 (3782,2162)-(3930,2073)
+  spine0.18 font 37.8 cov 1.00 on 1.00 bend 1.24 steep 0.71 score 18.93 (3784,2182)-(3928,2032)
+  ridge0.18 font 37.8 cov 1.00 on 1.00 bend 1.24 steep 0.71 score 18.93 (3784,2182)-(3928,2033)
+  ridgeAll font 37.8 cov 1.00 on 1.00 bend 1.24 steep 0.71 score 18.93 (3784,2182)-(3928,2033)
+ angle 15: 2 lines
+  arc0.35 font 40.4 cov 1.00 on 0.88 bend 0.57 steep 0.18 score 26.99 (3789,2146)-(3908,2112)
+  arc0.18 font 40.4 cov 1.00 on 0.88 bend 0.57 steep 0.18 score 26.99 (3789,2146)-(3908,2112)
+ angle 30: 2 lines
+  arc0.35 font 23.2 cov 0.95 on 0.96 bend 0.57 steep 0.00 score 18.75 (3798,2153)-(3869,2152)
+  arc0.18 font 26.1 cov 1.00 on 0.96 bend 0.10 steep 0.00 score 24.05 (3784,2159)-(3865,2158)
+ angle 45: 2 lines
+  arc0.35 font 17.6 cov 0.95 on 0.67 bend 0.00 steep 1.00 score 4.61 (3843,2090)-(3870,2137)
+  arc0.18 font 17.6 cov 0.95 on 0.67 bend 0.00 steep 1.00 score 4.61 (3843,2090)-(3870,2137)
+ angle 60: 6 lines
+  arc0.35 font 21.3 cov 0.65 on 0.83 bend 0.00 steep 1.00 score 5.76 (3817,2112)-(3850,2169)
+  spine0.35 font 14.4 cov 0.89 on 1.00 bend 1.02 steep 0.85 score 6.18 (3903,2062)-(3802,2196)
+  ridge0.35 font 14.4 cov 0.89 on 1.00 bend 0.94 steep 0.84 score 6.32 (3903,2063)-(3801,2196)
+  arc0.18 font 30.1 cov 0.92 on 0.46 REJECTED
+  ridge0.18 font 14.4 cov 0.89 on 1.00 bend 1.26 steep 0.89 score 5.64 (3925,2020)-(3802,2195)
+  ridgeAll font 14.4 cov 0.89 on 1.00 bend 1.26 steep 0.89 score 5.64 (3925,2020)-(3802,2195)
+ chosen arc0.35 score 28.52
+ITA group 41 locs 27 ang 5 elong 1.42
+ angle 5: 7 lines
+  arc0.35 font 73.1 cov 0.93 on 1.00 bend 0.26 steep 0.12 score 65.57 (3260,1691)-(3482,1736)
+  spine0.35 font 72.7 cov 0.92 on 1.00 bend 0.97 steep 0.14 score 55.47 (3263,1689)-(3479,1741)
+  ridge0.35 font 72.3 cov 0.92 on 1.00 bend 1.18 steep 0.12 score 52.95 (3263,1696)-(3479,1741)
+  arc0.18 font 73.1 cov 0.93 on 1.00 bend 0.26 steep 0.12 score 65.57 (3260,1691)-(3482,1736)
+  spine0.18 font 72.7 cov 0.92 on 1.00 bend 0.97 steep 0.14 score 55.47 (3263,1689)-(3479,1741)
+  ridge0.18 font 72.3 cov 0.92 on 1.00 bend 1.18 steep 0.12 score 52.95 (3263,1696)-(3479,1741)
+  ridgeAll font 72.3 cov 0.92 on 1.00 bend 1.18 steep 0.12 score 52.95 (3263,1696)-(3479,1741)
+ angle -60: 2 lines
+  arc0.35 font 48.4 cov 0.73 on 1.00 bend 0.00 steep 1.00 score 18.76 (3334,1792)-(3409,1662)
+  arc0.18 font 61.4 cov 0.92 on 1.00 bend 0.00 steep 0.87 score 32.48 (3331,1788)-(3442,1634)
+ angle -45: 2 lines
+  arc0.35 font 66.2 cov 0.92 on 1.00 bend 0.66 steep 0.30 score 46.57 (3282,1758)-(3466,1677)
+  arc0.18 font 70.7 cov 0.99 on 1.00 bend 0.68 steep 0.36 score 50.43 (3285,1761)-(3476,1663)
+ angle -30: 2 lines
+  arc0.35 font 75.3 cov 1.00 on 1.00 bend 0.65 steep 0.07 score 64.00 (3261,1725)-(3487,1693)
+  arc0.18 font 75.3 cov 1.00 on 1.00 bend 0.65 steep 0.07 score 64.00 (3261,1725)-(3487,1693)
+ angle -15: 2 lines
+  arc0.35 font 75.5 cov 1.00 on 1.00 bend 0.62 steep 0.04 score 65.55 (3257,1701)-(3486,1723)
+  arc0.18 font 75.5 cov 1.00 on 1.00 bend 0.62 steep 0.04 score 65.55 (3257,1701)-(3486,1723)
+ angle 0: 7 lines
+  arc0.35 font 73.1 cov 0.94 on 1.00 bend 0.26 steep 0.11 score 62.63 (3260,1691)-(3481,1734)
+  spine0.35 font 71.8 cov 0.92 on 1.00 bend 1.15 steep 0.10 score 50.78 (3262,1697)-(3479,1737)
+  ridge0.35 font 71.8 cov 0.92 on 1.00 bend 1.15 steep 0.10 score 50.78 (3262,1697)-(3479,1737)
+  arc0.18 font 73.1 cov 0.94 on 1.00 bend 0.26 steep 0.11 score 62.63 (3260,1691)-(3481,1734)
+  spine0.18 font 71.8 cov 0.92 on 1.00 bend 1.15 steep 0.10 score 50.78 (3262,1697)-(3479,1737)
+  ridge0.18 font 71.8 cov 0.92 on 1.00 bend 1.15 steep 0.10 score 50.78 (3262,1697)-(3479,1737)
+  ridgeAll font 71.8 cov 0.92 on 1.00 bend 1.15 steep 0.10 score 50.78 (3262,1697)-(3479,1737)
+ angle 15: 2 lines
+  arc0.35 font 76.0 cov 0.92 on 1.00 bend 0.21 steep 0.15 score 63.27 (3258,1697)-(3486,1754)
+  arc0.18 font 76.0 cov 0.92 on 1.00 bend 0.21 steep 0.15 score 63.27 (3258,1697)-(3486,1754)
+ angle 30: 2 lines
+  arc0.35 font 83.0 cov 0.95 on 1.00 bend 0.73 steep 0.28 score 59.52 (3253,1689)-(3484,1785)
+  arc0.18 font 83.0 cov 0.95 on 1.00 bend 0.73 steep 0.28 score 59.52 (3253,1689)-(3484,1785)
+ angle 45: 2 lines
+  arc0.35 font 82.0 cov 0.93 on 1.00 bend 0.70 steep 0.43 score 53.12 (3259,1665)-(3472,1794)
+  arc0.18 font 85.1 cov 0.96 on 1.00 bend 0.71 steep 0.46 score 55.60 (3262,1663)-(3479,1803)
+ angle 60: 5 lines
+  arc0.35 font 75.8 cov 0.90 on 1.00 bend 0.59 steep 0.65 score 42.00 (3276,1647)-(3445,1804)
+  spine0.35 font 74.0 cov 0.88 on 1.00 bend 1.40 steep 0.64 score 33.96 (3285,1645)-(3452,1797)
+  ridge0.35 font 74.1 cov 0.88 on 1.00 bend 1.35 steep 0.63 score 34.66 (3283,1647)-(3451,1798)
+  arc0.18 font 82.1 cov 0.97 on 1.00 bend 0.60 steep 0.67 score 47.48 (3284,1644)-(3463,1818)
+  spine0.18 font 80.5 cov 0.95 on 1.00 bend 1.28 steep 0.66 score 39.83 (3286,1646)-(3463,1815)
+ chosen arc0.35 score 65.57
+ITA group 49 locs 68 ang 57 elong 2.46
+ angle 57: 5 lines
+  arc0.35 font 32.4 cov 0.46 on 1.00 bend 0.00 steep 0.29 score 15.80 (3229,1316)-(3291,1396)
+  spine0.35 font 31.8 cov 0.45 on 1.00 bend 0.86 steep 0.31 score 12.82 (3234,1317)-(3289,1393)
+  ridge0.35 font 16.9 cov 0.24 on 1.00 bend 0.53 steep 0.28 score 4.45 (3233,1316)-(3265,1356)
+  arc0.18 font 29.7 cov 0.86 on 0.75 bend 0.00 steep 0.33 score 15.14 (3240,1315)-(3347,1484)
+  ridge0.18 font 34.2 cov 0.81 on 1.00 bend 1.12 steep 0.26 score 21.36 (3236,1319)-(3352,1446)
+ angle -60: 3 lines
+  arc0.35 font 20.8 cov 0.38 on 0.71 bend 0.00 steep 1.00 score 2.88 (3254,1403)-(3286,1348)
+  ridge0.35 font 34.2 cov 0.75 on 1.00 bend 0.79 steep 0.89 score 12.93 (3320,1439)-(3248,1337)
+  arc0.18 font 33.2 cov 0.61 on 0.67 bend 0.00 steep 1.00 score 6.12 (3227,1394)-(3279,1305)
+ angle -45: 3 lines
+  arc0.35 font 23.0 cov 0.54 on 0.58 REJECTED
+  spine0.35 font 23.2 cov 0.54 on 0.58 REJECTED
+  arc0.18 font 34.0 cov 0.79 on 0.50 REJECTED
+ angle -30: 3 lines
+  arc0.35 font 28.8 cov 0.93 on 0.42 REJECTED
+  ridge0.35 font 21.6 cov 1.00 on 1.00 bend 1.03 steep 0.57 score 12.61 (3241,1359)-(3341,1439)
+  arc0.18 font 28.8 cov 0.93 on 0.42 REJECTED
+ angle -15: 3 lines
+  arc0.35 font 28.4 cov 0.69 on 0.58 REJECTED
+  ridge0.35 font 23.4 cov 1.00 on 1.00 bend 1.03 steep 0.63 score 13.02 (3225,1335)-(3347,1445)
+  arc0.18 font 16.2 cov 0.79 on 0.62 bend 0.00 steep 0.18 score 6.06 (3215,1381)-(3347,1418)
+ angle 0: 3 lines
+  arc0.35 font 39.7 cov 0.76 on 1.00 bend 0.11 steep 0.42 score 24.68 (3244,1366)-(3350,1429)
+  ridge0.35 font 25.2 cov 0.98 on 1.00 bend 0.91 steep 0.73 score 13.14 (3234,1334)-(3348,1457)
+  arc0.18 font 34.2 cov 1.00 on 0.71 bend 0.57 steep 0.42 score 14.43 (3205,1333)-(3355,1422)
+ angle 15: 2 lines
+  arc0.35 font 36.0 cov 0.90 on 1.00 bend 0.51 steep 0.71 score 19.51 (3235,1350)-(3351,1470)
+  arc0.18 font 33.3 cov 1.00 on 1.00 bend 0.57 steep 0.71 score 19.32 (3211,1326)-(3350,1470)
+ angle 30: 2 lines
+  arc0.35 font 38.5 cov 0.58 on 0.54 REJECTED
+  arc0.18 font 29.7 cov 0.91 on 0.92 bend 0.00 steep 0.91 score 13.18 (3229,1301)-(3348,1474)
+ angle 45: 2 lines
+  arc0.35 font 37.4 cov 0.54 on 0.96 bend 0.00 steep 0.75 score 13.38 (3224,1316)-(3301,1402)
+  arc0.18 font 28.8 cov 0.84 on 0.83 bend 0.00 steep 0.94 score 10.12 (3236,1309)-(3346,1480)
+ angle 60: 4 lines
+  arc0.35 font 29.8 cov 0.43 on 1.00 bend 0.00 steep 0.84 score 8.70 (3231,1316)-(3287,1389)
+  ridge0.35 font 16.9 cov 0.24 on 1.00 bend 0.50 steep 0.82 score 2.92 (3233,1317)-(3265,1357)
+  arc0.18 font 28.8 cov 0.84 on 0.79 bend 0.00 steep 0.96 score 9.18 (3241,1315)-(3347,1485)
+  ridge0.18 font 34.2 cov 0.82 on 1.00 bend 1.04 steep 0.74 score 14.95 (3236,1320)-(3354,1448)
+ chosen arc0.35 score 24.68
+ITA group 100 locs 4 ang 33 elong 2.28
+ angle 33: 7 lines
+  arc0.35 font 17.0 cov 0.47 on 1.00 bend 0.73 steep 0.13 score 8.05 (3707,1919)-(3753,1942)
+  spine0.35 font 15.8 cov 0.44 on 1.00 bend 0.93 steep 0.12 score 6.85 (3708,1921)-(3751,1942)
+  ridge0.35 font 11.3 cov 0.32 on 1.00 bend 0.78 steep 0.18 score 3.73 (3707,1921)-(3736,1941)
+  arc0.18 font 19.6 cov 0.55 on 1.00 bend 0.58 steep 0.13 score 10.79 (3707,1919)-(3761,1947)
+  spine0.18 font 18.5 cov 0.52 on 1.00 bend 1.01 steep 0.13 score 8.85 (3708,1921)-(3758,1948)
+  ridge0.18 font 18.4 cov 0.51 on 1.00 bend 0.71 steep 0.13 score 9.30 (3708,1921)-(3758,1948)
+  ridgeAll font 10.8 cov 0.61 on 1.00 bend 0.95 steep 0.17 score 5.89 (3709,1922)-(3792,1977)
+ angle -60: 2 lines
+  arc0.35 font 11.7 cov 0.65 on 0.71 bend 0.00 steep 1.00 score 2.47 (3733,1953)-(3751,1921)
+  arc0.18 font 5.4 cov 0.61 on 0.54 REJECTED
+ angle -45: 2 lines
+  arc0.35 font 12.7 cov 0.73 on 0.75 bend 0.57 steep 0.15 score 5.32 (3714,1935)-(3752,1925)
+  arc0.18 font 19.1 cov 1.00 on 0.92 bend 0.57 steep 0.15 score 13.92 (3700,1945)-(3757,1931)
+ angle -30: 2 lines
+  arc0.35 font 17.9 cov 0.82 on 0.67 bend 0.57 steep 0.00 score 7.41 (3712,1931)-(3767,1932)
+  arc0.18 font 23.5 cov 1.00 on 0.62 bend 0.00 steep 0.00 score 11.58 (3692,1928)-(3765,1929)
+ angle -15: 4 lines
+  arc0.35 font 15.2 cov 0.56 on 0.96 bend 0.72 steep 0.30 score 6.61 (3700,1943)-(3743,1924)
+  spine0.35 font 14.9 cov 0.55 on 1.00 bend 0.96 steep 0.32 score 6.38 (3701,1943)-(3741,1924)
+  ridge0.35 font 14.9 cov 0.55 on 1.00 bend 0.96 steep 0.32 score 6.38 (3702,1943)-(3741,1924)
+  arc0.18 font 25.2 cov 1.00 on 0.46 REJECTED
+ angle 0: 2 lines
+  arc0.35 font 14.8 cov 0.47 on 1.00 bend 0.74 steep 0.00 score 7.02 (3701,1930)-(3746,1930)
+  arc0.18 font 18.9 cov 1.00 on 1.00 bend 0.59 steep 0.38 score 13.64 (3703,1925)-(3792,1974)
+ angle 15: 3 lines
+  arc0.35 font 13.4 cov 0.39 on 1.00 bend 0.74 steep 0.17 score 5.05 (3703,1927)-(3742,1937)
+  arc0.18 font 21.7 cov 0.64 on 1.00 bend 0.73 steep 0.30 score 11.19 (3705,1926)-(3765,1952)
+  ridge0.18 font 17.1 cov 0.50 on 1.00 bend 1.10 steep 0.22 score 7.00 (3705,1929)-(3752,1945)
+ angle 30: 7 lines
+  arc0.35 font 16.6 cov 0.47 on 1.00 bend 0.51 steep 0.33 score 6.84 (3707,1920)-(3753,1942)
+  spine0.35 font 15.5 cov 0.44 on 1.00 bend 0.58 steep 0.31 score 6.06 (3708,1922)-(3751,1941)
+  ridge0.35 font 11.3 cov 0.32 on 1.00 bend 0.62 steep 0.48 score 3.04 (3707,1922)-(3736,1941)
+  arc0.18 font 20.5 cov 0.58 on 1.00 bend 0.22 steep 0.33 score 10.59 (3707,1922)-(3764,1949)
+  spine0.18 font 19.7 cov 0.55 on 1.00 bend 0.97 steep 0.36 score 8.33 (3708,1922)-(3762,1949)
+  ridge0.18 font 19.6 cov 0.55 on 1.00 bend 0.70 steep 0.36 score 8.70 (3708,1922)-(3762,1950)
+  ridgeAll font 10.8 cov 0.62 on 1.00 bend 0.87 steep 0.47 score 4.75 (3709,1923)-(3792,1977)
+ angle 45: 2 lines
+  arc0.35 font 17.0 cov 0.47 on 1.00 bend 0.74 steep 0.60 score 5.66 (3708,1915)-(3747,1948)
+  arc0.18 font 23.1 cov 0.64 on 1.00 bend 0.71 steep 0.45 score 10.98 (3709,1916)-(3768,1953)
+ angle 60: 2 lines
+  arc0.35 font 17.3 cov 0.50 on 0.92 bend 0.00 steep 0.87 score 4.90 (3708,1912)-(3739,1955)
+  arc0.18 font 24.7 cov 0.72 on 0.92 bend 0.65 steep 0.55 score 10.64 (3708,1913)-(3767,1959)
+ chosen arc0.18 score 13.92
+ITA group 204 locs 5 ang -60 elong 2.00
+ angle -60: 2 lines
+  arc0.35 font 13.5 cov 0.92 on 0.96 bend 0.12 steep 1.00 score 6.15 (3218,1475)-(3238,1438)
+  arc0.18 font 13.5 cov 0.92 on 0.96 bend 0.12 steep 1.00 score 6.15 (3218,1475)-(3238,1438)
+ angle -60: 2 lines
+  arc0.35 font 13.5 cov 0.92 on 0.96 bend 0.12 steep 1.00 score 6.15 (3218,1475)-(3238,1438)
+  arc0.18 font 13.5 cov 0.92 on 0.96 bend 0.12 steep 1.00 score 6.15 (3218,1475)-(3238,1438)
+ angle -45: 2 lines
+  arc0.35 font 12.1 cov 0.91 on 1.00 bend 0.00 steep 1.00 score 5.61 (3215,1470)-(3234,1437)
+  arc0.18 font 12.6 cov 0.95 on 0.96 bend 0.00 steep 1.00 score 5.68 (3214,1471)-(3234,1437)
+ angle -30: 5 lines
+  arc0.35 font 11.5 cov 1.00 on 1.00 bend 0.00 steep 1.00 score 5.73 (3217,1471)-(3235,1440)
+  ridge0.35 font 12.4 cov 1.00 on 1.00 bend 1.13 steep 1.17 score 4.94 (3219,1473)-(3234,1438)
+  arc0.18 font 12.0 cov 1.00 on 1.00 bend 0.00 steep 1.00 score 5.98 (3217,1472)-(3235,1440)
+  ridge0.18 font 12.7 cov 1.00 on 1.00 bend 1.19 steep 1.15 score 5.00 (3218,1474)-(3234,1438)
+  ridgeAll font 12.7 cov 1.00 on 1.00 bend 1.19 steep 1.15 score 5.00 (3218,1474)-(3234,1438)
+ angle -15: 2 lines
+  arc0.35 font 8.8 cov 0.99 on 0.92 bend 0.63 steep 0.58 score 4.80 (3215,1462)-(3236,1445)
+  arc0.18 font 9.4 cov 1.00 on 0.88 bend 0.51 steep 0.66 score 4.71 (3215,1463)-(3236,1443)
+ angle 0: 2 lines
+  arc0.35 font 7.5 cov 0.97 on 0.92 bend 0.17 steep 0.21 score 5.57 (3214,1459)-(3236,1452)
+  arc0.18 font 7.5 cov 0.97 on 0.92 bend 0.17 steep 0.21 score 5.57 (3214,1459)-(3236,1452)
+ angle 15: 2 lines
+  arc0.35 font 7.1 cov 0.79 on 1.00 bend 0.04 steep 0.38 score 4.74 (3216,1450)-(3236,1461)
+  arc0.18 font 7.6 cov 0.85 on 1.00 bend 0.36 steep 0.43 score 4.89 (3216,1448)-(3236,1460)
+ angle 30: 2 lines
+  arc0.35 font 9.3 cov 0.89 on 1.00 bend 0.23 steep 1.00 score 4.03 (3218,1441)-(3233,1466)
+  arc0.18 font 10.6 cov 1.00 on 1.00 bend 0.12 steep 1.00 score 5.20 (3216,1440)-(3232,1469)
+ angle 45: 2 lines
+  arc0.35 font 10.9 cov 0.95 on 1.00 bend 0.00 steep 1.00 score 5.22 (3219,1437)-(3235,1467)
+  arc0.18 font 10.9 cov 0.95 on 1.00 bend 0.00 steep 1.00 score 5.22 (3219,1437)-(3235,1467)
+ angle 60: 2 lines
+  arc0.35 font 11.7 cov 0.92 on 1.00 bend 0.00 steep 1.00 score 5.45 (3218,1438)-(3236,1469)
+  arc0.18 font 11.7 cov 0.92 on 1.00 bend 0.00 steep 1.00 score 5.45 (3218,1438)-(3236,1469)
+ chosen arc0.35 score 6.15

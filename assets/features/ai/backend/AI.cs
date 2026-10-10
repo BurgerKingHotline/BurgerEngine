@@ -299,22 +299,71 @@ public class GameAi : AiSystem
                 foreach (var st in D.GoalStates(g).Where(s => held.Any(h => h.State == s)).Take(3))
                     if (Game.Population.MajorityCulture(st) is { } mc && !offer.Terms.Any(t => t.Type == PeaceTermType.ReleaseCountry && t.Culture == mc))
                         Try(new PeaceTerm { Type = PeaceTermType.ReleaseCountry, State = st, Culture = mc, Beneficiary = winner });
-        // land: goal states first (to whoever fights for them), then the rest of the held land
+        // democracies (peace_puppets) set up friendly subjects instead of taking foreign land: the defeated country itself
+        // becomes a subject when we hold much of its own people's land, other peoples in the land we hold are released as
+        // subjects; we take only land of our own (accepted) peoples, cores and claims
+        var pop = Game.Population;
+        var rel = Game.World.Relations;
+        bool puppets = rules.PrefersPuppets(Game, winner) && rel.OverlordOf(winner) == null; // subjects have no subjects
+        bool subjugated = false;
+        bool OursToTake(State s) => !puppets || !pop.Enabled || s.Cores.Contains(winner) || s.Claims.Contains(winner)
+                                    || pop.MajorityCulture(s) is not { } mc || pop.IsAccepted(winner, mc);
+        if (puppets && pop.Enabled)
+        {
+            string loserCulture = pop.Of(loser).Culture ?? "";
+            var homeHeld = held.Where(h => h.State.Owner == loser && pop.MajorityCulture(h.State) == loserCulture && !OursToTake(h.State)).ToList();
+            int home = loser.OwnedStates.Count(s => pop.MajorityCulture(s) == loserCulture);
+            if (rel.OverlordOf(loser) == null && homeHeld.Count > 0 && homeHeld.Count * 3 >= Math.Max(1, home) && !D.HoldsHomelandOf(winner, loser))
+                subjugated = Try(new PeaceTerm { Type = PeaceTermType.Subjugate, Beneficiary = winner, SubjectType = Game.Data.SubjectTypes.Keys.First() });
+            if (!subjugated)
+                foreach (var (state, _) in held.OrderByDescending(x => x.Held).ThenByDescending(x => x.State.Tax))
+                {
+                    if (OursToTake(state) || pop.MajorityCulture(state) is not { } mc) continue;
+                    if (mc == (pop.Of(state.Owner!).Culture ?? "")) continue; // the owner's own people: not split off
+                    if (offer.Terms.Any(t => t.Type == PeaceTermType.ReleaseCountry && t.Culture == mc)) continue;
+                    if (offer.Terms.Count(t => t.Type == PeaceTermType.ReleaseCountry) >= 3) break;
+                    Try(new PeaceTerm { Type = PeaceTermType.ReleaseCountry, State = state, Culture = mc, Beneficiary = winner, AsSubject = true });
+                }
+        }
+        // land: goal states first (to whoever fights for them), then the rest of the held land. Allies and subjects only get
+        // land that touches their own (or land they get in this deal): no far-away pieces for puppets; the rest goes to the winner.
+        var gained = new Dictionary<Country, HashSet<State>>();
+        bool Touches(Country x, State s)
+        {
+            gained.TryGetValue(x, out var got);
+            foreach (var l in s.Locations)
+                foreach (var a in l.Neighbors)
+                    if (a.Kind != AdjacencyKind.Sea && a.To.IsLand && a.To.State is { } ns && ns != s && (ns.Owner == x || got?.Contains(ns) == true))
+                        return true;
+            return false;
+        }
         Country BeneficiaryOf(State s)
         {
-            foreach (var g in goals) if (D.GoalStates(g).Contains(s)) return g.Holder;
-            var claimant = winnerSide.FirstOrDefault(x => s.Cores.Contains(x)) ?? winnerSide.FirstOrDefault(x => s.Claims.Contains(x));
+            foreach (var g in goals)
+                if (D.GoalStates(g).Contains(s) && (g.Holder == winner || Touches(g.Holder, s))) return g.Holder;
+            if (s.Cores.Contains(winner) || s.Claims.Contains(winner)) return winner;
+            var claimant = winnerSide.FirstOrDefault(x => x != winner && s.Cores.Contains(x) && Touches(x, s))
+                           ?? winnerSide.FirstOrDefault(x => x != winner && s.Claims.Contains(x) && Touches(x, s));
             return claimant ?? winner;
         }
         bool IsGoal(State s) => goals.Any(g => D.GoalStates(g).Contains(s));
-        foreach (var (state, _) in held.OrderByDescending(x => IsGoal(x.State)).ThenByDescending(x => x.Held).ThenByDescending(x => x.State.Tax))
-        {
-            if (offer.Terms.Any(t => t.State == state)) continue;
-            // never take a country's last state through cession - that is annexation
-            if (state.Owner!.OwnedStates.Count - offer.Terms.Count(x => x.Type == PeaceTermType.TransferState && x.State?.Owner == state.Owner) <= 1) continue;
-            Try(new PeaceTerm { Type = PeaceTermType.TransferState, State = state, Beneficiary = BeneficiaryOf(state) });
-        }
-        if (offer.Terms.Count == 0 && Game.World.Relations.OverlordOf(loser) == null)
+        if (!subjugated)
+            foreach (var (state, _) in held.OrderByDescending(x => IsGoal(x.State)).ThenByDescending(x => x.Held).ThenByDescending(x => x.State.Tax))
+            {
+                if (offer.Terms.Any(t => t.State == state)) continue;
+                // states released as a people go with that people
+                if (offer.Terms.Any(t => t.Type == PeaceTermType.ReleaseCountry && t.State?.Owner == state.Owner && pop.Enabled && pop.MajorityCulture(state) == t.Culture)) continue;
+                // never take a country's last state through cession - that is annexation
+                if (state.Owner!.OwnedStates.Count - offer.Terms.Count(x => x.Type == PeaceTermType.TransferState && x.State?.Owner == state.Owner) <= 1) continue;
+                var to = BeneficiaryOf(state);
+                if (to == winner && !OursToTake(state)) continue;
+                if (Try(new PeaceTerm { Type = PeaceTermType.TransferState, State = state, Beneficiary = to }))
+                {
+                    if (!gained.TryGetValue(to, out var set)) gained[to] = set = new HashSet<State>();
+                    set.Add(state);
+                }
+            }
+        if (offer.Terms.Count == 0 && rel.OverlordOf(loser) == null && !D.HoldsHomelandOf(winner, loser))
             Try(new PeaceTerm { Type = PeaceTermType.Subjugate, Beneficiary = winner, SubjectType = Game.Data.SubjectTypes.Keys.First() });
         if (offer.Terms.Count == 0) Try(new PeaceTerm { Type = PeaceTermType.Humiliate, Beneficiary = winner });
         if (offer.Terms.Count == 0 && loser.Gold > 10)

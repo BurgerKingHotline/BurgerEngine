@@ -219,6 +219,81 @@ public sealed partial class DiplomacySystem
         foreach (var s in R.Subjects.Keys.ToList()) if (s.Exists) _liberty[s] = ComputeLiberty(s);
     }
 
+    // =============================================================================================
+    // Subjects
+    // =============================================================================================
+
+    /// <summary>
+    /// The overlord already holds the other country's homeland: they are the same people (same primary culture), or it owns
+    /// at least half of the other's core states. Such a country is annexed, never made a subject (no "Russian Republic"
+    /// puppet in Siberia while its overlord rules Russia).
+    /// </summary>
+    public bool HoldsHomelandOf(Country overlord, Country other)
+    {
+        if (overlord == other) return true;
+        var pop = _game.Population;
+        if (pop.Enabled)
+        {
+            string a = pop.Of(overlord).Culture ?? "", b = pop.Of(other).Culture ?? "";
+            if (a.Length > 0 && string.Equals(a, b, StringComparison.OrdinalIgnoreCase)) return true;
+        }
+        int cores = 0, held = 0;
+        foreach (var s in _game.World.States)
+        {
+            if (!s.Cores.Contains(other)) continue;
+            cores++;
+            if (s.Owner == overlord) held++;
+        }
+        return cores > 0 && held * 2 >= cores;
+    }
+
+    /// <summary>Makes a country a subject: its government follows the overlord's ideology (no democratic puppets of communists).</summary>
+    public void MakeSubject(Country subject, Country overlord, SubjectType type)
+    {
+        if (subject == overlord) return;
+        R.SetSubject(subject, overlord, type);
+        _liberty.Remove(subject);
+        FollowOverlord(subject, overlord, popularity: 0.2);
+        InvalidateCasusBelli();
+        _game.RaiseMapChanged();
+    }
+
+    /// <summary>Puts the overlord's ideology in power in a subject (with some extra support for it).</summary>
+    private void FollowOverlord(Country subject, Country overlord, double popularity)
+    {
+        var pol = _game.Politics;
+        if (!pol.Enabled) return;
+        string want = pol.Of(overlord).Ruling;
+        if (string.IsNullOrEmpty(want) || string.Equals(pol.Of(subject).Ruling, want, StringComparison.OrdinalIgnoreCase)) return;
+        pol.SetRulingParty(subject, want, "overlord");
+        if (popularity > 0) pol.AddPopularity(subject, want, popularity);
+    }
+
+    /// <summary>
+    /// Monthly: an overlord that holds a subject's homeland annexes it; subjects that changed government (elections,
+    /// revolts) are brought back in line with the overlord's ideology.
+    /// </summary>
+    private void MonthlySubjects()
+    {
+        foreach (var kv in R.Subjects.ToList())
+        {
+            var (subject, overlord) = (kv.Key, kv.Value.Overlord);
+            if (!subject.Exists || !overlord.Exists) continue;
+            if (_game.World.AtWar(subject, overlord)) continue;
+            if (HoldsHomelandOf(overlord, subject))
+            {
+                R.ReleaseSubject(subject);
+                _liberty.Remove(subject);
+                _game.Notify($"{overlord.Name} annexed {subject.Name}: it already rules their homeland.",
+                    overlord.IsPlayer || subject.IsPlayer ? NotificationKind.Diplomacy : NotificationKind.Info);
+                Record($"{overlord.Tag} annexed its subject {subject.Tag} (holds their homeland)");
+                Annex(overlord, subject);
+                continue;
+            }
+            FollowOverlord(subject, overlord, popularity: 0.05);
+        }
+    }
+
     /// <summary>A subject joins its overlord's wars only while its liberty desire is below 50.</summary>
     private bool JoinsOverlord(Country subject) => R.SubjectTypeOf(subject)?.JoinsOverlordWars == true && LibertyDesire(subject) < _game.Data.Defines.Get("liberty_desire_rebel", 50);
 
@@ -238,6 +313,9 @@ public sealed partial class DiplomacySystem
                 if (!_game.Population.Enabled) return "No peoples in this game";
                 if (t.State?.Owner == null || !war.SideOf(loser).Contains(t.State.Owner)) return "Invalid state";
                 if (ReleaseStates(t.State.Owner, t.Culture).Count == 0) return $"No {t.Culture} states to release";
+                if (t.AsSubject && (t.Beneficiary == null || R.OverlordOf(t.Beneficiary) != null)) return "A subject cannot have subjects of its own";
+                if (t.AsSubject && t.Beneficiary != null && _game.Population.IsAccepted(t.Beneficiary, t.Culture))
+                    return $"The {t.Culture} people are {t.Beneficiary.Name}'s own: take their land instead";
                 break;
             case PeaceTermType.RegimeChange:
                 if (!_game.Politics.Enabled || _game.Politics.Ideology(t.Ideology) == null) return "No ideologies in this game";
@@ -262,7 +340,9 @@ public sealed partial class DiplomacySystem
                 if (t.State?.Owner is { } owner)
                 {
                     var freed = _game.Population.ReleaseCulture(owner, t.Culture);
-                    if (freed != null) AddOpinion(freed, winner, "Liberated us", 75, 0.5);
+                    if (freed != null && t.AsSubject)
+                        MakeSubject(freed, t.Beneficiary ?? winner, _game.Data.SubjectTypes.Values.First());
+                    else if (freed != null) AddOpinion(freed, winner, "Liberated us", 75, 0.5);
                 }
                 break;
             case PeaceTermType.RegimeChange:

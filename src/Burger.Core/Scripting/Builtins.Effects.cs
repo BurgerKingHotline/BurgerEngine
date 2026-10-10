@@ -188,8 +188,7 @@ public static partial class Builtins
             if (overlord == null || subject == null || overlord == subject) return;
             string type = n.GetString("type") ?? game.Data.SubjectTypes.Keys.First();
             if (!game.Data.SubjectTypes.TryGetValue(type, out var st)) { Log.ErrorOnce("st:" + n.Location, $"Unknown subject type '{type}'", n.Location); return; }
-            R.SetSubject(subject, overlord, st);
-            game.RaiseMapChanged();
+            game.Diplomacy.MakeSubject(subject, overlord, st);
         }, (ctx, n) => $"{s.ArgScope(n, ctx)?.DisplayName} becomes our subject");
         s.RegisterEffect("release_subject", (ctx, n) => { if (s.ArgCountry(n, ctx) is { } b) { R.ReleaseSubject(b); game.RaiseMapChanged(); } },
             (ctx, n) => $"Release {s.ArgScope(n, ctx)?.DisplayName}");

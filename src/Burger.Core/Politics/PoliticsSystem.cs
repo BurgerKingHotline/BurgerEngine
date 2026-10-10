@@ -68,6 +68,7 @@ public sealed partial class PoliticsSystem
                     Order = Ideologies.Count,
                     Definition = n,
                 };
+                i.PeacePuppets = n.Get("peace_puppets") != null ? n.GetBool("peace_puppets") : i.Elections;
                 i.Adjective = n.GetString("adjective") ?? i.Name;
                 i.PartyName = n.GetString("party_name") ?? i.Name;
                 if (Rgb.TryParse(n.Get("color"), out var col)) i.Color = col;
@@ -457,7 +458,7 @@ public sealed partial class PoliticsSystem
             if (!p.Government.Contains(MinisterParty(kv.Value) ?? "", StringComparer.OrdinalIgnoreCase)) p.Ministers.Remove(kv.Key);
         if (_game.World.Player != null)
         {
-            string how = reason switch { "election" => "after an election", "revolution" => "after a revolution", "coup" => "in a coup", _ => "" };
+            string how = reason switch { "election" => "after an election", "revolution" => "after a revolution", "coup" => "in a coup", "overlord" => "backed by its overlord", _ => "" };
             _game.Notify($"{c.Name}: the {PartyName(c, p.Ruling)} ({ideology.Name}) took power {how}.".Replace("  ", " ").Replace(" .", "."), c.IsPlayer ? NotificationKind.Diplomacy : NotificationKind.Info);
         }
         _game.Events.FireOnAction("on_ruling_party_changed", c);

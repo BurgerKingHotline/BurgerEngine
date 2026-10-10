@@ -169,7 +169,6 @@ public sealed partial class PopulationSystem
         GoldProjects.Clear();
         if (!Enabled) return;
         var w = _game.World;
-        var d = _game.Data.Defines;
         // a culture for every country that has none (games without common/cultures)
         foreach (var c in w.Countries)
         {
@@ -217,8 +216,8 @@ public sealed partial class PopulationSystem
             var sp = Of(s);
             if (sp.Pops.Count > 0 || s.Locations.All(l => !l.IsLand)) continue;
             string culture = s.Owner != null ? Of(s.Owner).Culture! : NativeCulture(s).Key;
-            double size = Math.Max(d.Get("min_state_pops", 500), Math.Max(s.Manpower, 5) * d.Get("pops_per_manpower", 100));
-            sp.Pops.Add(new Pop { Culture = culture, Size = size });
+            double size = Rules.StartingPops(_game, s);
+            if (size > 0) sp.Pops.Add(new Pop { Culture = culture, Size = size });
         }
         // religions: the country's state religion is the most common faith of its people (or of its culture)
         if (ReligionByKey.Count > 0)
@@ -380,6 +379,9 @@ public sealed partial class PopulationSystem
 
     public double Capacity(State s) => Rules.Capacity(_game, s, Of(s));
 
+    /// <summary>How full a state is: its people compared to its capacity.</summary>
+    public double FillOf(State s) => _states.TryGetValue(s, out var sp) ? sp.Total / Math.Max(1, Rules.Capacity(_game, s, sp)) : 0;
+
     /// <summary>Opinion between countries because of their religions (religion feature).</summary>
     public double ReligionOpinion(Country from, Country to)
     {
@@ -423,9 +425,7 @@ public sealed partial class PopulationSystem
         foreach (var p in sp.Pops)
         {
             double rate = Rules.YearlyGrowth(_game, s, p);
-            // growth slows as the state fills; above capacity people die off or leave (slowly)
-            double g = room >= 0 ? rate * room : Math.Max(-0.05, room * 0.1);
-            p.Size = Math.Max(0, p.Size * (1 + g / 12));
+            p.Size = Math.Max(0, p.Size * (1 + Rules.MonthlyGrowth(_game, s, p, rate, room)));
         }
     }
 
@@ -452,15 +452,14 @@ public sealed partial class PopulationSystem
             // social classes
             if (ClassesEnabled && p.Type != null && PopTypeByKey.TryGetValue(p.Type, out var t) && t.PromoteTo != null && t.PromoteRate > 0)
             {
-                double rate = t.PromoteRate * Math.Max(0, 1 + _game.Modifiers.Sum(s, "promotion") + _game.Modifiers.Sum(owner, "promotion"));
-                double moved = p.Size * rate / 12;
+                double moved = p.Size * Rules.YearlyPromotion(_game, s, p, t) / 12;
                 if (moved > 0) { p.Size -= moved; additions.Add(new Pop { Culture = p.Culture, Religion = p.Religion, Type = t.PromoteTo, Size = moved }); }
             }
         }
         sp.Pops.AddRange(additions);
     }
 
-    /// <summary>People leave crowded states for emptier states of the same country next to them.</summary>
+    /// <summary>People leave crowded states for other states (rule MigrationTarget: emptier states of the same country next to them).</summary>
     private void Migrate()
     {
         foreach (var c in _game.World.Countries)
@@ -470,17 +469,9 @@ public sealed partial class PopulationSystem
             {
                 if (!_states.TryGetValue(s, out var sp) || sp.Pops.Count == 0) continue;
                 double fill = sp.Total / Math.Max(1, Rules.Capacity(_game, s, sp));
-                if (fill < 0.85) continue;
-                State? best = null;
-                double bestFill = fill;
-                foreach (var n in NeighbourStates(s))
-                {
-                    if (n.Owner != c || !_states.TryGetValue(n, out var np)) continue;
-                    double nf = np.Total / Math.Max(1, Rules.Capacity(_game, n, np));
-                    if (nf < bestFill) { bestFill = nf; best = n; }
-                }
-                if (best == null) continue;
-                double share = Rules.MonthlyMigration(_game, s, best, fill, bestFill);
+                var best = Rules.MigrationTarget(_game, s, fill);
+                if (best == null || best == s) continue;
+                double share = Math.Min(1, Rules.MonthlyMigration(_game, s, best, fill, FillOf(best)));
                 if (share <= 0) continue;
                 var target = Of(best);
                 foreach (var p in sp.Pops.ToList())
@@ -565,9 +556,7 @@ public sealed partial class PopulationSystem
         if (c.Exists)
         {
             var (acc, faith) = Shares(c);
-            // culture tension (culture policy laws: modifier culture_tension) makes unaccepted cultures weigh more or less
-            double tension = Math.Max(0, 1 + _game.Politics.ModifierValue(c, "culture_tension"));
-            double penalty = (1 - acc) * _game.Data.Defines.Get("culture_stability", 10) * tension + (ReligionEnabled ? (1 - faith) * _game.Data.Defines.Get("religion_stability", 10) : 0);
+            double penalty = Rules.StabilityPenalty(_game, c, acc, faith);
             if (penalty > 0.01) m["stability_target"] = m.GetValueOrDefault("stability_target") - penalty;
         }
         return m;

@@ -137,7 +137,9 @@ public class GameDiplomacyRules : DiplomacyRules
                     double total = owner.OwnedStates.Sum(s => s.Locations.Sum(l => LocationWarValue(game, l)));
                     double value = freed.Sum(s => s.Locations.Sum(l => LocationWarValue(game, l)));
                     if (total <= 0) return 100;
-                    return Math.Min(100, value / total * 100 * d.PeaceStateCostMultiplier * 0.6 * game.Diplomacy.GoalMultiplierFor(war, winner, WarGoalType.Liberation));
+                    double goal = game.Diplomacy.GoalMultiplierFor(war, winner, WarGoalType.Liberation);
+                    if (term.AsSubject) goal = Math.Min(goal, game.Diplomacy.GoalMultiplierFor(war, winner, WarGoalType.Subjugation));
+                    return Math.Min(100, value / total * 100 * d.PeaceStateCostMultiplier * 0.6 * goal);
                 }
             case PeaceTermType.Independence: return d.Get("independence_peace_cost", 40) * game.Diplomacy.GoalMultiplierFor(war, term.Beneficiary ?? winner, WarGoalType.Independence);
             case PeaceTermType.RegimeChange: return d.Get("regime_change_cost", 50) * game.Diplomacy.GoalMultiplierFor(war, winner, WarGoalType.Ideology);
@@ -153,7 +155,13 @@ public class GameDiplomacyRules : DiplomacyRules
         }
     }
 
-    /// <summary>Does an AI country accept a peace offer?</summary>
+    /// <summary>
+    /// The AI winner sets up subjects (puppets) of the peoples it defeats instead of taking foreign land: by default
+    /// countries ruled by an ideology with peace_puppets (democracies).
+    /// </summary>
+    public override bool PrefersPuppets(Game game, Country winner)
+        => game.Politics.Enabled && game.Politics.RulingIdeology(winner)?.PeacePuppets == true;
+
     /// <summary>
     /// Does an AI country accept a peace offer? War exhaustion, a long war and a stalemate make it give in sooner
     /// (<see cref="PeaceWillingness"/> points of war score).
@@ -165,7 +173,12 @@ public class GameDiplomacyRules : DiplomacyRules
         var aiScore = war.ScoreFor(ai);
         double willing = PeaceWillingness(game, war, ai);
         if (offer.Terms.All(t => t.Type == PeaceTermType.WhitePeace))
+        {
+            // in a war of independence a white peace means losing the land: the old ruler only gives up when losing or worn out
+            if (war.Vars.HasFlag("independence_war") && war.IsDefender(ai))
+                return aiScore < -15 + willing * 0.5;
             return aiScore < 10 + willing * 0.5 || (game.World.Date.TotalDays - war.StartDate.TotalDays) > 365 * 2 && Math.Abs(aiScore) < 25;
+        }
         if (offer.FromIsWinner)
             return -aiScore + willing >= cost; // AI is the loser being asked to give things up
         // AI is the winner being offered concessions

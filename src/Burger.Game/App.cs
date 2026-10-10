@@ -202,6 +202,7 @@ public sealed class App
         _opt.Exec.Clear();
         if (_opt.MapMode != null && Enum.TryParse<MapMode>(_opt.MapMode, true, out var mode)) { Renderer!.Mode = mode; Renderer.Dirty = true; }
         if (_opt.Zoom != null) Camera!.LookAt(Camera.Target, _opt.Zoom.Value);
+        if (_opt.NoFogShading) MapRenderer.FogShading = false;
         if (_opt.Open != null)
         {
             var parts = _opt.Open.Split(':');
@@ -458,6 +459,7 @@ public sealed class App
             {
                 PlanTool.Front => planArmy.FrontLimit.Contains(l) ? "Click to remove from the front" : "Click to add to the front",
                 PlanTool.Arrow => $"Click: attack towards {l.DisplayName}",
+                PlanTool.PickFront => _hud?.FrontTargetOf(planArmy, l) is { } ft ? (ft == planArmy.Owner ? "Click: remove the front" : $"Click: front against {ft.Name}") : "Pick a neighbouring or enemy country",
                 _ => planArmy.Fallback.Contains(l) ? "Click to remove from the fallback line" : "Click to add to the fallback line",
             };
         if (Ui.Left == LeftPanel.Recruit && Ui.RecruitTemplate != null && Game?.World.Player is { } player)

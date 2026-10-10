@@ -7,7 +7,7 @@ public enum LeftPanel { None, Location, Country, Military, Recruit, Characters, 
 /// <summary>Panels on the right: world-wide overviews opened from the top right.</summary>
 public enum RightPanel { None, Wars, Peace, World, Ledger }
 /// <summary>Battle plan drawing tools: front segment, offensive arrow, fallback line.</summary>
-public enum PlanTool { None, Front, Arrow, Fallback }
+public enum PlanTool { None, Front, Arrow, Fallback, PickFront }
 
 /// <summary>Peace deal being built by the player.</summary>
 public sealed class PeaceDraft

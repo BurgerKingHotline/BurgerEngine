@@ -529,6 +529,9 @@ public sealed unsafe class MapRenderer : IDisposable
     // Drawing
     // ===============================================================================================
 
+    /// <summary>Fog of war shading of the map (greyed, darker land you cannot see). Off: the map looks clear, but units you cannot see stay hidden.</summary>
+    public static bool FogShading = true; // kept for the whole session (new games, loads)
+
     /// <summary>Camera height above which the map is a strategic overview: no fog of war, no unit counters.</summary>
     public float StrategicZoom => Math.Max(140f, Math.Max(WorldWidth, WorldHeight) * 0.33f);
 
@@ -543,7 +546,7 @@ public sealed unsafe class MapRenderer : IDisposable
         Raylib.SetShaderValue(_shader, _locTint, tint, ShaderUniformDataType.Float);
         Raylib.SetShaderValue(_shader, _locViewPos, cam.Position, ShaderUniformDataType.Vec3);
         // far out (strategic view) the fog of war fades away
-        float fog = Math.Clamp((StrategicZoom - camH) / (StrategicZoom * 0.2f), 0f, 1f);
+        float fog = FogShading ? Math.Clamp((StrategicZoom - camH) / (StrategicZoom * 0.2f), 0f, 1f) : 0f;
         Raylib.SetShaderValue(_shader, _locFog, fog, ShaderUniformDataType.Float);
         Raylib.SetShaderValue(_shader, _locBorderScale, Math.Clamp(camH / 40f, 0.6f, 4f), ShaderUniformDataType.Float);
         Raylib.SetShaderValue(_shader, _locShowBorders, camH < 120 ? 1.0f : 0.0f, ShaderUniformDataType.Float);

@@ -18,6 +18,9 @@ public sealed class IdeologyDef
     public bool Elections;
     /// <summary>Gains support when stability is low or a war goes badly.</summary>
     public bool Extremist;
+    /// <summary>Winning wars, countries ruled by this ideology set up subjects (puppets) of the peoples they defeat instead of
+    /// taking foreign land (peace_puppets; default: ideologies that hold elections, i.e. democracies).</summary>
+    public bool PeacePuppets;
     /// <summary>Ideologies whose parties this one will form a coalition with (both must accept each other).</summary>
     public HashSet<string> Coalition = new(StringComparer.OrdinalIgnoreCase);
     /// <summary>Opinion a country ruled by this ideology has of countries ruled by each ideology.</summary>

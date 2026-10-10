@@ -20,6 +20,7 @@ public sealed class CountryLabels
         public float FontPx;                              // letter height in map pixels
         public float[] Heights = Array.Empty<float>();    // smoothed terrain height under each point (the name lies on the ground)
         public float LengthPx;
+        public string Kind = "";                        // how the line was found (debugging)
         public float Coverage = 1;                        // share of the land's length the name runs along
     }
 
@@ -162,13 +163,19 @@ public sealed class CountryLabels
         var angles = new List<double> { ang };
         for (int deg = -60; deg <= 60; deg += 15) angles.Add(deg * Math.PI / 180);
         Label? fallback = null;
+        // BURGER_LABEL_DEBUG=TAG writes every candidate line of that country to label_debug.txt
+        bool debug = Environment.GetEnvironmentVariable("BURGER_LABEL_DEBUG") is { } dbgTag && dbgTag == c.Tag;
+        var dbg = debug ? new System.Text.StringBuilder($"{c.Tag} group {groupId} locs {locs.Count} ang {ang * 180 / Math.PI:F0} elong {elong:F2}\n") : null;
         foreach (var a in angles)
-            foreach (var cand in FitAngle(a))
+        {
+            var cands = FitAngle(a);
+            if (dbg != null) dbg.Append($" angle {a * 180 / Math.PI:F0}: {cands.Count} lines\n");
+            foreach (var cand in cands)
             {
                 fallback ??= cand;
                 // names stay on their land: lines that run over the sea or other countries lose
                 double on = cand.Points.Count(p => Inside((int)p.X, (int)p.Y)) / (double)cand.Points.Length;
-                if (on < 0.6) continue;
+                if (on < 0.6) { dbg?.Append($"  {cand.Kind} font {cand.FontPx:F1} cov {cand.Coverage:F2} on {on:F2} REJECTED\n"); continue; }
                 // steep names read worse: they must fit clearly bigger letters to win (less so along the land's own long axis)
                 var chord = cand.Points[^1] - cand.Points[0];
                 double tilt = Math.Min(Math.Abs(Math.Atan2(chord.Y, chord.X)), Math.Abs(Math.Atan2(-chord.Y, -chord.X)));
@@ -182,10 +189,19 @@ public sealed class CountryLabels
                     var d1 = cand.Points[k] - cand.Points[k - 1];
                     bend += Math.Abs(Math.Atan2(d0.X * d1.Y - d0.Y * d1.X, d0.X * d1.X + d0.Y * d1.Y));
                 }
-                double score = cand.FontPx * (1 - 0.5 * Math.Min(1, steep)) * (a == ang ? 1.06 : 1) * Math.Pow(on, 1.5) * Math.Pow(cand.Coverage, 0.8)
-                             * (1 - 0.18 * Math.Min(1.5, bend));
+                // (bigger letters count, but less than running along more of the land: long thin countries get long names)
+                double axis = a == ang ? (elong > 2.2 ? 1.25 : 1.06) : 1;
+                double score = Math.Pow(cand.FontPx, 0.7) * (1 - 0.5 * Math.Min(1, steep)) * axis * Math.Pow(on, 1.5) * Math.Pow(cand.Coverage, 1.3)
+                             * (1 - 0.05 * Math.Min(1.5, bend));
+                dbg?.Append($"  {cand.Kind} font {cand.FontPx:F1} cov {cand.Coverage:F2} on {on:F2} bend {bend:F2} steep {steep:F2} score {score:F2} ({cand.Points[0].X:F0},{cand.Points[0].Y:F0})-({cand.Points[^1].X:F0},{cand.Points[^1].Y:F0})\n");
                 if (score > bestScore) { bestScore = score; best = cand; }
             }
+        }
+        if (dbg != null)
+        {
+            dbg.Append($" chosen {best?.Kind} score {bestScore:F2}\n");
+            try { System.IO.File.AppendAllText("label_debug.txt", dbg.ToString()); } catch { }
+        }
         return best ?? fallback;
 
         List<Label> FitAngle(double ang)
@@ -280,16 +296,16 @@ public sealed class CountryLabels
             double r0 = u0 + bestStart * binW, r1 = u0 + (bestStart + bestLen) * binW;
             double extent = u1 - u0;
             var arc = Arc(bestStart, bestLen, r0, r1);
-            if (arc != null) { var l = Finish(arc, rigid: true, extent); if (l != null) result.Add(l); }
+            if (arc != null) { var l = Finish(arc, rigid: true, extent); if (l != null) { l.Kind = $"arc{thr}"; result.Add(l); } }
             var spine = Spine(bestStart, bestLen);
-            if (spine != null) { var l = Finish(spine, rigid: false, extent); if (l != null) result.Add(l); }
+            if (spine != null) { var l = Finish(spine, rigid: false, extent); if (l != null) { l.Kind = $"spine{thr}"; result.Add(l); } }
             var ridge = Ridge(thr);
-            if (ridge != null) { var l = Finish(ridge, rigid: false, extent); if (l != null) result.Add(l); }
+            if (ridge != null) { var l = Finish(ridge, rigid: false, extent); if (l != null) { l.Kind = $"ridge{thr}"; result.Add(l); } }
         }
         // and down the whole length of long, thin land (Norway's coast, Chile), however narrow it gets
         {
             var ridge = Ridge(0.06);
-            if (ridge != null) { var l = Finish(ridge, rigid: false, u1 - u0); if (l != null) result.Add(l); }
+            if (ridge != null) { var l = Finish(ridge, rigid: false, u1 - u0); if (l != null) { l.Kind = "ridgeAll"; result.Add(l); } }
         }
         return result;
 
@@ -504,12 +520,15 @@ public sealed class CountryLabels
                 for (int j = Math.Max(0, i - 6); j <= Math.Min(np - 1, i + 6); j++) { float wgt = 7 - Math.Abs(i - j); sum += raw[j] * wgt; wsum += wgt; }
                 heights[i] = sum / wsum + 0.02f;
             }
-            return new Label { Country = c, Text = text, Points = points, FontPx = fontPx, Heights = heights, LengthPx = len, Coverage = (float)Math.Min(1, Math.Min(len, fontPx * (text.Length * 0.62f + 0.8f * (text.Length - 1))) / Math.Max(1, extent)) };
+            return new Label { Country = c, Text = text, Points = points, FontPx = fontPx, Heights = heights, LengthPx = len, Coverage = (float)Math.Min(1, Math.Min(len, fontPx * (text.Length * 0.62f + MaxSpacing * (text.Length - 1))) / Math.Max(1, extent)) };
         }
         }
     }
 
     // ------------------------------------------------------------------------------------- drawing
+    // widest gap between letters, in letter heights: long names spread out over long countries
+    const float MaxSpacing = 2.0f;
+
     public void Draw(Camera3D cam, float minScreenFont = 3f)
     {
         if (_dirty && Raylib.GetTime() - _lastBuild > 1.5) { Rebuild(); _lastBuild = Raylib.GetTime(); }
@@ -543,7 +562,7 @@ public sealed class CountryLabels
             for (int i = 0; i < lb.Text.Length; i++) { adv[i] = Raylib.MeasureTextEx(font, lb.Text[i].ToString(), fs, 0).X; total += adv[i]; }
             float avail = L * 0.9f;   // a little room at both ends, so neighbouring names do not touch
             if (total > avail) { float k = avail / total; fs *= k; for (int i = 0; i < adv.Length; i++) adv[i] *= k; total = avail; if (fs < minScreenFont) continue; }
-            float spacing = lb.Text.Length > 1 ? Math.Clamp((avail - total) / (lb.Text.Length - 1), 0, fs * 0.8f) : 0;
+            float spacing = lb.Text.Length > 1 ? Math.Clamp((avail - total) / (lb.Text.Length - 1), 0, fs * MaxSpacing) : 0;
             float used = total + spacing * (lb.Text.Length - 1);
             float pos = (L - used) / 2;
             // solid letters with a dark outline, so names read on any map color (fading in only while tiny)

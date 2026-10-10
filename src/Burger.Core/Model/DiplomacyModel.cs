@@ -120,6 +120,8 @@ public sealed class PeaceTerm
     public string Culture = "";
     /// <summary>RegimeChange: ideology put in power.</summary>
     public string Ideology = "";
+    /// <summary>ReleaseCountry: the freed people become a subject of the beneficiary (a puppet) instead of a free country.</summary>
+    public bool AsSubject;
 
     public override string ToString() => Type switch
     {
@@ -128,7 +130,7 @@ public sealed class PeaceTerm
         PeaceTermType.Annex => $"Be annexed by {Beneficiary?.Name}",
         PeaceTermType.Gold => $"Pay {Amount:0} gold to {Beneficiary?.Name}",
         PeaceTermType.Independence => $"Free {Beneficiary?.Name} from its overlord",
-        PeaceTermType.ReleaseCountry => $"Release {Culture} people of {State?.DisplayName} as a free country",
+        PeaceTermType.ReleaseCountry => AsSubject ? $"Release {Culture} people of {State?.DisplayName} as a subject of {Beneficiary?.Name}" : $"Release {Culture} people of {State?.DisplayName} as a free country",
         PeaceTermType.RegimeChange => $"Put the {Ideology} party in power (like {Beneficiary?.Name})",
         PeaceTermType.Humiliate => $"Be humiliated by {Beneficiary?.Name}",
         _ => "White peace",
