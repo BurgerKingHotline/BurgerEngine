@@ -1,4 +1,8 @@
 # On actions: run events or effects when something happens.
 on_game_start = {
-	events = { start.1 }
+	events = { start.1 depression.1 depression.2 }
+}
+# a demilitarized state is occupied again (demilitarization feature)
+on_state_remilitarized = {
+	events = { demil.1 }
 }

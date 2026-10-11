@@ -9,7 +9,8 @@ public class PoliticsRules
     /// <summary>
     /// Monthly change of each ideology's popularity, in percentage points (they are normalised to 100% afterwards).
     /// Sources: modifiers named <c>IDEOLOGY_drift</c> (laws, ministers, events), the ruling party's propaganda,
-    /// lost wars, low stability, ideologies ruling the neighbours, and a little chance.
+    /// lost wars, war exhaustion, lost core land, low stability, ideologies ruling the neighbours, political crises and a
+    /// little chance. No ideology takes a country over for good: a dominant one loses support and small ones keep a following.
     /// </summary>
     public virtual Dictionary<string, double> MonthlyDrift(Game game, Country c)
     {
@@ -38,18 +39,81 @@ public class PoliticsRules
             foreach (var i in pol.Ideologies.Where(i => i.Extremist && i.Key != p.Ruling)) Add(i.Key, 0.4);
         }
         else if (stability > 70) Add(p.Ruling, 0.2);
+        // weak democracies: where people vote but stability is low (under weak_democracy_stability, 40) or the parties in
+        // government have little support (under weak_democracy_support, 35%), they look for a strong hand: ideologies
+        // with weak_democracy_drift (fascists) gain, the more the weaker the democracy is
+        if (pol.HoldsElections(c))
+        {
+            // (support only counts as weak where the government is not the clear plurality: a divided opposition does not unseat it)
+            double gov = GovernmentSupport(game, c);
+            double rival = p.Popularity.Where(kv => !p.Government.Contains(kv.Key) && kv.Key != p.Ruling).Select(kv => kv.Value).DefaultIfEmpty(0).Max();
+            double plurality = Math.Clamp((gov - rival * 1.25) / 0.15, 0, 1);
+            double weak = Math.Max(Math.Clamp((d.Get("weak_democracy_stability", 40) - stability) / 30, 0, 1),
+                                   Math.Clamp((d.Get("weak_democracy_support", 0.35) - gov) / 0.2, 0, 1) * (1 - plurality));
+            if (weak > 0)
+                foreach (var i in pol.Ideologies.Where(i => i.WeakDemocracyDrift > 0 && !p.Government.Contains(i.Key))) Add(i.Key, i.WeakDemocracyDrift * weak);
+        }
+        // and the other way round: where nobody votes, a country wealthier than most wants a say (liberalisation_drift for
+        // the ideologies that hold elections, growing with its wealth above the world's typical) - poor dictatorships last
+        else
+        {
+            double want = d.Get("liberalisation_drift", 0.1) * Math.Clamp(game.Politics.WealthIndex(c) - 1, 0, 1.5);
+            if (want > 0) foreach (var i in pol.Ideologies.Where(i => i.Elections && i.Key != p.Ruling)) Add(i.Key, want);
+        }
+        // a long war wears the government down, whoever rules
+        if (game.Features.Has(FeatureSet.Diplomacy))
+        {
+            double tired = game.Diplomacy.WarExhaustion(c) * d.Get("war_exhaustion_drift", 0.05);
+            if (tired > 0)
+            {
+                Add(p.Ruling, -tired);
+                foreach (var i in pol.Ideologies.Where(i => i.Key != p.Ruling)) Add(i.Key, tired / Math.Max(1, pol.Ideologies.Count - 1));
+            }
+        }
+        // revanchism: a country whose core land is held by others listens to extremists
+        if (pol.Ideology(p.Ruling) is not { Extremist: true } && game.World.States.Any(s => s.Owner != null && s.Owner != c && s.Cores.Contains(c)))
+            foreach (var i in pol.Ideologies.Where(i => i.WeakDemocracyDrift > 0 && i.Key != p.Ruling)) Add(i.Key, d.Get("revanchism_drift", 0.15) * 3); // lost land feeds the nationalists
         // ideas spread from neighbours (stronger neighbours spread more)
         {
-            double own = Math.Max(1, game.Rules.Diplomacy.MilitaryStrength(game, c));
+            double own = Math.Max(1, game.Diplomacy.Strength(c));
             var fromNeighbours = new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase);
             foreach (var n in Burger.Core.Scripting.Builtins.NeighborCountries(game, c))
             {
                 string r = pol.Of(n).Ruling;
                 if (r == p.Ruling || r.Length == 0) continue;
-                double power = Math.Max(1, game.Rules.Diplomacy.MilitaryStrength(game, n));
+                double power = Math.Max(1, game.Diplomacy.Strength(n));
                 fromNeighbours[r] = fromNeighbours.GetValueOrDefault(r) + d.Get("neighbour_drift", 0.1) * Math.Min(2, power / own);
             }
-            foreach (var kv in fromNeighbours) Add(kv.Key, Math.Min(0.6, kv.Value));
+            // (an idea spreads into a country where it is new; where four in ten already hold it, the neighbours add nothing)
+            foreach (var kv in fromNeighbours)
+                Add(kv.Key, Math.Min(0.6, kv.Value) * Math.Clamp(1 - p.Popularity.GetValueOrDefault(kv.Key) / d.Get("neighbour_drift_cap", 0.4), 0, 1));
+        }
+        // pluralism: no ideology takes a country over for good. The further one is above dominance_threshold (55%), the
+        // faster it loses support (people tire of it, it splits); one below ideology_floor (5%) wins some back.
+        {
+            double top = d.Get("dominance_threshold", 0.55), decay = d.Get("dominance_decay", 0.04), low = d.Get("ideology_floor", 0.05);
+            foreach (var i in pol.Ideologies)
+            {
+                double cur = p.Popularity.GetValueOrDefault(i.Key);
+                if (cur > top) Add(i.Key, -(cur - top) * 100 * decay);
+                else if (cur < low) Add(i.Key, (low - cur) * 100 * 0.1);
+            }
+        }
+        // political crises: now and then (political_crisis_chance, about once in eight years) a scandal, a slump or a
+        // strike wave turns people away from the government and towards one of the others (extremists when things are bad)
+        if (pol.Ideologies.Count > 1 && game.Rng.NextDouble() < d.Get("political_crisis_chance", 0.01))
+        {
+            var others = pol.Ideologies.Where(i => i.Key != p.Ruling).ToList();
+            double Weight(IdeologyDef i) => 0.5 + p.Popularity.GetValueOrDefault(i.Key) + (i.Extremist && stability < 50 ? 1 : 0);
+            double pick = game.Rng.NextDouble() * others.Sum(Weight);
+            var gainer = others[^1];
+            foreach (var i in others) { pick -= Weight(i); if (pick <= 0) { gainer = i; break; } }
+            double swing = d.Get("political_crisis_swing", 10);
+            Add(p.Ruling, -swing / 2);
+            Add(gainer.Key, swing);
+            var stab = game.Resources.Defs.FirstOrDefault(r => string.Equals(r.Key, "stability", StringComparison.OrdinalIgnoreCase));
+            if (stab != null) game.Resources.Set(c, stab, game.Resources.Get(c, stab) - d.Get("political_crisis_stability", 10));
+            game.NotifyPlayer($"A political crisis shakes {c.Name}: many turn to the {gainer.Name} cause.", NotificationKind.Info, c);
         }
         // a ruling party that holds no elections keeps a core of support (repression, patronage, the army)
         if (!pol.HoldsElections(c))
@@ -68,6 +132,80 @@ public class PoliticsRules
         var def = game.Resources.Defs.FirstOrDefault(r => string.Equals(r.Key, "stability", StringComparison.OrdinalIgnoreCase));
         return def == null ? 50 : game.Resources.Get(c, def);
     }
+
+    /// <summary>
+    /// Does a government that has lost the country fall into a snap election? When the most popular party is out of government with a clear
+    /// lead (snap_election_lead, 8 points) and the last vote was over snap_election_months (12) ago: coalitions collapse, the president dissolves
+    /// parliament, the people are asked again.
+    /// </summary>
+    public virtual bool CallsSnapElection(Game game, Country c)
+    {
+        var pol = game.Politics;
+        var p = pol.Of(c);
+        var d = game.Data.Defines;
+        if (p.LastElection is { } last && game.World.Date.TotalDays - last.TotalDays < d.Get("snap_election_months", 12) * 30) return false;
+        var top = p.Popularity.OrderByDescending(kv => kv.Value).First();
+        if (p.Government.Contains(top.Key)) return false;
+        return top.Value - p.Popularity.GetValueOrDefault(p.Ruling) >= d.Get("snap_election_lead", 0.08);
+    }
+
+    /// <summary>Support for the parties in government (0-1): the sum of their ideologies' popularity.</summary>
+    public virtual double GovernmentSupport(Game game, Country c)
+    {
+        var p = game.Politics.Of(c);
+        return p.Government.Count > 0 ? p.Government.Sum(g => p.Popularity.GetValueOrDefault(g)) : p.Popularity.GetValueOrDefault(p.Ruling);
+    }
+
+    /// <summary>
+    /// Wealth per person, compared between countries (<see cref="PoliticsSystem.WealthIndex"/>): monthly income per head
+    /// with the economy, else the tax value of its states per head.
+    /// </summary>
+    public virtual double WealthPerPerson(Game game, Country c)
+    {
+        double people = game.Population.Enabled ? game.Population.TotalOf(c) : c.OwnedStates.Count;
+        if (people <= 0) return 0;
+        double wealth = game.Features.Has(FeatureSet.Economy) && c.LastIncome > 0 ? c.LastIncome : c.OwnedStates.Sum(s => s.Tax);
+        return Math.Max(0, wealth) / people;
+    }
+
+    /// <summary>
+    /// What moves a country's stability besides laws, ministers and buildings (points of stability_target, with the name
+    /// shown in tooltips): poverty (poor countries are restless: poverty_stability, up to -25), prosperity, a government
+    /// whose parties have under government_support_needed (40%) support, and core land held by others.
+    /// </summary>
+    public virtual List<(string Source, double Value)> StabilitySources(Game game, Country c)
+    {
+        var d = game.Data.Defines;
+        var list = new List<(string, double)>();
+        double wealth = game.Politics.WealthIndex(c);
+        if (wealth < 1) list.Add(("Poverty", -(1 - wealth) * d.Get("poverty_stability", 25)));
+        else list.Add(("Prosperity", Math.Min(d.Get("prosperity_stability", 5), (wealth - 1) * 5)));
+        double need = d.Get("government_support_needed", 0.4), support = GovernmentSupport(game, c);
+        if (support < need) list.Add(("Unpopular government", -(need - support) * 100 * d.Get("unpopular_government_stability", 0.6)));
+        if (game.World.States.Any(s => s.Owner != null && s.Owner != c && s.Cores.Contains(c)))
+            list.Add(("Core land in foreign hands", -d.Get("lost_cores_stability", 5)));
+        return list;
+    }
+
+    /// <summary>
+    /// How close a country is to breaking apart (0-1): low stability, worse in a poor country, or really high war
+    /// exhaustion (above civil_war_exhaustion, 8 of 20). Makes civil wars likelier and coups rarer.
+    /// </summary>
+    public virtual double UnrestPressure(Game game, Country c)
+    {
+        double unstable = Math.Clamp((50 - StabilityOf(game, c)) / 50, 0, 1);
+        double poor = Math.Clamp(1 - game.Politics.WealthIndex(c), 0, 1);
+        double tired = game.Features.Has(FeatureSet.Diplomacy)
+            ? Math.Clamp((game.Diplomacy.WarExhaustion(c) - game.Data.Defines.Get("civil_war_exhaustion", 8)) / 8, 0, 1) : 0;
+        return Math.Clamp(Math.Max(unstable * (0.5 + poor), tired), 0, 1);
+    }
+
+    /// <summary>
+    /// Can an ideology that could win elections still take power by force (coup or civil war)? By default extremists,
+    /// in a democracy whose stability has fallen under democracy_coup_stability (25).
+    /// </summary>
+    public virtual bool CanSeizePower(Game game, Country c, IdeologyDef ideology)
+        => ideology.Extremist && StabilityOf(game, c) < game.Data.Defines.Get("democracy_coup_stability", 25);
 
     /// <summary>Share of the vote of each ideology in an election (popularity with a little chance).</summary>
     public virtual Dictionary<string, double> Votes(Game game, Country c)
@@ -130,19 +268,26 @@ public class PoliticsRules
     public virtual double CoupChance(Game game, Country c, IdeologyDef ideology, double popularity)
     {
         var d = game.Data.Defines;
-        double threshold = d.Get("coup_threshold", 0.4);
+        // a country in turmoil is toppled by less (UnrestPressure lowers the support a coup needs by up to 20 points)
+        double threshold = d.Get("coup_threshold", 0.4) - 0.2 * UnrestPressure(game, c);
         if (popularity < threshold) return 0;
         double ruling = game.Politics.Of(c).Popularity.GetValueOrDefault(game.Politics.Of(c).Ruling);
         double stability = StabilityOf(game, c);
-        return d.Get("coup_chance", 0.06) * (1 + (popularity - threshold) * 5) * (1.5 - ruling) * (1.5 - stability / 100.0);
+        // (where the country is poor and unstable, or worn out by war, the struggle is fought out in a civil war instead)
+        return d.Get("coup_chance", 0.06) * (1 + (popularity - threshold) * 5) * (1.5 - ruling) * (1.5 - stability / 100.0) * (1 - 0.7 * UnrestPressure(game, c));
     }
 
-    /// <summary>Monthly chance that a shut-out ideology with this much support starts a civil war (HOI4 style).</summary>
+    /// <summary>
+    /// Monthly chance that a shut-out ideology with this much support starts a civil war (HOI4 style). Under pressure
+    /// (<see cref="UnrestPressure"/>: unstable and poor, or worn out by war) it needs less support (civil_war_threshold
+    /// 50%, down to 20%) and strikes far more often.
+    /// </summary>
     public virtual double CivilWarChance(Game game, Country c, IdeologyDef ideology, double popularity)
     {
-        double threshold = game.Data.Defines.Get("civil_war_threshold", 0.5);
+        double pressure = UnrestPressure(game, c);
+        double threshold = game.Data.Defines.Get("civil_war_threshold", 0.5) - 0.3 * pressure;
         if (popularity < threshold) return 0;
-        return game.Data.Defines.Get("civil_war_chance", 0.08) * (0.5 + (popularity - threshold) * 2);
+        return game.Data.Defines.Get("civil_war_chance", 0.08) * (0.5 + (popularity - threshold) * 2) * (0.5 + 3 * pressure);
     }
 
     /// <summary>
@@ -159,6 +304,25 @@ public class PoliticsRules
     /// <summary>Share of the country (states, divisions, treasury) that joins the rebels: the ideology's support.</summary>
     public virtual double CivilWarShare(Game game, Country c, string ideology, double popularity)
         => Math.Clamp(popularity, 0.1, 0.9);
+
+    /// <summary>
+    /// Who has won a civil war: true = the old government, false = the rebels, null = not decided. A side that is beaten
+    /// (lost its capital and most of its land) has lost; otherwise a side far ahead in war score for civil_war_decisive_months (3)
+    /// wins (score gap civil_war_decisive_score, 40), a side clearly ahead after civil_war_stalemate_months (18) wins (gap 15),
+    /// and no civil war goes on longer than civil_war_max_months (36): the side ahead takes the country, the government if even.
+    /// </summary>
+    public virtual bool? CivilWarVerdict(Game game, CivilWar cw, bool originBeaten, bool rebelBeaten)
+    {
+        if (rebelBeaten) return true;
+        if (originBeaten) return false;
+        var d = game.Data.Defines;
+        double score = cw.War.ScoreFor(cw.Origin);
+        int months = (game.World.Date.TotalDays - cw.War.StartDate.TotalDays) / 30;
+        if (months >= d.Get("civil_war_decisive_months", 3) && Math.Abs(score) >= d.Get("civil_war_decisive_score", 40)) return score > 0;
+        if (months >= d.Get("civil_war_stalemate_months", 18) && Math.Abs(score) >= 15) return score > 0;
+        if (months >= d.Get("civil_war_max_months", 36)) return score >= 0;
+        return null;
+    }
 
     /// <summary>Years after a coup or civil war before the next one can start.</summary>
     public virtual double CalmYears(Game game, Country c) => game.Data.Defines.Get("revolt_calm_years", 5);

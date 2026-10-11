@@ -40,7 +40,7 @@ public sealed unsafe class MapRenderer : IDisposable
     private int _hw, _hh;
 
     private int _locMapData, _locLut, _locLutSize, _locBlockRows, _locMapSize, _locWorldSize, _locAtlasGrid, _locTileScale,
-        _locWater, _locRiver, _locTime, _locBorderScale, _locStateBorders, _locShowBorders, _locTint, _locViewPos, _locFog;
+        _locWater, _locRiver, _locTime, _locBorderScale, _locStripe, _locStateBorders, _locShowBorders, _locTint, _locViewPos, _locFog;
     private int _visibilityVersion = -1;
 
     public float WorldWidth { get; }
@@ -236,6 +236,7 @@ public sealed unsafe class MapRenderer : IDisposable
         _locRiver = Raylib.GetShaderLocation(_shader, "riverColor");
         _locTime = Raylib.GetShaderLocation(_shader, "time");
         _locBorderScale = Raylib.GetShaderLocation(_shader, "borderScale");
+        _locStripe = Raylib.GetShaderLocation(_shader, "stripePeriod");
         _locStateBorders = Raylib.GetShaderLocation(_shader, "stateBorders");
         _locShowBorders = Raylib.GetShaderLocation(_shader, "showProvinceBorders");
         _locTint = Raylib.GetShaderLocation(_shader, "tintStrength");
@@ -502,6 +503,7 @@ public sealed unsafe class MapRenderer : IDisposable
             if (l.IsLake) flags |= 16;
             if (!_game.IsVisible(l)) flags |= 32;
             if (HighlightState != null && l.State == HighlightState) flags |= 64;
+            if (l.State?.Demilitarized == true && !l.IsWater) flags |= 128; // demilitarized zone: hatched
             var stripe = occupied && l.Controller != null ? l.Controller.Color : Rgb.Black;
             _lut[block * 2 + i] = new Color(stripe.R, stripe.G, stripe.B, (byte)flags);
         }
@@ -549,6 +551,10 @@ public sealed unsafe class MapRenderer : IDisposable
         float fog = FogShading ? Math.Clamp((StrategicZoom - camH) / (StrategicZoom * 0.2f), 0f, 1f) : 0f;
         Raylib.SetShaderValue(_shader, _locFog, fog, ShaderUniformDataType.Float);
         Raylib.SetShaderValue(_shader, _locBorderScale, Math.Clamp(camH / 40f, 0.6f, 4f), ShaderUniformDataType.Float);
+        // occupation stripes keep their size on screen roughly, but only change in steps: a size that follows the camera
+        // continuously makes the stripes crawl and flicker
+        float stripe = MathF.Pow(2f, MathF.Round(MathF.Log2(Math.Max(0.05f, camH * 0.045f))));
+        Raylib.SetShaderValue(_shader, _locStripe, stripe, ShaderUniformDataType.Float);
         Raylib.SetShaderValue(_shader, _locShowBorders, camH < 120 ? 1.0f : 0.0f, ShaderUniformDataType.Float);
         // state borders fade out when zoomed out (country borders stay)
         float stateFade = Math.Clamp((StrategicZoom * 0.6f - camH) / (StrategicZoom * 0.25f), 0f, 1f);

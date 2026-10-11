@@ -28,7 +28,7 @@ public sealed class App
     private int _frame;
     private Action? _pending;
 
-    public App(AppOptions options) { _opt = options; }
+    public App(AppOptions options) { _opt = options; UserSettings.Load(); }
 
     public string GameRoot => _gameRoot;
     public string SavesDir => Path.Combine(Path.GetDirectoryName(Path.GetFullPath(_gameRoot).TrimEnd('/', '\\')) ?? ".", "saves");
@@ -170,7 +170,9 @@ public sealed class App
     private void StartGame(string? tag)
     {
         if (Game == null) return;
+        Game.HistoricalBias = _opt.Bias ?? UserSettings.HistoricalBias;
         Game.StartNewGame(tag);
+        UserSettings.Apply(Game);
         EnterPlaying();
     }
 
@@ -203,6 +205,7 @@ public sealed class App
         if (_opt.MapMode != null && Enum.TryParse<MapMode>(_opt.MapMode, true, out var mode)) { Renderer!.Mode = mode; Renderer.Dirty = true; }
         if (_opt.Zoom != null) Camera!.LookAt(Camera.Target, _opt.Zoom.Value);
         if (_opt.NoFogShading) MapRenderer.FogShading = false;
+        if (_opt.NoUnits) MapOverlay.ShowUnits = false;
         if (_opt.Open != null)
         {
             var parts = _opt.Open.Split(':');
@@ -212,6 +215,7 @@ public sealed class App
                 case "recruit": Ui.Left = LeftPanel.Recruit; Ui.RecruitTemplate = game.Data.Templates.Values.FirstOrDefault(); break;
                 case "characters": Ui.Left = LeftPanel.Characters; break;
                 case "decisions": Ui.Left = LeftPanel.Decisions; break;
+                case "focus": Ui.Left = LeftPanel.Focus; break;
                 case "production": Ui.Left = LeftPanel.Production; Ui.ProductionTab = int.TryParse(parts.ElementAtOrDefault(1), out var pt) ? pt : 0; break;
                 case "designer": Ui.Left = LeftPanel.Designer; break;
                 case "air": Ui.Left = LeftPanel.Air; _hud!.AirTab = int.TryParse(parts.ElementAtOrDefault(1), out var at) ? at : 0; break;
@@ -522,7 +526,7 @@ public sealed class App
         Gui.Label("Choose a country (or click it on the map):", x, y, 16);
         y += 26 * s;
         var playable = game.World.Countries.Where(c => c.Playable && c.Exists).OrderBy(c => c.Name).ToList();
-        float listH = panel.Y + panel.Height - y - 250 * s;
+        float listH = panel.Y + panel.Height - y - 310 * s;
         float top = Gui.BeginScroll("menu-countries", new Rectangle(x, y, w, listH), playable.Count * 40 * s);
         float cy = top;
         foreach (var c in playable)
@@ -549,6 +553,15 @@ public sealed class App
             Gui.LabelShadow(c.Name, x + 70 * s, y, 21, Gui.Gold, FontKind.Header);
             Gui.Label($"{c.OwnedStates.Count} states - ruler: {c.Ruler?.DisplayName ?? "none"}", x + 70 * s, y + 24 * s, 14, Gui.TextDim);
             y += 50 * s;
+        }
+        // how strongly historical motives drive the AI in this game
+        {
+            double bias = UserSettings.HistoricalBias;
+            string label = bias >= 0.9 ? "very historical" : bias >= 0.65 ? "historical" : bias >= 0.35 ? "loosely historical" : bias >= 0.1 ? "alternate history" : "free";
+            Gui.Label($"Historical bias: {bias:P0} ({label})", x, y, 15);
+            y += 22 * s;
+            if (Gui.Slider("bias", new Rectangle(x, y, w, 20 * s), ref bias, 0, 1)) UserSettings.HistoricalBias = Math.Round(bias * 100) / 100;
+            y += 28 * s;
         }
         float bh = 36 * s;
         if (Gui.Button(new Rectangle(x, y, w, bh), _menuSelection != null ? $"Play as {_menuSelection.Name}" : "Select a country", _menuSelection != null, null, false, 18))

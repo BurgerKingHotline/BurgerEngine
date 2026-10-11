@@ -47,6 +47,8 @@ public sealed class SubjectType
     public double IncomeShare = 0.1;
     public bool JoinsOverlordWars = true;
     public bool CanDeclareWar;
+    /// <summary>Does a subject of this type use up one of its overlord's diplomatic relations (counts_as_relation, default yes; dominions and colonies do not).</summary>
+    public bool CountsAsRelation = true;
     /// <summary>Base liberty desire of this kind of subject (EU style; added to the computed value).</summary>
     public double LibertyDesire;
     public Node Definition = Node.Root("");
@@ -106,7 +108,7 @@ public sealed class War : IScope
     public override string ToString() => Name;
 }
 
-public enum PeaceTermType { WhitePeace, TransferState, Subjugate, Annex, Gold, Independence, ReleaseCountry, RegimeChange, Humiliate }
+public enum PeaceTermType { WhitePeace, TransferState, Subjugate, Annex, Gold, Independence, ReleaseCountry, RegimeChange, Humiliate, Demilitarize }
 
 public sealed class PeaceTerm
 {
@@ -133,6 +135,7 @@ public sealed class PeaceTerm
         PeaceTermType.ReleaseCountry => AsSubject ? $"Release {Culture} people of {State?.DisplayName} as a subject of {Beneficiary?.Name}" : $"Release {Culture} people of {State?.DisplayName} as a free country",
         PeaceTermType.RegimeChange => $"Put the {Ideology} party in power (like {Beneficiary?.Name})",
         PeaceTermType.Humiliate => $"Be humiliated by {Beneficiary?.Name}",
+        PeaceTermType.Demilitarize => $"Demilitarize {State?.DisplayName}",
         _ => "White peace",
     };
 }

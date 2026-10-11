@@ -1,0 +1,5 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Commodities (steel, oil, rubber...)"
+category = "Economy"
+order = 81
+description = "Strategic commodities from common/commodities with deposits per state (history/commodities). Equipment needs them (commodities = { steel = 0.02 } in common/equipment); countries dig what they own, trade surpluses with countries they are not at war with and are slowed by shortages. The AI wants land and friends with what it lacks."

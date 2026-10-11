@@ -12,6 +12,9 @@ public sealed class MapOverlay
     private readonly MapRenderer _map;
     private readonly CountryLabels _countryLabels;
 
+    /// <summary>Unit counters, fleets, battles and order arrows on the map (the Units button, H). Kept for the whole session like the fog shading.</summary>
+    public static bool ShowUnits = true;
+
     public MapOverlay(Game game, MapRenderer map)
     {
         _game = game;
@@ -51,6 +54,7 @@ public sealed class MapOverlay
     public bool DrawUnits(Camera3D cam, UiState ui, bool mouseOverUi)
     {
         Counters.Clear();
+        if (!ShowUnits) return false;
         if (cam.Position.Y > _map.StrategicZoom) return false; // strategic view: no counters
         bool clicked = false;
         var w = _game.World;
@@ -150,6 +154,7 @@ public sealed class MapOverlay
     /// <summary>Fleets (navy feature): a ship counter per fleet, naval battles and the selected fleet's route. Returns true if a fleet was clicked.</summary>
     public bool DrawFleets(Camera3D cam, UiState ui, bool mouseOverUi)
     {
+        if (!ShowUnits) return false;
         if (cam.Position.Y > _map.StrategicZoom) return false;
         if (!_game.Features.Has(Burger.Core.Modding.FeatureSet.Navy)) return false;
         var player = _game.World.Player;
@@ -259,6 +264,7 @@ public sealed class MapOverlay
     /// <summary>Front lines of the player's armies and paths of selected divisions.</summary>
     public void DrawOrders(Camera3D cam, UiState ui)
     {
+        if (!ShowUnits) return;
         var player = _game.World.Player;
         if (player == null) return;
         float ppu = _game.World.Map.Settings.PixelsPerUnit;

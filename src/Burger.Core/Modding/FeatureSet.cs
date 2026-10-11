@@ -45,6 +45,12 @@ public sealed class FeatureSet
     public const string BuildingsClassic = "buildings_classic";
     public const string BuildingsModern = "buildings_modern";
 
+    public const string Technology = "technology";
+    public const string Commodities = "commodities";
+    public const string Demilitarization = "demilitarization";
+    public const string AiProfiles = "ai_profiles";
+    public const string Focus = "focus";
+
     /// <summary>The features games had before features existed (all on for a game without features.txt).</summary>
     public static readonly string[] BuiltIn = { Military, Diplomacy, Characters, CharacterInteractions, Economy, FogOfWar, Ai };
 

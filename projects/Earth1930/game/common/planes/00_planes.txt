@@ -9,45 +9,137 @@
 #   cost              gold for a full wing (without the production feature, with economy)
 #   production_cost   production cost of ONE plane (with the production feature)
 #   manpower, build_days   crew and building time of a wing bought with gold
+#   requires_tech     a technology that is needed to build it; commodities = what one plane uses up
 # Any other number is kept as a stat, readable from C# (wing.Type.Stat("my_stat")).
 
 plane_types = {
 	fighter = {
-		name = "Fighter"
+		name = "Biplane Fighter"
 		category = fighter
-		range = 700
-		air_attack = 12
-		air_defense = 10
+		range = 650
+		air_attack = 8
+		air_defense = 8
 		agility = 40
-		cost = 60
-		production_cost = 22
+		cost = 55
+		production_cost = 18
 		manpower = 100
 		build_days = 90
+		commodities = { aluminium = 0.012 steel = 0.004 rubber = 0.0008 oil = 0.002 }
+	}
+	fighter_2 = {
+		name = "Monoplane Fighter"
+		category = fighter
+		range = 750
+		air_attack = 14
+		air_defense = 11
+		agility = 38
+		cost = 70
+		production_cost = 24
+		manpower = 110
+		build_days = 100
+		requires_tech = fighter_2
+		commodities = { aluminium = 0.016 steel = 0.005 rubber = 0.001 oil = 0.003 }
+	}
+	fighter_3 = {
+		name = "Advanced Fighter"
+		category = fighter
+		range = 900
+		air_attack = 21
+		air_defense = 14
+		agility = 36
+		cost = 90
+		production_cost = 30
+		manpower = 120
+		build_days = 110
+		requires_tech = fighter_3
+		commodities = { aluminium = 0.02 steel = 0.006 rubber = 0.001 oil = 0.004 tungsten = 0.0003 }
 	}
 	close_air_support = {
-		name = "Close Air Support"
+		name = "Army Cooperation Aircraft"
 		category = cas
 		range = 500
 		air_attack = 2
-		air_defense = 8
+		air_defense = 7
 		agility = 20
-		ground_attack = 20
-		cost = 70
-		production_cost = 24
+		ground_attack = 14
+		cost = 62
+		production_cost = 20
 		manpower = 120
 		build_days = 100
+		commodities = { aluminium = 0.012 steel = 0.005 rubber = 0.0008 oil = 0.002 }
+	}
+	cas_2 = {
+		name = "Dive Bomber"
+		category = cas
+		range = 600
+		air_attack = 3
+		air_defense = 9
+		agility = 22
+		ground_attack = 22
+		cost = 80
+		production_cost = 26
+		manpower = 130
+		build_days = 110
+		requires_tech = cas_2
+		commodities = { aluminium = 0.016 steel = 0.006 rubber = 0.001 oil = 0.003 }
+	}
+	cas_3 = {
+		name = "Ground Attack Aircraft"
+		category = cas
+		range = 700
+		air_attack = 5
+		air_defense = 12
+		agility = 24
+		ground_attack = 32
+		cost = 100
+		production_cost = 32
+		manpower = 140
+		build_days = 120
+		requires_tech = cas_3
+		commodities = { aluminium = 0.02 steel = 0.008 rubber = 0.001 oil = 0.004 }
 	}
 	bomber = {
+		name = "Medium Bomber"
+		category = bomber
+		range = 1000
+		air_defense = 10
+		agility = 8
+		ground_attack = 2
+		strategic_attack = 8
+		cost = 90
+		production_cost = 34
+		manpower = 200
+		build_days = 140
+		commodities = { aluminium = 0.022 steel = 0.008 rubber = 0.0015 oil = 0.004 }
+	}
+	bomber_2 = {
+		name = "Heavy Bomber"
+		category = bomber
+		range = 1700
+		air_defense = 14
+		agility = 8
+		ground_attack = 3
+		strategic_attack = 14
+		cost = 130
+		production_cost = 50
+		manpower = 280
+		build_days = 170
+		requires_tech = bomber_2
+		commodities = { aluminium = 0.035 steel = 0.012 rubber = 0.002 oil = 0.007 }
+	}
+	bomber_3 = {
 		name = "Strategic Bomber"
 		category = bomber
-		range = 1400
-		air_defense = 14
-		agility = 10
-		strategic_attack = 12
-		ground_attack = 2
-		cost = 110
-		production_cost = 45
-		manpower = 200
-		build_days = 150
+		range = 2600
+		air_defense = 18
+		agility = 8
+		ground_attack = 4
+		strategic_attack = 22
+		cost = 180
+		production_cost = 70
+		manpower = 380
+		build_days = 200
+		requires_tech = bomber_3
+		commodities = { aluminium = 0.05 steel = 0.018 rubber = 0.003 oil = 0.01 }
 	}
 }

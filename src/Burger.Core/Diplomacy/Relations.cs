@@ -118,5 +118,5 @@ public sealed class Relations
 
     /// <summary>Number of diplomatic relation slots in use (alliances + guarantees given + subjects).</summary>
     public int RelationsUsed(Country c)
-        => AlliesOf(c).Count() + Guarantees.Count(g => g.Guarantor == c) + SubjectsOf(c).Count();
+        => AlliesOf(c).Count() + Guarantees.Count(g => g.Guarantor == c) + SubjectsOf(c).Count(x => Subjects[x].Type.CountsAsRelation);
 }

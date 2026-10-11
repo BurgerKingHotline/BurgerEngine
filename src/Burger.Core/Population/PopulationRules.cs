@@ -4,6 +4,13 @@ using Burger.Core.Modding;
 namespace Burger.Core.Population;
 
 /// <summary>Overridable rules for population: growth, capacity, assimilation, conversion, migration, how people turn into tax and manpower, cores and colonies. Subclass and assign to <c>Game.Rules.Population</c> (the population feature puts a copy in backend/Population.cs).</summary>
+/// <summary>One nation of a separation: the people and the states it takes.</summary>
+public sealed class SeparationPart
+{
+    public string Culture = "";
+    public List<State> States = new();
+}
+
 public class PopulationRules
 {
     /// <summary>Yearly growth of a pop before the capacity limit (default 0.016 = 1.6% a year).</summary>
@@ -36,13 +43,29 @@ public class PopulationRules
     public virtual double MonthlyMigration(Game game, State from, State to, double fromFill, double toFill)
         => fromFill > 0.85 && fromFill - toFill > 0.15 ? game.Data.Defines.Get("migration_rate", 0.002) * Math.Min(1, (fromFill - toFill) * 2) : 0;
 
+    /// <summary>
+    /// Does the country have cultural ties to the state: its people are the country's own culture or one it accepts by name
+    /// (accepted_cultures, never a whole culture group), or the state is its core. Land without ties is held by force alone:
+    /// a country that has only such land left, or is made a puppet, does not keep it.
+    /// </summary>
+    public virtual bool HasCulturalTies(Game game, Country c, State s)
+    {
+        if (s.Cores.Contains(c)) return true;
+        var pop = game.Population;
+        if (pop.MajorityCulture(s) is not { } major) return true; // land without people
+        var cp = pop.Of(c);
+        return cp.Culture == null || string.Equals(cp.Culture, major, StringComparison.OrdinalIgnoreCase) || cp.Accepted.Contains(major);
+    }
+
     /// <summary>Is this culture accepted by the country (its own culture, an accepted culture, or one of the same group)?</summary>
     public virtual bool IsAccepted(Game game, Country c, string culture)
     {
         var cp = game.Population.Of(c);
         if (cp.Culture == null) return true;
         if (string.Equals(cp.Culture, culture, StringComparison.OrdinalIgnoreCase) || cp.Accepted.Contains(culture)) return true;
-        if (game.Data.Defines.GetBool("culture_group_accepted", true) && game.Population.CultureByKey.TryGetValue(cp.Culture, out var own)
+        // (a country can turn the group rule off for itself: culture_group_accepted = no in its definition)
+        if (game.Data.Defines.GetBool("culture_group_accepted", true) && c.Definition.GetBool("culture_group_accepted", true)
+            && game.Population.CultureByKey.TryGetValue(cp.Culture, out var own)
             && game.Population.CultureByKey.TryGetValue(culture, out var other) && own.Group == other.Group) return true;
         return false;
     }
@@ -283,6 +306,67 @@ public class PopulationRules
         if (s == c.Capital?.State) return null;
         string? major = game.Population.MajorityCulture(s);
         return major == null || game.Population.IsAccepted(c, major) ? null : major;
+    }
+
+    /// <summary>
+    /// The land a people takes when it leaves a country (independence movement or a peace term that releases it), as one or
+    /// more nations. Never a scattering of single states: the heart is the biggest connected block of states where the
+    /// people is the majority; it is extended with neighbouring states where the people (or its culture group) is a big
+    /// minority (separation_claim_share, 30%); land that would be cut off from the old country's capital goes with it
+    /// when it has some of the people or is just an enclave, else (in peace deals) it becomes a nation of its own people,
+    /// else the whole separation is refused (an empty list). The capital state always stays.
+    /// </summary>
+    public virtual List<SeparationPart> SeparatistRegion(Game game, Country owner, string culture, bool peaceDeal)
+    {
+        var pop = game.Population;
+        var capital = owner.Capital?.State;
+        string? ownCulture = pop.Of(owner).Culture;
+        bool Seed(State s) => s != capital && (peaceDeal ? pop.MajorityCulture(s) == culture : SeparatistCulture(game, owner, s) == culture);
+        var seeds = owner.OwnedStates.Where(Seed).ToList();
+        if (seeds.Count == 0) return new List<SeparationPart>();
+        double People(State s) => pop.Of(s).Pops.Where(p => p.Culture == culture).Sum(p => p.Size);
+        var region = pop.Components(seeds).OrderByDescending(comp => comp.Sum(People)).First().ToHashSet();
+        // nearby land with a big share of the same people (or of its group)
+        double claim = game.Data.Defines.Get("separation_claim_share", 0.3);
+        var group = pop.Culture(culture)?.Group;
+        bool Wants(State s)
+        {
+            if (s == capital || s.Owner != owner || region.Contains(s)) return false;
+            var sp = pop.Of(s);
+            if (sp.Total <= 0) return false;
+            double share = People(s) / sp.Total;
+            double groupShare = group == null ? 0 : sp.Pops.Where(p => pop.Culture(p.Culture)?.Group == group).Sum(p => p.Size) / sp.Total;
+            if (ownCulture != null && pop.MajorityCulture(s) == ownCulture && share < 0.5) return false; // the old country's own heartland
+            return share >= claim || (groupShare >= 0.5 && share >= 0.1);
+        }
+        for (bool grew = true; grew;)
+        {
+            grew = false;
+            foreach (var s in region.ToList())
+                foreach (var n in pop.NeighbourStates(s))
+                    if (Wants(n) && region.Add(n)) grew = true;
+        }
+        // what the old country would be cut off from
+        var extras = new List<SeparationPart>();
+        if (capital != null && capital.Owner == owner)
+        {
+            var before = pop.Reachable(capital, owner.OwnedStates);
+            var taken = new HashSet<State>(region);
+            var home = pop.Reachable(capital, owner.OwnedStates.Where(s => !taken.Contains(s)));
+            var orphans = before.Where(s => !taken.Contains(s) && !home.Contains(s)).ToList();
+            foreach (var comp in pop.Components(orphans))
+            {
+                double total = comp.Sum(s => pop.Of(s).Total), mine = comp.Sum(People);
+                string? major = pop.Breakdown(comp, p => p.Culture).FirstOrDefault().Key;
+                if (!peaceDeal || comp.Count <= 2 || (total > 0 && mine / total >= 0.15)) { foreach (var s in comp) region.Add(s); continue; }
+                if (major != null && major != culture && major != ownCulture && !pop.IsAccepted(owner, major))
+                    extras.Add(new SeparationPart { Culture = major, States = comp.OrderBy(s => s.Index).ToList() });
+                else return new List<SeparationPart>(); // it cannot be done sensibly: no release
+            }
+        }
+        var parts = new List<SeparationPart> { new SeparationPart { Culture = culture, States = region.OrderBy(s => s.Index).ToList() } };
+        parts.AddRange(extras);
+        return parts;
     }
 
     /// <summary>Share of the country's people a culture needs in its separatist states to form a movement (independence_min_share); under half of it the movement fades.</summary>

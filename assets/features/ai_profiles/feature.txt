@@ -1,0 +1,5 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "AI profiles and historical bias"
+category = "AI"
+order = 82
+description = "Archetypes (aggressive, defensive, isolationist ...) and historical profiles of countries from common/ai_profiles with rivals, friends and ambitions. The Historical Bias chosen at the start of a game blends the two: at 1 countries pursue their historical motives, at 0 they act like their generic archetype."

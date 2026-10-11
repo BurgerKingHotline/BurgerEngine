@@ -9,6 +9,7 @@
 #   cost           gold, when bought without the production feature (with economy)
 #   production_cost  dockyard production cost, with the production feature
 #   manpower, build_days   crew and building time when bought with gold
+#   requires_tech  a technology that is needed to build it; commodities = what one ship uses up
 # Any other number is kept as a stat, readable from C# (ship.Type.Stat("my_stat")).
 
 ship_types = {
@@ -24,6 +25,67 @@ ship_types = {
 		production_cost = 1200
 		manpower = 200
 		build_days = 120
+		commodities = { steel = 1.0 oil = 0.15 }
+	}
+	destroyer_2 = {
+		name = "Fleet Destroyer"
+		category = screen
+		hp = 24
+		speed = 36
+		light_attack = 5.5
+		heavy_attack = 0.8
+		armor = 1.5
+		cost = 55
+		production_cost = 1500
+		manpower = 230
+		build_days = 130
+		requires_tech = destroyer_2
+		commodities = { steel = 1.3 oil = 0.2 aluminium = 0.02 }
+	}
+	destroyer_3 = {
+		name = "Modern Destroyer"
+		category = screen
+		hp = 28
+		speed = 36
+		light_attack = 7
+		heavy_attack = 1.2
+		armor = 2
+		cost = 70
+		production_cost = 1900
+		manpower = 250
+		build_days = 140
+		requires_tech = destroyer_3
+		commodities = { steel = 1.5 oil = 0.2 aluminium = 0.03 tungsten = 0.01 }
+	}
+	submarine = {
+		name = "Submarine"
+		category = screen
+		hp = 12
+		speed = 22
+		light_attack = 5
+		heavy_attack = 0.3
+		armor = 0
+		cost = 35
+		production_cost = 1000
+		manpower = 100
+		build_days = 110
+		requires_tech = submarine_1
+		commodities = { steel = 0.9 oil = 0.1 rubber = 0.05 }
+	}
+	submarine_2 = {
+		name = "Ocean Submarine"
+		category = screen
+		hp = 14
+		speed = 24
+		light_attack = 7
+		heavy_attack = 0.4
+		armor = 0
+		cost = 45
+		production_cost = 1300
+		manpower = 110
+		build_days = 120
+		requires_tech = submarine_2
+		commodities = { steel = 1.1 oil = 0.12 rubber = 0.06 }
 	}
 	light_cruiser = {
 		name = "Light Cruiser"
@@ -37,6 +99,37 @@ ship_types = {
 		production_cost = 2600
 		manpower = 500
 		build_days = 200
+		commodities = { steel = 2.4 oil = 0.3 }
+	}
+	light_cruiser_2 = {
+		name = "Modern Light Cruiser"
+		category = screen
+		hp = 48
+		speed = 33
+		light_attack = 9
+		heavy_attack = 1.5
+		armor = 4
+		cost = 105
+		production_cost = 3400
+		manpower = 560
+		build_days = 220
+		requires_tech = cruiser_2
+		commodities = { steel = 3.0 oil = 0.35 aluminium = 0.03 }
+	}
+	heavy_cruiser = {
+		name = "Heavy Cruiser"
+		category = capital
+		hp = 70
+		speed = 31
+		light_attack = 6
+		heavy_attack = 7
+		armor = 6
+		cost = 150
+		production_cost = 5000
+		manpower = 800
+		build_days = 330
+		requires_tech = heavy_cruiser_1
+		commodities = { steel = 4.2 oil = 0.45 chromium = 0.02 }
 	}
 	battleship = {
 		name = "Battleship"
@@ -50,6 +143,22 @@ ship_types = {
 		production_cost = 9000
 		manpower = 1500
 		build_days = 540
+		commodities = { steel = 8 oil = 0.8 chromium = 0.05 }
+	}
+	battleship_2 = {
+		name = "Fast Battleship"
+		category = capital
+		hp = 150
+		speed = 28
+		light_attack = 4
+		heavy_attack = 18
+		armor = 15
+		cost = 340
+		production_cost = 12500
+		manpower = 1800
+		build_days = 600
+		requires_tech = battleship_2
+		commodities = { steel = 10.5 oil = 1.1 chromium = 0.08 tungsten = 0.02 }
 	}
 	transport = {
 		name = "Transport"
@@ -61,5 +170,6 @@ ship_types = {
 		production_cost = 600
 		manpower = 100
 		build_days = 90
+		commodities = { steel = 0.5 oil = 0.05 }
 	}
 }

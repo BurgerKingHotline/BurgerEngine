@@ -4289,8 +4289,10 @@ sandys_parish_state = {
 	pop = { culture = english religion = protestant size = 9242 }
 }
 republic_of_kalmykia_state = {
-	pop = { culture = mongol religion = buddhist size = 477773 }
-	pop = { culture = mongol religion = irreligious size = 53086 }
+	pop = { culture = kalmyk religion = buddhist size = 235000 }
+	pop = { culture = kalmyk religion = irreligious size = 25000 }
+	pop = { culture = russian religion = orthodox size = 210000 }
+	pop = { culture = kazakh religion = sunni size = 60859 }
 	pop = { culture = ukrainian religion = orthodox size = 28388 }
 	pop = { culture = jewish religion = judaism size = 8516 }
 }

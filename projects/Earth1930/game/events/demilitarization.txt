@@ -1,0 +1,31 @@
+# A demilitarized zone is occupied again (demilitarization feature). The engine fires on_state_remilitarized for every country around it and
+# the one that imposed the treaty: ROOT = the challenger, scope:state, scope:remilitarizer. The AI answers by its strength and its personality.
+namespace = demil
+
+country_event = {
+	id = demil.1
+	title = "The Zone is Occupied"
+	desc = "Troops have marched into the demilitarized zone, against the treaty. The world waits to see what we do."
+	is_triggered_only = yes
+	trigger = { always = yes }
+	option = {
+		name = "Protest to the League of Nations"
+		add_opinion = { target = scope:remilitarizer value = -25 name = "Broke the treaty" }
+		ai_chance = { factor = 4 modifier = { factor = 2 ai_archetype = status_quo } modifier = { factor = 0.4 ai_aggression >= 1.4 } }
+	}
+	option = {
+		name = "Demand the troops are withdrawn - or it is war"
+		trigger = { can_declare_war_on = scope:remilitarizer }
+		declare_war = scope:remilitarizer
+		ai_chance = {
+			factor = 0.05
+			modifier = { factor = 60 stronger_than = { target = scope:remilitarizer ratio = 1.6 } NOT = { is_at_war = yes } ai_aggression >= 0.8 }
+			modifier = { factor = 3 ai_archetype = aggressive stronger_than = { target = scope:remilitarizer ratio = 1.2 } }
+			modifier = { factor = 0.3 ai_isolation >= 1.5 }
+		}
+	}
+	option = {
+		name = "Do nothing"
+		ai_chance = { factor = 3 modifier = { factor = 2 ai_isolation >= 1.2 } modifier = { factor = 2 ai_archetype = passive } }
+	}
+}

@@ -6,3 +6,5 @@
 #                        overlord losing a war and the tribute; at 50 the subject may fight a War of Independence.
 client_state = { name = "Client State" income_share = 0.10 joins_overlord_wars = yes liberty_desire = 0 }
 tributary = { name = "Tributary" income_share = 0.25 joins_overlord_wars = no liberty_desire = 10 }
+dominion = { name = "Dominion" income_share = 0.0 joins_overlord_wars = yes liberty_desire = -25 counts_as_relation = no }
+colony = { name = "Colony or Raj" income_share = 0.15 joins_overlord_wars = yes liberty_desire = -40 counts_as_relation = no }

@@ -103,16 +103,16 @@ public static partial class Builtins
             if (ctx.This is State st) st.Manpower += s.ResolveNumber(n.Value, ctx);
             else if (NeedCountry(ctx, n) is { } c) c.Manpower += s.ResolveNumber(n.Value, ctx);
         }, (ctx, n) => $"Manpower: {ScriptEngine.FormatSigned(s.ResolveNumber(n.Value, ctx))}");
-        s.RegisterEffect("set_country_name", (ctx, n) => { if (NeedCountry(ctx, n) is { } c) { c.Name = n.Value != null ? game.Events.FormatText(n.Value, ctx) : c.DefaultName; game.RaiseMapChanged(); } },
+        s.RegisterEffect("set_country_name", (ctx, n) => { if (NeedCountry(ctx, n) is { } c) { c.Name = n.Value != null ? game.Events.FormatText(n.Value, ctx) : c.DefaultName; c.Vars.SetFlag("name_scripted"); game.RaiseMapChanged(); } },
             (ctx, n) => $"Country is renamed to {Localisation.Get(n.Value ?? "")}");
-        s.RegisterEffect("reset_country_name", (ctx, n) => { if (NeedCountry(ctx, n) is { } c) c.Name = c.DefaultName; }, (ctx, n) => "Country name is reset");
+        s.RegisterEffect("reset_country_name", (ctx, n) => { if (NeedCountry(ctx, n) is { } c) { c.Name = c.DefaultName; c.Vars.ClearFlag("name_scripted"); game.RefreshName(c); } }, (ctx, n) => "Country name is reset");
         s.RegisterEffect("set_country_color", (ctx, n) =>
         {
             if (NeedCountry(ctx, n) is not { } c) return;
-            if (Rgb.TryParse(n, out var col)) { c.Color = col; game.RaiseMapChanged(); }
+            if (Rgb.TryParse(n, out var col)) { c.Color = col; c.Vars.SetFlag("color_scripted"); game.RaiseMapChanged(); }
             else Log.ErrorOnce("color:" + n.Location, "set_country_color needs a color like { 255 0 0 } or \"FF0000\"", n.Location);
         }, (ctx, n) => "Country color changes");
-        s.RegisterEffect("reset_country_color", (ctx, n) => { if (NeedCountry(ctx, n) is { } c) { c.Color = c.DefaultColor; game.RaiseMapChanged(); } }, (ctx, n) => "Country color is reset");
+        s.RegisterEffect("reset_country_color", (ctx, n) => { if (NeedCountry(ctx, n) is { } c) { c.Color = c.DefaultColor; c.Vars.ClearFlag("color_scripted"); game.RefreshName(c); game.RaiseMapChanged(); } }, (ctx, n) => "Country color is reset");
         EffectFn setFlagImage = (ctx, n) => { if (NeedCountry(ctx, n) is { } c) c.FlagPath = n.Value ?? c.DefaultFlagPath; };
         s.RegisterEffect("set_flag_image", setFlagImage, (ctx, n) => "Country flag changes");
         s.RegisterEffect("set_country_banner", setFlagImage, (ctx, n) => "Country flag changes");

@@ -80,6 +80,12 @@ public static class WorldLoader
                     c.Names.Female.AddRange(names.GetList("female"));
                     c.Names.Family.AddRange(names.GetList("family"));
                 }
+                if (n.Get("country_names") is { Children: not null } variants)
+                    foreach (var v in variants.All)
+                        if (v.Value != null) c.NameVariants[v.Key] = v.Value;
+                if (n.Get("country_colors") is { Children: not null } colors)
+                    foreach (var v in colors.All)
+                        if (Rgb.TryParse(v, out var vc)) c.ColorVariants[v.Key] = vc;
                 foreach (var f in n.GetList("flags")) c.Vars.SetFlag(f);
                 world.Countries.Add(c);
                 world.CountryByTag[tag] = c;
@@ -316,6 +322,12 @@ public static class WorldLoader
                             if (a != null && b != null) R.AddOpinion(a, b, n.GetString("name") ?? "Historical", n.GetDouble("value"), n.GetDouble("decay", 0));
                             break;
                         }
+                    case "pact":
+                        {
+                            var a = Get("first"); var b = Get("second");
+                            if (a != null && b != null) R.AddPact(a, b, GameDate.Parse(n.GetString("until") ?? "", w.Date.AddYears(5)));
+                            break;
+                        }
                     case "truce":
                         {
                             var a = Get("first"); var b = Get("second");
@@ -334,7 +346,7 @@ public static class WorldLoader
                             break;
                         }
                     default:
-                        Log.Error($"Unknown diplomacy entry '{n.Key}' (alliance, military_access, guarantee, subject, opinion, truce, war)", n.Location);
+                        Log.Error($"Unknown diplomacy entry '{n.Key}' (alliance, military_access, guarantee, pact, subject, opinion, truce, war)", n.Location);
                         break;
                 }
             }

@@ -1,0 +1,54 @@
+# National focuses (focus feature). A focus is a goal a country works toward for some days; its reward is not a script of events, only a push.
+# House rules for the trees of this game (Burger's lint lists breaches): no date checks (what lets a country take a focus, or the AI choose it, is the
+# situation of the country and the world - never the clock), and no war or conquest effects: a focus may make a demand (make_demand), whose acceptance
+# is the other country's decision under the diplomatic action's own rules. The AI picks by ai_will_do; the weights of a historical tree are
+# scaled by the Historical Bias in the rule FocusRules.AiWeight (at bias 0 only generic reasons are left).
+
+tree_default = {
+	default = yes
+
+	focus = { id = industrial_base days = 70 x = 0 y = 0
+		name = "Industrial Base" desc = "Put the state behind building factories and railways."
+		completion_reward = { add_modifier = { name = industrial_drive years = 5 } }
+		ai_will_do = { base = 1.5 modifier = { add = 1 num_of_states >= 6 } modifier = { factor = 0.5 is_at_war = yes } } }
+	focus = { id = science_academy days = 70 x = 1 y = 0
+		name = "Scientific Drive" desc = "Fund universities and laboratories."
+		prerequisite = { focus = industrial_base }
+		completion_reward = { add_modifier = { name = scientific_drive years = 6 } }
+		ai_will_do = { base = 1 modifier = { add = 1 num_of_states >= 10 } } }
+	focus = { id = national_unity days = 70 x = 2 y = 0
+		name = "National Unity" desc = "Bind the nation to its government."
+		completion_reward = { add_modifier = { name = national_unity years = 5 } add_stability = 3 }
+		ai_will_do = { base = 0.5 modifier = { add = 3 stability < 45 } modifier = { add = 1.5 war_exhaustion > 4 } } }
+	focus = { id = army_reform days = 70 x = 0 y = 1
+		name = "Army Reform" desc = "Modernise recruitment and training."
+		prerequisite = { focus = industrial_base }
+		completion_reward = { add_modifier = { name = army_reform_programme years = 6 } }
+		ai_will_do = { base = 1 modifier = { add = 2 ai_aggression >= 1.2 } modifier = { add = 1.5 any_neighbor_country = { stronger_than = { target = ROOT ratio = 1.4 } ideological_enemy = ROOT } } modifier = { factor = 0.5 ai_isolation >= 1.5 } } }
+	focus = { id = rearm days = 100 x = 0 y = 2
+		name = "Rearmament" desc = "Put the economy and the manpower of the nation behind the army."
+		prerequisite = { focus = army_reform }
+		completion_reward = { add_modifier = { name = rearmament years = 6 } set_law = extensive_conscription }
+		ai_will_do = { base = 0.5 modifier = { add = 3 ai_aggression >= 1.2 } modifier = { add = 2 ruling_ideology = fascist } modifier = { add = 1.5 ruling_ideology = communist }
+			modifier = { add = 2 any_neighbor_country = { stronger_than = { target = ROOT ratio = 1.4 } ideological_enemy = ROOT } } } }
+	focus = { id = state_economy days = 70 x = 1 y = 1
+		name = "Economic Stimulus" desc = "Public works against hard times."
+		prerequisite = { focus = industrial_base }
+		completion_reward = { add_modifier = { name = economic_stimulus years = 3 } add_stability = 2 }
+		ai_will_do = { base = 1 modifier = { add = 2 stability < 50 } } }
+	focus = { id = reformed_state days = 70 x = 2 y = 1
+		name = "Reform the State" desc = "Streamline the administration."
+		prerequisite = { focus = national_unity }
+		completion_reward = { add_modifier = { name = reformed_state years = 8 } }
+		ai_will_do = { base = 1 } }
+	focus = { id = air_power days = 80 x = 1 y = 2
+		name = "Air Power" desc = "Build an air force."
+		prerequisite = { focus = army_reform focus = science_academy }
+		completion_reward = { add_modifier = { name = air_programme years = 6 } }
+		ai_will_do = { base = 0.5 modifier = { add = 1 ai_aggression >= 1.0 } } }
+	focus = { id = naval_programme days = 80 x = 2 y = 2
+		name = "Naval Programme" desc = "Build a navy to guard the coasts and the trade."
+		prerequisite = { focus = industrial_base }
+		completion_reward = { add_modifier = { name = naval_expansion years = 6 } }
+		ai_will_do = { base = 0.3 modifier = { add = 1.5 ai_isolation < 1.0 num_of_states >= 8 } } }
+}

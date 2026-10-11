@@ -1,0 +1,745 @@
+# Leaders of 1930 (characters feature). Each is the ruler of the country that names him.
+# Stats 1-10: martial, finesse (diplomacy and administration), charisma, zeal.
+
+ramsay_macdonald = {
+	first_name = "Ramsay"
+	family = "MacDonald"
+	birth_date = 1866.10.12
+	country = ENG
+	martial = 3 finesse = 6 charisma = 7 zeal = 5
+	traits = { charismatic }
+}
+andre_tardieu = {
+	first_name = "Andre"
+	family = "Tardieu"
+	birth_date = 1876.9.22
+	country = FRA
+	martial = 4 finesse = 7 charisma = 6 zeal = 5
+	traits = { ambitious }
+}
+joseph_stalin = {
+	first_name = "Joseph"
+	family = "Stalin"
+	birth_date = 1878.12.18
+	country = SOV
+	martial = 5 finesse = 8 charisma = 6 zeal = 9
+	traits = { paranoid cruel ambitious }
+}
+herbert_hoover = {
+	first_name = "Herbert"
+	family = "Hoover"
+	birth_date = 1874.8.10
+	country = USA
+	martial = 3 finesse = 7 charisma = 4 zeal = 6
+	traits = { diligent honest }
+}
+heinrich_bruening = {
+	first_name = "Heinrich"
+	family = "Bruning"
+	birth_date = 1885.11.26
+	country = GER
+	martial = 4 finesse = 8 charisma = 4 zeal = 6
+	traits = { diligent }
+}
+benito_mussolini = {
+	first_name = "Benito"
+	family = "Mussolini"
+	birth_date = 1883.7.29
+	country = ITA
+	martial = 4 finesse = 6 charisma = 8 zeal = 8
+	traits = { ambitious charismatic }
+}
+hirohito = {
+	first_name = "Hirohito"
+	family = "of Japan"
+	birth_date = 1901.4.29
+	country = JAP
+	martial = 4 finesse = 5 charisma = 5 zeal = 6
+	traits = { cautious }
+}
+chiang_kai_shek = {
+	first_name = "Chiang"
+	family = "Kai-shek"
+	birth_date = 1887.10.31
+	country = CHI
+	martial = 7 finesse = 6 charisma = 6 zeal = 8
+	traits = { ambitious paranoid }
+}
+jozef_pilsudski = {
+	first_name = "Jozef"
+	family = "Pilsudski"
+	birth_date = 1867.12.5
+	country = POL
+	martial = 8 finesse = 7 charisma = 9 zeal = 8
+	traits = { tactician charismatic }
+}
+mustafa_kemal = {
+	first_name = "Mustafa Kemal"
+	family = "Ataturk"
+	birth_date = 1881.5.19
+	country = TUR
+	martial = 9 finesse = 8 charisma = 9 zeal = 8
+	traits = { tactician charismatic ambitious }
+}
+alfonso_xiii = {
+	first_name = "Alfonso"
+	family = "de Borbon"
+	birth_date = 1886.5.17
+	country = SPA
+	martial = 4 finesse = 4 charisma = 6 zeal = 5
+	traits = { lazy }
+}
+oscar_carmona = {
+	first_name = "Oscar"
+	family = "Carmona"
+	birth_date = 1869.11.24
+	country = POR
+	martial = 6 finesse = 5 charisma = 5 zeal = 6
+	traits = { cautious }
+}
+iuliu_maniu = {
+	first_name = "Iuliu"
+	family = "Maniu"
+	birth_date = 1873.1.8
+	country = ROM
+	martial = 3 finesse = 7 charisma = 7 zeal = 7
+	traits = { honest }
+}
+alexander_i = {
+	first_name = "Alexander"
+	family = "Karadjordjevic"
+	birth_date = 1888.12.16
+	country = YUG
+	martial = 7 finesse = 6 charisma = 6 zeal = 7
+	traits = { brave }
+}
+tomas_masaryk = {
+	first_name = "Tomas"
+	family = "Masaryk"
+	birth_date = 1850.3.7
+	country = CZE
+	martial = 4 finesse = 9 charisma = 8 zeal = 7
+	traits = { honest just }
+}
+miklos_horthy = {
+	first_name = "Miklos"
+	family = "Horthy"
+	birth_date = 1868.6.18
+	country = HUN
+	martial = 8 finesse = 6 charisma = 6 zeal = 6
+	traits = { brave }
+}
+johann_schober = {
+	first_name = "Johann"
+	family = "Schober"
+	birth_date = 1874.11.14
+	country = AUS
+	martial = 4 finesse = 7 charisma = 5 zeal = 5
+	traits = { diligent }
+}
+albert_i = {
+	first_name = "Albert"
+	family = "of Belgium"
+	birth_date = 1875.4.8
+	country = BEL
+	martial = 7 finesse = 6 charisma = 8 zeal = 6
+	traits = { brave just }
+}
+wilhelmina = {
+	first_name = "Wilhelmina"
+	family = "of Orange-Nassau"
+	birth_date = 1880.8.31
+	country = HOL
+	female = yes
+	martial = 3 finesse = 6 charisma = 8 zeal = 7
+	traits = { just }
+}
+gustaf_v = {
+	first_name = "Gustaf"
+	family = "Bernadotte"
+	birth_date = 1858.6.16
+	country = SWE
+	martial = 3 finesse = 5 charisma = 6 zeal = 5
+	traits = { cautious }
+}
+haakon_vii = {
+	first_name = "Haakon"
+	family = "of Norway"
+	birth_date = 1872.8.3
+	country = NOR
+	martial = 3 finesse = 6 charisma = 8 zeal = 6
+	traits = { just }
+}
+christian_x = {
+	first_name = "Christian"
+	family = "of Denmark"
+	birth_date = 1870.9.26
+	country = DEN
+	martial = 4 finesse = 5 charisma = 7 zeal = 6
+	traits = { honest }
+}
+svinhufvud = {
+	first_name = "Pehr Evind"
+	family = "Svinhufvud"
+	birth_date = 1861.12.15
+	country = FIN
+	martial = 4 finesse = 6 charisma = 6 zeal = 8
+	traits = { honest }
+}
+konstantin_paets = {
+	first_name = "Konstantin"
+	family = "Paets"
+	birth_date = 1874.2.23
+	country = EST
+	martial = 3 finesse = 7 charisma = 6 zeal = 6
+	traits = { diligent }
+}
+karlis_ulmanis = {
+	first_name = "Karlis"
+	family = "Ulmanis"
+	birth_date = 1877.9.4
+	country = LAT
+	martial = 3 finesse = 7 charisma = 7 zeal = 7
+	traits = { ambitious }
+}
+antanas_smetona = {
+	first_name = "Antanas"
+	family = "Smetona"
+	birth_date = 1874.8.10
+	country = LIT
+	martial = 3 finesse = 7 charisma = 6 zeal = 7
+	traits = { ambitious }
+}
+jean_marie_musy = {
+	first_name = "Jean-Marie"
+	family = "Musy"
+	birth_date = 1876.4.10
+	country = SWI
+	martial = 3 finesse = 7 charisma = 5 zeal = 6
+	traits = { cautious }
+}
+wt_cosgrave = {
+	first_name = "William"
+	family = "Cosgrave"
+	birth_date = 1880.6.6
+	country = IRE
+	martial = 5 finesse = 7 charisma = 6 zeal = 6
+	traits = { diligent }
+}
+tryggvi_thorhallsson = {
+	first_name = "Tryggvi"
+	family = "Thorhallsson"
+	birth_date = 1889.2.9
+	country = ICE
+	martial = 2 finesse = 6 charisma = 5 zeal = 5
+}
+charlotte = {
+	first_name = "Charlotte"
+	family = "of Luxembourg"
+	birth_date = 1896.1.23
+	country = LUX
+	female = yes
+	martial = 2 finesse = 5 charisma = 7 zeal = 5
+}
+mackenzie_king = {
+	first_name = "William Lyon"
+	family = "Mackenzie King"
+	birth_date = 1874.12.17
+	country = CAN
+	martial = 3 finesse = 8 charisma = 5 zeal = 5
+	traits = { cautious }
+}
+james_scullin = {
+	first_name = "James"
+	family = "Scullin"
+	birth_date = 1876.9.18
+	country = AST
+	martial = 3 finesse = 6 charisma = 6 zeal = 6
+}
+joseph_ward = {
+	first_name = "Joseph"
+	family = "Ward"
+	birth_date = 1856.4.26
+	country = NZL
+	martial = 3 finesse = 6 charisma = 6 zeal = 5
+}
+jbm_hertzog = {
+	first_name = "James Barry Munnik"
+	family = "Hertzog"
+	birth_date = 1866.4.3
+	country = SAF
+	martial = 5 finesse = 6 charisma = 6 zeal = 7
+	traits = { zealous }
+}
+richard_squires = {
+	first_name = "Richard"
+	family = "Squires"
+	birth_date = 1880.1.18
+	country = NFL
+	martial = 2 finesse = 5 charisma = 6 zeal = 5
+}
+venizelos = {
+	first_name = "Eleftherios"
+	family = "Venizelos"
+	birth_date = 1864.8.23
+	country = GRE
+	martial = 6 finesse = 9 charisma = 9 zeal = 7
+	traits = { charismatic ambitious }
+}
+boris_iii = {
+	first_name = "Boris"
+	family = "of Bulgaria"
+	birth_date = 1894.1.30
+	country = BUL
+	martial = 5 finesse = 7 charisma = 7 zeal = 6
+	traits = { cautious }
+}
+zog = {
+	first_name = "Ahmet"
+	family = "Zogu"
+	birth_date = 1895.10.8
+	country = ALB
+	martial = 5 finesse = 6 charisma = 5 zeal = 6
+	traits = { paranoid }
+}
+heinrich_sahm = {
+	first_name = "Heinrich"
+	family = "Sahm"
+	birth_date = 1877.9.12
+	country = DNZ
+	martial = 2 finesse = 7 charisma = 5 zeal = 5
+}
+washington_luis = {
+	first_name = "Washington"
+	family = "Luis"
+	birth_date = 1869.10.26
+	country = BRA
+	martial = 3 finesse = 6 charisma = 5 zeal = 5
+}
+hipolito_yrigoyen = {
+	first_name = "Hipolito"
+	family = "Yrigoyen"
+	birth_date = 1852.7.12
+	country = ARG
+	martial = 2 finesse = 5 charisma = 7 zeal = 7
+	traits = { sickly }
+}
+carlos_ibanez = {
+	first_name = "Carlos"
+	family = "Ibanez"
+	birth_date = 1877.11.3
+	country = CHL
+	martial = 7 finesse = 6 charisma = 6 zeal = 7
+	traits = { ambitious }
+}
+ortiz_rubio = {
+	first_name = "Pascual"
+	family = "Ortiz Rubio"
+	birth_date = 1877.3.10
+	country = MEX
+	martial = 4 finesse = 5 charisma = 5 zeal = 5
+}
+abadia_mendez = {
+	first_name = "Miguel"
+	family = "Abadia Mendez"
+	birth_date = 1867.7.5
+	country = COL
+	martial = 2 finesse = 5 charisma = 5 zeal = 5
+}
+juan_vicente_gomez = {
+	first_name = "Juan Vicente"
+	family = "Gomez"
+	birth_date = 1857.7.24
+	country = VEN
+	martial = 6 finesse = 7 charisma = 6 zeal = 7
+	traits = { cruel paranoid }
+}
+augusto_leguia = {
+	first_name = "Augusto"
+	family = "Leguia"
+	birth_date = 1863.2.19
+	country = PRU
+	martial = 3 finesse = 7 charisma = 6 zeal = 6
+	traits = { ambitious }
+}
+hernando_siles = {
+	first_name = "Hernando"
+	family = "Siles"
+	birth_date = 1882.8.5
+	country = BOL
+	martial = 3 finesse = 6 charisma = 5 zeal = 6
+}
+isidro_ayora = {
+	first_name = "Isidro"
+	family = "Ayora"
+	birth_date = 1879.8.31
+	country = ECU
+	martial = 3 finesse = 6 charisma = 5 zeal = 6
+}
+jose_guggiari = {
+	first_name = "Jose"
+	family = "Guggiari"
+	birth_date = 1884.4.3
+	country = PAR
+	martial = 3 finesse = 5 charisma = 5 zeal = 5
+}
+juan_campisteguy = {
+	first_name = "Juan"
+	family = "Campisteguy"
+	birth_date = 1859.2.26
+	country = URU
+	martial = 2 finesse = 5 charisma = 5 zeal = 5
+}
+gerardo_machado = {
+	first_name = "Gerardo"
+	family = "Machado"
+	birth_date = 1869.9.28
+	country = CUB
+	martial = 5 finesse = 6 charisma = 5 zeal = 7
+	traits = { cruel }
+}
+lazaro_chacon = {
+	first_name = "Lazaro"
+	family = "Chacon"
+	birth_date = 1873.5.2
+	country = GUA
+	martial = 5 finesse = 4 charisma = 4 zeal = 4
+}
+mejia_colindres = {
+	first_name = "Vicente"
+	family = "Mejia Colindres"
+	birth_date = 1878.4.6
+	country = HON
+	martial = 2 finesse = 5 charisma = 5 zeal = 5
+}
+romero_bosque = {
+	first_name = "Pio"
+	family = "Romero Bosque"
+	birth_date = 1860.5.16
+	country = ELS
+	martial = 2 finesse = 5 charisma = 5 zeal = 5
+}
+jose_moncada = {
+	first_name = "Jose Maria"
+	family = "Moncada"
+	birth_date = 1870.12.26
+	country = NIC
+	martial = 5 finesse = 5 charisma = 5 zeal = 5
+}
+gonzalez_viquez = {
+	first_name = "Cleto"
+	family = "Gonzalez Viquez"
+	birth_date = 1858.4.22
+	country = COS
+	martial = 2 finesse = 5 charisma = 5 zeal = 5
+}
+arosemena = {
+	first_name = "Florencio"
+	family = "Arosemena"
+	birth_date = 1873.8.20
+	country = PAN
+	martial = 2 finesse = 5 charisma = 5 zeal = 5
+}
+stenio_vincent = {
+	first_name = "Stenio"
+	family = "Vincent"
+	birth_date = 1874.2.22
+	country = HAI
+	martial = 3 finesse = 6 charisma = 6 zeal = 5
+}
+horacio_vasquez = {
+	first_name = "Horacio"
+	family = "Vasquez"
+	birth_date = 1860.12.14
+	country = DOM
+	martial = 3 finesse = 5 charisma = 5 zeal = 5
+}
+reza_shah = {
+	first_name = "Reza"
+	family = "Pahlavi"
+	birth_date = 1878.3.15
+	country = PER
+	martial = 8 finesse = 6 charisma = 7 zeal = 8
+	traits = { cruel ambitious }
+}
+nadir_shah = {
+	first_name = "Mohammed Nadir"
+	family = "Shah"
+	birth_date = 1883.4.9
+	country = AFG
+	martial = 7 finesse = 6 charisma = 6 zeal = 7
+	traits = { cautious }
+}
+ibn_saud = {
+	first_name = "Abdulaziz"
+	family = "ibn Saud"
+	birth_date = 1875.1.15
+	country = SAU
+	martial = 8 finesse = 7 charisma = 9 zeal = 8
+	traits = { tactician charismatic }
+}
+imam_yahya = {
+	first_name = "Yahya"
+	family = "Muhammad Hamid ed-Din"
+	birth_date = 1869.6.19
+	country = YEM
+	martial = 5 finesse = 6 charisma = 5 zeal = 8
+	traits = { cautious }
+}
+said_bin_taimur = {
+	first_name = "Said"
+	family = "bin Taimur"
+	birth_date = 1910.8.13
+	country = OMA
+	martial = 3 finesse = 5 charisma = 5 zeal = 5
+}
+haile_selassie = {
+	first_name = "Haile"
+	family = "Selassie"
+	birth_date = 1892.7.23
+	country = ETH
+	martial = 5 finesse = 8 charisma = 8 zeal = 8
+	traits = { charismatic }
+}
+prajadhipok = {
+	first_name = "Prajadhipok"
+	family = "of Siam"
+	birth_date = 1893.11.8
+	country = SIA
+	martial = 3 finesse = 6 charisma = 6 zeal = 5
+}
+juddha_shamsher = {
+	first_name = "Juddha"
+	family = "Shamsher Rana"
+	birth_date = 1875.4.9
+	country = NEP
+	martial = 4 finesse = 5 charisma = 5 zeal = 5
+}
+jigme_wangchuck = {
+	first_name = "Jigme"
+	family = "Wangchuck"
+	birth_date = 1905.5.20
+	country = BHU
+	martial = 3 finesse = 5 charisma = 5 zeal = 5
+}
+dalai_lama_13 = {
+	first_name = "Thubten"
+	family = "Gyatso"
+	birth_date = 1876.2.27
+	country = TIB
+	martial = 3 finesse = 8 charisma = 8 zeal = 9
+	traits = { zealous }
+}
+jin_shuren = {
+	first_name = "Jin"
+	family = "Shuren"
+	birth_date = 1879.6.5
+	country = SIK
+	martial = 5 finesse = 5 charisma = 4 zeal = 5
+	traits = { paranoid }
+}
+peljidiin_genden = {
+	first_name = "Peljidiin"
+	family = "Genden"
+	birth_date = 1892.1.13
+	country = MON
+	martial = 3 finesse = 6 charisma = 6 zeal = 8
+}
+salchak_toka = {
+	first_name = "Salchak"
+	family = "Toka"
+	birth_date = 1901.8.4
+	country = TAN
+	martial = 3 finesse = 5 charisma = 5 zeal = 8
+}
+charles_king = {
+	first_name = "Charles"
+	family = "King"
+	birth_date = 1875.3.12
+	country = LIB
+	martial = 2 finesse = 5 charisma = 5 zeal = 5
+}
+lord_irwin = {
+	first_name = "Edward"
+	family = "Wood, Lord Irwin"
+	birth_date = 1881.4.16
+	country = RAJ
+	martial = 4 finesse = 7 charisma = 6 zeal = 6
+	traits = { just }
+}
+adolf_hitler = {
+	first_name = "Adolf"
+	family = "Hitler"
+	birth_date = 1889.4.20
+	country = GER
+	martial = 5 finesse = 7 charisma = 9 zeal = 10
+	traits = { charismatic paranoid ambitious }
+}
+paul_von_hindenburg = {
+	first_name = "Paul"
+	family = "von Hindenburg"
+	birth_date = 1847.10.2
+	country = GER
+	martial = 9 finesse = 4 charisma = 7 zeal = 5
+	traits = { tactician }
+}
+ernst_thaelmann = {
+	first_name = "Ernst"
+	family = "Thaelmann"
+	birth_date = 1886.4.16
+	country = GER
+	martial = 2 finesse = 4 charisma = 6 zeal = 9
+	traits = { zealous }
+}
+kurt_von_schleicher = {
+	first_name = "Kurt"
+	family = "von Schleicher"
+	birth_date = 1882.4.7
+	country = GER
+	martial = 5 finesse = 8 charisma = 4 zeal = 5
+	traits = { ambitious }
+}
+leon_trotsky = {
+	first_name = "Leon"
+	family = "Trotsky"
+	birth_date = 1879.11.7
+	country = SOV
+	martial = 7 finesse = 8 charisma = 9 zeal = 9
+	traits = { charismatic }
+}
+georgy_zhukov = {
+	first_name = "Georgy"
+	family = "Zhukov"
+	birth_date = 1896.12.1
+	country = SOV
+	martial = 9 finesse = 4 charisma = 5 zeal = 6
+	traits = { tactician brave }
+}
+mikhail_tukhachevsky = {
+	first_name = "Mikhail"
+	family = "Tukhachevsky"
+	birth_date = 1893.2.16
+	country = SOV
+	martial = 8 finesse = 6 charisma = 6 zeal = 6
+	traits = { tactician }
+}
+winston_churchill = {
+	first_name = "Winston"
+	family = "Churchill"
+	birth_date = 1874.11.30
+	country = ENG
+	martial = 5 finesse = 8 charisma = 9 zeal = 8
+	traits = { charismatic ambitious }
+}
+oswald_mosley = {
+	first_name = "Oswald"
+	family = "Mosley"
+	birth_date = 1896.11.16
+	country = ENG
+	martial = 3 finesse = 6 charisma = 7 zeal = 8
+	traits = { charismatic }
+}
+charles_de_gaulle = {
+	first_name = "Charles"
+	family = "de Gaulle"
+	birth_date = 1890.11.22
+	country = FRA
+	martial = 7 finesse = 6 charisma = 6 zeal = 8
+	traits = { tactician }
+}
+maurice_gamelin = {
+	first_name = "Maurice"
+	family = "Gamelin"
+	birth_date = 1872.9.20
+	country = FRA
+	martial = 5 finesse = 5 charisma = 5 zeal = 4
+	traits = { cautious }
+}
+mao_zedong = {
+	first_name = "Mao"
+	family = "Zedong"
+	birth_date = 1893.12.26
+	country = CHI
+	martial = 7 finesse = 8 charisma = 8 zeal = 9
+	traits = { charismatic }
+}
+hideki_tojo = {
+	first_name = "Hideki"
+	family = "Tojo"
+	birth_date = 1884.12.30
+	country = JAP
+	martial = 6 finesse = 6 charisma = 4 zeal = 8
+	traits = { diligent }
+}
+isoroku_yamamoto = {
+	first_name = "Isoroku"
+	family = "Yamamoto"
+	birth_date = 1884.4.4
+	country = JAP
+	martial = 7 finesse = 7 charisma = 6 zeal = 6
+	traits = { tactician }
+}
+francisco_franco = {
+	first_name = "Francisco"
+	family = "Franco"
+	birth_date = 1892.12.4
+	country = SPA
+	martial = 7 finesse = 6 charisma = 5 zeal = 7
+	traits = { cautious }
+}
+dwight_eisenhower = {
+	first_name = "Dwight"
+	family = "Eisenhower"
+	birth_date = 1890.10.14
+	country = USA
+	martial = 7 finesse = 8 charisma = 8 zeal = 5
+	traits = { diligent }
+}
+douglas_macarthur = {
+	first_name = "Douglas"
+	family = "MacArthur"
+	birth_date = 1880.1.26
+	country = USA
+	martial = 8 finesse = 6 charisma = 8 zeal = 7
+	traits = { brave }
+}
+franklin_roosevelt = {
+	first_name = "Franklin"
+	family = "Roosevelt"
+	birth_date = 1882.1.30
+	country = USA
+	martial = 3 finesse = 9 charisma = 10 zeal = 7
+	traits = { charismatic }
+}
+rodolfo_graziani = {
+	first_name = "Rodolfo"
+	family = "Graziani"
+	birth_date = 1882.8.11
+	country = ITA
+	martial = 6 finesse = 3 charisma = 4 zeal = 7
+	traits = { cruel }
+}
+pietro_badoglio = {
+	first_name = "Pietro"
+	family = "Badoglio"
+	birth_date = 1871.9.28
+	country = ITA
+	martial = 6 finesse = 5 charisma = 5 zeal = 4
+	traits = { cautious }
+}
+carl_gustaf_mannerheim = {
+	first_name = "Carl Gustaf"
+	family = "Mannerheim"
+	birth_date = 1867.6.4
+	country = FIN
+	martial = 8 finesse = 7 charisma = 8 zeal = 7
+	traits = { tactician }
+}
+ion_antonescu = {
+	first_name = "Ion"
+	family = "Antonescu"
+	birth_date = 1882.6.15
+	country = ROM
+	martial = 6 finesse = 5 charisma = 4 zeal = 7
+	traits = { ambitious }
+}

@@ -3,7 +3,7 @@ using Burger.Core.Model;
 namespace Burger.Runtime;
 
 /// <summary>Panels on the left: your own country's menus (left menu bar) and the location/country you clicked.</summary>
-public enum LeftPanel { None, Location, Country, Military, Recruit, Characters, Decisions, Custom, Production, Designer, Navy, Air, Politics, Population }
+public enum LeftPanel { None, Location, Country, Military, Recruit, Characters, Decisions, Custom, Production, Designer, Navy, Air, Politics, Population, Technology, Focus }
 /// <summary>Panels on the right: world-wide overviews opened from the top right.</summary>
 public enum RightPanel { None, Wars, Peace, World, Ledger }
 /// <summary>Battle plan drawing tools: front segment, offensive arrow, fallback line.</summary>
@@ -22,6 +22,7 @@ public sealed class PeaceDraft
     public bool FreeSubjects;   // independence for the loser's subjects that fight with the winner
     public bool RegimeChange;   // put the winner's ideology in power
     public bool Humiliate;
+    public HashSet<State> Demilitarize = new(); // states of the loser that are demilitarized (demilitarization feature)
     public HashSet<string> Release = new(); // peoples of the loser to free (cultures)
 }
 
@@ -48,6 +49,7 @@ public sealed class UiState
     public bool ErrorsOpen;
     public bool EditorActive;
     public bool PauseMenuOpen;
+    public bool SettingsOpen;
     public bool SaveMenuOpen;
     public PeaceDraft? Peace;
     public string Status = "";

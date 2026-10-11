@@ -111,12 +111,28 @@ GER = {                                   # tag: exactly 3 characters A-Z / 0-9
     ruler = ger_kaiser                    # character ids from history/characters
     heir = ger_crown_prince
     names = { male = { Otto Karl } female = { Luise } family = { "von Hohenzollern" } }  # for generated characters
+    country_names = {                     # the name follows the government and dependence (optional)
+        subject = "Dominion of Germany"   # while it is somebody's subject (or <ideology>_subject = ...)
+        democratic = "Weimar Republic"    # an ideology key: the name while that ideology rules
+        communist = "German Socialist Republic"
+        fascist = "German Reich"
+    }                                     # no entry: the name above
+    country_colors = {                    # the map color follows the government too (same keys as country_names)
+        communist = { 170 40 40 }         # a red Russia only under communists
+        democratic = { 96 128 176 }
+    }
+    culture_group_accepted = no           # population: do not accept every culture of the culture group (default yes)
 }
 ```
 
 Use the tag everywhere: `owner = GER`, `GER = { add_gold = 10 }`, `is_at_war_with = GER`, `c:GER`.
 During play, `set_country_name = "German Republic"`, `set_country_color = { 200 0 0 }` and
-`set_flag_image = "gfx/flags/GER_republic.png"` change the name, color and flag (`reset_...` restores them).
+`set_flag_image = "gfx/flags/GER_republic.png"` change the name, color and flag (`reset_...` restores them). A name set
+by a script stays until `reset_country_name`; otherwise `country_names` decides (order: `<ideology>_subject`, `subject`, the
+ruling ideology, the name above), at the start, when the government changes and when a country becomes or stops being a subject.
+`country_colors` works the same way for the map color (`set_country_color` pins it until `reset_country_color`); a country
+without an entry for its ideology gets the ideology's `country_color_blend = { color = { r g b } amount = 0.45 }` (the
+communist ideology tints towards red) applied to its original color.
 
 ---------------------------------------------------------------------------------------------------
 
@@ -199,6 +215,8 @@ A changed or vanished front takes its drawn front segment and attack arrow with 
 
 **Fog of war** (`fog_of_war` feature): land you cannot see is greyed out. The **Fog** button on the map mode bar (or the
 F key; `--no-fog-shading` on the command line) turns the shading off; enemy units you cannot see stay hidden.
+The **Units** button next to it (or the H key; `--no-units`) hides divisions, fleets, battles and order arrows for a
+clear look at the map.
 
 **Supply** (`supply_range` or `supply_hubs`): every day each country gets a supply map. *Range*: supply spreads
 from the capital and your own land, weaker with each step (rough terrain costs more, infrastructure less) and only
@@ -282,7 +300,24 @@ GER = {
 
 **Popularity drift** (monthly, `backend/Politics.cs` `MonthlyDrift`): modifiers named `IDEOLOGY_drift` and
 `ruling_party_drift` (points per month), propaganda of rulers without elections (`ruling_party_drift` define), lost
-wars, low or high stability, ideologies ruling the neighbours, and chance.
+wars, low or high stability, ideologies ruling the neighbours, and chance. War exhaustion wears the ruling party down
+(`war_exhaustion_drift`), core land in foreign hands helps extremists (`revanchism_drift`), and now and then a political
+crisis (`political_crisis_chance`, `political_crisis_swing`, `political_crisis_stability`) turns people to another
+ideology. No ideology takes a country over for good: above `dominance_threshold` (0.55) it loses support
+(`dominance_decay`), below `ideology_floor` (0.05) it wins some back, and neighbours add nothing to an idea four in ten
+already hold (`neighbour_drift_cap`). **Weak democracies**: where elections are held but stability is under
+`weak_democracy_stability` (40) or the parties in government have under `weak_democracy_support` (35%) support,
+ideologies with `weak_democracy_drift = 0.6` in common/ideologies (fascists) gain up to that much a month; under
+`democracy_coup_stability` (25) extremists may even take such a democracy by coup or civil war (rule `CanSeizePower`).
+The other way round, a country without elections that is wealthier than most wants a say: ideologies with elections
+gain `liberalisation_drift` (0.1 a month at twice the world's typical wealth, nothing at or below it).
+
+**Stability** moves towards 60 plus `stability_target`. Besides laws, ministers and buildings (rule `StabilitySources`):
+poverty (wealth per person compared to the world's median, rules `WealthPerPerson` and `WealthIndex`; up to
+`poverty_stability` -25 for the poorest, `prosperity_stability` +5 for the rich), a government whose parties have under
+`government_support_needed` (40%) support (`unpopular_government_stability`), core land in foreign hands
+(`lost_cores_stability` -5) and war exhaustion (`war_exhaustion_stability`, 1.5 a point).
+`burger validate <project> --days 36500` prints rulers and stability every ten years; `--seed N` plays another world.
 
 **Elections**: votes = popularity with a little chance; seats by D'Hondt among parties that are not banned and pass
 `election_threshold` (0.05). The biggest party that can form a majority with willing partners governs (coalition);
@@ -305,6 +340,12 @@ grows each month (faster with low stability, `movement_speed`) and revolts at 10
 suppress it (`suppress_movement_cost` political power, some stability). A shut-out ideology above `coup_threshold`
 (0.4) may seize power in a coup (`coup_chance` a month, likelier the more popular it is and the less popular the
 government and stability are); above `civil_war_threshold` (0.5) it may also start a civil war (`civil_war_chance`).
+Civil wars come from pressure (rule `UnrestPressure`, 0-1): low stability, worse in a poor country, or war exhaustion
+above `civil_war_exhaustion` (8). Under pressure a civil war needs less support (down to 20%) and is far likelier, and
+coups are rarer; a rich, stable country sees coups instead.
+A civil war never goes on for ever (rule `CivilWarVerdict`): a side far ahead in war score for `civil_war_decisive_months`
+(3, gap `civil_war_decisive_score` 40) wins, one clearly ahead (gap 15) after `civil_war_stalemate_months` (18) wins, and
+after `civil_war_max_months` (36) the side ahead takes the country (the government if even); the loser is annexed.
 A revolt is a coup instead of a civil war when the government's parties have less than `civil_war_loyal_share` (0.2)
 support or the rebels more than `coup_above` (0.75). After a coup or civil war, `revolt_calm_years` (5) pass before the
 next. A ruling party without elections keeps at least about `ruling_party_floor` (0.15) support. A civil war splits
@@ -398,6 +439,16 @@ back, or a new one forms (culture `country_name`, default "<Culture> Republic");
 (`independence_people_per_division`), part of the garrison defects (`independence_garrison_defect`) and it wins if it still
 holds half its land after `independence_war_months` (24). On actions: `on_independence_movement`, `on_independence_declared`,
 `on_independence` (scope: the new country, `scope:origin`).
+**Cultural ties** (rule `HasCulturalTies`): the country's own culture, a culture it accepts by name (never a whole culture
+group), or its cores. Land without ties is held by force alone: a country made a *puppet* in a peace deal does not keep
+what it conquered from others (colonies stay), and a country that had a homeland and has lost every state it has ties to
+(the mainland is taken) cannot keep its distant lands: they go to a country of their people or become countries of their
+own (`DissolveHoldings`, define `holdings_collapse`).
+What leaves is one block (rule `SeparatistRegion`, also used by the peace term that releases a people): the heartland
+(connected states where the people is the majority), the neighbouring states where it is a big minority
+(`separation_claim_share`, 30%, or half of the people of its culture group with 10% of its own), and the land the old country
+would be cut off from (it goes with them; in peace deals a people of its own gets it, else the release is refused). The
+capital state always stays.
 
 **Backend rules** (`backend/Population.cs`, class `GamePopulationRules`): the engine keeps the bookkeeping (pops, saves,
 when things run) and asks these rules for every decision, so a game can change them without touching the engine.
@@ -425,6 +476,73 @@ removes), `set_culture`, `add_accepted_culture`, `remove_accepted_culture`, `set
 
 ---------------------------------------------------------------------------------------------------
 
+## 4d. A historical scenario: technology, commodities, AI profiles, demilitarized zones, the scorecard
+
+These features were built for `projects/Earth1930` (1930-1950). Each is a feature package (`assets/features/<id>`), listed in `features.txt`, with its rules in a `backend/*.cs` copy you can edit.
+
+### Technology (`technology` feature)
+
+`common/technologies/*.txt` defines the tree. A technology has `category` (infantry artillery armor doctrine air naval industry), `year` (when it was historically available), `cost`, `requires = { ... }` and a `modifier` block:
+
+- `<stat>_factor = 0.05` changes that stat of every division of the country by 5% (`soft_attack`, `hard_attack`, `defense`, `breakthrough`, `armor`, `piercing`, `speed`, `max_organisation` ...). Division stats are the template's stat times `Country.StatFactor(stat)`.
+- Any other key is an ordinary country modifier (`production`, `construction_speed`, `research_speed`, `extraction`, `<commodity>_output`, `manpower`, `building_slots`, ...). `building_slots = 1` adds a slot to every state of the country.
+
+Unit types, ships, planes, equipment and buildings name the technologies they need with `requires_tech = { x y }`. A country that does not know them cannot recruit, design or build them, and the AI does not plan with them.
+
+`history/technologies.txt` gives each country a `lag` (years behind 1930; without an entry the rule `StartLag` uses industry). A country knows the technologies dated up to 1930 minus its lag. Research: `MonthlyPoints`, `Slots`, `Cost` (researching more than `research_ahead_years` early is not allowed; early research costs more) and `AiScore` (the AI weighs categories by the research weights of its profile) are overridable in `backend/Technology.cs`. The player researches in the Technology panel (key `T`).
+
+### Commodities (`commodities` feature)
+
+`common/commodities.txt` defines strategic goods (`price`, `civilian_use`); `history/commodities.txt` gives deposits per state (steel in 10,000 t, oil in 100,000 t, others in 1,000 t a year). Equipment, ships and planes list what they use per unit: `commodities = { steel = 0.02 }`. Each month a country's output, imports, exports and use are balanced; the share it can satisfy (`Balance.Satisfied`) slows every production line that needs the good (`CommoditySystem.Factor`, never below `commodity_floor`, 0.15). Trade goes to friends first (`WillTrade`, `TradePriority`: opinion, war and embargo decide). Shortages feed the AI: `NeedScore` and `ResourceMotive` make a country that lacks oil or steel want the states that have it (scaled by its readiness, aggression and expansion), and `Readiness` discounts a target whose land would fill the need.
+
+### AI profiles (`ai_profiles` feature)
+
+`common/ai_profiles/*.txt` holds archetypes (`archetype = yes`: aggressive, expansionist, opportunist, status_quo, defensive, isolationist, passive, imperial) and per-country historical profiles:
+
+```
+italy = {
+    countries = { ITA }
+    parent = expansionist
+    aggression = 1.4 expansion = 1.6 risk = 1.3 navy = 1.3
+    rivals = { YUG = 1.5 FRA = 1.2 }     # hostile to them
+    friends = { GER = 1.0 }              # courts them
+    want = { ETH = 3 ALB = 2.5 }         # wants their land
+    timing = { ETH = 1934 ALB = 1937 }   # the year each ambition awakens
+    ideology_hostility = { communist = 1 }
+    research = { naval = 1.3 }
+}
+```
+
+Traits are multipliers around 1. A country always has a generic archetype (rule `GenericArchetype`, from ideology and rank) and, if listed, a historical profile. The **Historical Bias** (0-1; the Settings slider, `historical_bias` in the user settings, `--bias` on the command line, `Game.HistoricalBias`) blends them through `HistoryWeight`: at 0 only the archetype and the scripted `ai_will_do` weights count; at 1 the profile's rivals, friends and wants add weight (`Motive`) to wars, claims, demands, alliances and guarantees. A motive never forces anything: it adds to the weight of an option, and the AI still needs `Readiness` (strength with allies against the target), `Affinity` (acceptance) and the usual random choice. Overridable in `backend/AiProfiles.cs`.
+
+### Demilitarized zones (`demilitarization` feature)
+
+A state flagged `Demilitarized` cannot be entered by armed forces and nothing can be raised in it. Start list: `history/demilitarized.txt` (`state = { by = TAG }`). It is imposed by a peace term (`Demilitarize`, in the peace window: select a state, press the button; the AI asks for it when the loser's neighbours are threatened - `WantsDemilitarized`), and it ends when its owner is at war (checked daily). The owner can remilitarize with the decision in `common/decisions`; the AI does so when `RemilitarizationOdds` (its strength with allies against the neighbours and the country that imposed it) is high enough. `on_state_remilitarized` is fired for the neighbours, who get the event in `events/demilitarization.txt` to challenge it. Scripts: effects `demilitarize_state` (state scope) and `remilitarize_states` (country scope); triggers `demilitarized` (state) and `has_demilitarized_states` (country); value `remilitarization_odds`.
+
+### National focuses (`focus` feature)
+
+`common/focuses/*.txt` holds focus trees (HOI4 style). A tree belongs to countries (`countries = { GER }`) or is the fallback (`default = yes`); each `focus = { ... }` has an `id` (unique across trees), `days`, grid position `x`/`y` for the panel (key `G`), `prerequisite = { focus = a focus = b }` (any one), `requires = { focus = a focus = b }` (all), `mutually_exclusive`, an `available` trigger, a `completion_reward` effect (ROOT is the country) and `ai_will_do` weights. A country works on one focus at a time; the idle AI picks one each month by weight (a weight of 0 means never; no `ai_will_do` means 1). `FocusRules` (`backend/Focus.cs`) sets the days (`focus_speed` modifier), how often the AI starts one, and `AiWeight` - a country's own tree is its history, so its weights count a quarter at Historical Bias 0 and in full at 1.
+
+Triggers: `has_completed_focus`, `is_working_on_focus`, value `num_of_focuses`, `can_demand = { target = TAG action = demand_state }` (the diplomatic action could be put now), `ai_ambition = { target = TAG min = 1 }` (the AI profile's `want` for that country, once its `timing` year has come). Effects: `make_demand = TAG` or `make_demand = { target = TAG action = demand_subjugation }` and `propose_action = { target = TAG action = offer_alliance }` put a diplomatic action to another country, which accepts or refuses by that action's own rules - a refusal is the action's business (`demand_state` goes to war on refusal), the focus does not declare it.
+
+The engine allows everything a trigger or effect can do, including `date` checks and `declare_war`. The Earth1930 trees follow stricter house rules, kept by `FocusSystem.Lint()` (the selftest runs it): no date checks (what lets a country take a focus, or the AI choose it, is its situation - strength, ideology, stability, war exhaustion, ambition) and no war or conquest effects (`declare_war`, `annex_country`, `transfer_state`, `set_owner`, `set_controller`, `white_peace`). Focuses guide a country - an economic drive, a political turn, a demand on a neighbour - they are not a substitute for its AI or its wars. `BURGER_FOCUS_LOG=1` prints every demand a focus puts.
+
+### The historical scorecard
+
+`projects/<name>/scorecard.txt` lists questions asked of every simulated world; they measure, they never make anything happen. Each line is `name = { kind = ... expect = low-high note = "..." }`; the hit rate over the worlds is compared with the `expect` band (wide where history was one possibility among several, narrow where it was heavily favoured; lines marked `given` are only asked in worlds where the war arose). Kinds: `ruling`, `ruling_not`, `ruling_ever`, `exists`, `gone`, `owns`, `owns_country`, `alliance`, `alliance_at`, `independent`, `civil_war`, `countries`, `wars`, `war`, `war_result`, `war_holds`, `world_war`, `tech`, `industry_rank`, `growth`, `remilitarized`.
+
+```
+burger validate Earth1930 --days 7300 --seeds 1,2,3,4,5,6 --scorecard
+burger validate Earth1930 --days 7300 --seed 1 --watch ENG,SPA     # politics every six months
+burger validate Earth1930 --days 7300 --bias 0                      # alternate history; 1 = historical
+```
+
+Environment variables for diagnosis: `BURGER_AI_LOG=TAG` (what a country's AI weighs each month), `BURGER_DIPLO_LOG=action` (accepted/declined actions), `BURGER_PEACE_LOG`, `BURGER_FACT_LOG` (factories of the big powers, with `--scorecard`). `burger selftest` checks the features above.
+
+### Speed 5
+
+Speed 5 normally runs as fast as the machine allows. The Settings panel (and `speed5_days_per_second` in the user settings) caps it at a number of simulated days per second; 0 means no cap. Speeds 1-4 are unchanged.
+
 ## 5. Diplomacy (Imperator style)
 
 - **Opinion**: modifiers that decay (`add_opinion`, `reverse_add_opinion`) plus a base from the relationship.
@@ -451,10 +569,31 @@ removes), `set_culture`, `add_accepted_culture`, `remove_accepted_culture`, `set
   independence accepts a white peace only when losing or exhausted. Allies and subjects of the winner only get land that
   touches their own; the rest goes to the war leader. Democracies (`peace_puppets`, rule `PrefersPuppets`) make the loser
   a subject when they hold much of its people's land, release other peoples of the land they hold as subjects, and take
-  only land of their own peoples, cores and claims.
+  only land of their own peoples, cores and claims. In some wars (`regime_change_instead_of_puppet`, 0.5; rule
+  `PrefersRegimeChange`) they only put their ideology in power and leave the loser independent. Nobody gets land it
+  cannot reach: a state must border the receiver's land (or land it gets in the same deal), or have a coast within the
+  receiver's reach over sea (rule `SeaReachKm`: `peace_sea_range_km`, 400, plus `peace_sea_range_per_ship`, 150 km for
+  every ship - far coasts are only for navies; without the navy feature any coast). Releasing a people (rule
+  `SeparatistRegion`, method `PlanRelease`): the land goes to a country of that people that exists - on the winner's side, a
+  puppet of the losing side (it is set free with the land), or a friendly neutral - else to the winner if it accepts that people
+  (no "German Republic" out of German land), else a new country is made; never a second country of one people, and the term
+  is refused when the land cannot be reached or releasing it would cut up the old country. After a deal, land that lost its
+  link to its country's capital goes to the neighbour that surrounds it (`SettleStranded`; the capital moves if it was cut off
+  from most of the country). AI winners take colonies directly, take enclaves inside their land first, and free subjects of the
+  loser (rule `PrefersLiberation`: democracies, and subjects of another culture group with `liberate_liberty` 50); liberal overlords
+  grant independence on their own (rule `WillGrantIndependence`, `overlord_release_chance`), and AI countries want
+  enclaves back (trigger `enclave_held_by = scope:recipient`). Core land is never handed on: a
+  winner keeps its own cores, and the loser's core states are not given to a third country of the same people.
+  Land of a people goes to an existing country of that people if the winner likes it (its own subject, or opinion of at
+  least `kin_land_opinion`, 25; rule `GivesLandToKin`), also one outside the war, instead of a new country; a winner
+  never has two subjects of one people (the land joins the subject it has).
+- **Rivals**: two countries with the same primary culture are rivals for one nation: `same_culture_opinion` (-60) between
+  them (not between an overlord and its subject), and the AI neither offers nor accepts their alliances and breaks existing ones.
 - **Subjects** follow their overlord's ideology (set when they become subjects and kept monthly). A country is never made
   a subject of an overlord that already rules its homeland (same primary culture, or half of its core states): it is
-  annexed instead, and such existing subjects are annexed. Subjects cannot have subjects of their own.
+  annexed instead, and such existing subjects are annexed. Subjects have no subjects of their own: what a subject
+  subjugates or releases as a subject goes to its overlord, and the subjects of a country that becomes a subject pass to
+  the new overlord.
   `BURGER_PEACE_LOG=1 burger validate <project> --days N` prints every peace deal and the subjects at the end.
 - **Liberty desire** (subjects, 0-100, EU style): from the subject's strength and size compared to its overlord, its opinion
   of it, a different ideology or culture group, the overlord losing a war, the tribute, `liberty_desire` of the subject type

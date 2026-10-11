@@ -42,6 +42,9 @@ public class EconomyRules
     {
         if (!string.IsNullOrEmpty(t.OwnerTag) && !string.Equals(t.OwnerTag, c.Tag, StringComparison.OrdinalIgnoreCase)) return "This template belongs to another country";
         if (loc.Controller != c || loc.Owner != c) return "You must own and control the location";
+        if (loc.State?.Demilitarized == true) return "The state is demilitarized";
+        foreach (var (u, _) in t.Units)
+            if (!game.Tech.CanUse(c, u.Definition)) return $"{u.Name} needs a technology you do not have";
         if (game.Economy.GoldCosts && c.Gold < t.Cost) return $"Needs {t.Cost:0} gold";
         if (c.Manpower < t.Manpower) return $"Needs {t.Manpower:0} manpower";
         return null;

@@ -436,6 +436,34 @@ public static class Gui
         return _focusedField == id;
     }
 
+    private static string? _dragSlider;
+
+    /// <summary>A horizontal slider from <paramref name="min"/> to <paramref name="max"/>. Returns true while the value changes.</summary>
+    public static bool Slider(string id, Rectangle r, ref double value, double min, double max)
+    {
+        bool hover = Hover(r);
+        if (_leftPressed && hover && !LeftClickConsumed) { _dragSlider = id; LeftClickConsumed = true; }
+        if (!Raylib.IsMouseButtonDown(MouseButton.Left)) _dragSlider = null;
+        bool changed = false;
+        if (_dragSlider == id)
+        {
+            double t = Math.Clamp((Mouse.X - r.X) / Math.Max(1, r.Width), 0, 1);
+            double v = min + (max - min) * t;
+            changed = Math.Abs(v - value) > 1e-9;
+            value = v;
+        }
+        float f = (float)Math.Clamp((value - min) / Math.Max(1e-9, max - min), 0, 1);
+        var track = new Rectangle(r.X, r.Y + r.Height / 2 - 3 * Scale, r.Width, 6 * Scale);
+        Raylib.DrawRectangleRec(track, new Color(12, 12, 14, 230));
+        Raylib.DrawRectangleRec(new Rectangle(track.X, track.Y, track.Width * f, track.Height), Gold);
+        Raylib.DrawRectangleLinesEx(track, 1, ButtonBorder);
+        var knob = new Rectangle(r.X + r.Width * f - 5 * Scale, r.Y + 2 * Scale, 10 * Scale, r.Height - 4 * Scale);
+        Raylib.DrawRectangleRec(knob, hover || _dragSlider == id ? Lighter(Gold, 0.3f) : Gold);
+        Raylib.DrawRectangleLinesEx(knob, 1, ButtonBorder);
+        Block(r);
+        return changed;
+    }
+
     public static void Bar(Rectangle r, float fraction, Color fill, Color? back = null)
     {
         bool skinned = back == null && Skin("bar", r);

@@ -64,10 +64,13 @@ public sealed partial class PoliticsSystem
                     Desc = n.GetString("desc", "")!,
                     Elections = n.GetBool("elections"),
                     Extremist = n.GetBool("extremist"),
+                    WeakDemocracyDrift = n.GetDouble("weak_democracy_drift"),
+                    ColorBlendAmount = n.Get("country_color_blend")?.GetDouble("amount", 0.5) ?? 0,
                     Government = n.GetString("government"),
                     Order = Ideologies.Count,
                     Definition = n,
                 };
+                if (n.Get("country_color_blend")?.Get("color") is { } blend && Rgb.TryParse(blend, out var blendColor)) i.ColorBlend = blendColor;
                 i.PeacePuppets = n.Get("peace_puppets") != null ? n.GetBool("peace_puppets") : i.Elections;
                 i.Adjective = n.GetString("adjective") ?? i.Name;
                 i.PartyName = n.GetString("party_name") ?? i.Name;
@@ -155,6 +158,7 @@ public sealed partial class PoliticsSystem
 
         // modifier keys this system can provide (so Sum() skips the lookup for every other key)
         foreach (var i in Ideologies) foreach (var k in i.Modifier.Keys) _modifierKeys.Add(k);
+        _modifierKeys.Add("stability_target"); // rule StabilitySources
         foreach (var l in Laws.Values) foreach (var k in l.Modifier.Keys) _modifierKeys.Add(k);
         foreach (var p in Positions) { foreach (var k in p.Modifier.Keys) _modifierKeys.Add(k); foreach (var k in p.PerPoint.Keys) _modifierKeys.Add(k); }
     }
@@ -451,6 +455,7 @@ public sealed partial class PoliticsSystem
         GovernmentChanges++;
         var ideology = Ideology(p.Ruling)!;
         if (ideology.Government != null) c.Government = ideology.Government;
+        _game.RefreshName(c); // country_names follow the government
         if (!HoldsElections(c, p)) p.NextElection = null;
         else p.NextElection ??= _game.World.Date.AddMonths(ElectionMonths());
         // ministers of parties that left the government step down
@@ -508,7 +513,32 @@ public sealed partial class PoliticsSystem
                 double stat = pos.Stat.Length > 0 ? ch.GetStat(pos.Stat) : 0;
                 foreach (var m in pos.PerPoint) list.Add(($"{pos.Name} ({ch.DisplayName})", m.Key, m.Value * stat));
             }
+        // poverty, a government without support, lost land (rule StabilitySources)
+        foreach (var (source, value) in Rules.StabilitySources(_game, c))
+            if (Math.Abs(value) > 0.01) list.Add((source, "stability_target", value));
         return list;
+    }
+
+    private readonly Dictionary<Country, double> _wealth = new();
+    private int _wealthDay = int.MinValue;
+
+    /// <summary>
+    /// How wealthy a country is compared to the world: its wealth per person (rule WealthPerPerson) divided by the
+    /// median of all countries (1 = typical, 0.3 = poor, 2 = rich; recounted monthly).
+    /// </summary>
+    public double WealthIndex(Country c)
+    {
+        int today = _game.World.Date.TotalDays;
+        if (_wealthDay == int.MinValue || today - _wealthDay >= 30 || today < _wealthDay)
+        {
+            _wealth.Clear();
+            _wealthDay = today;
+            var all = _game.World.Countries.Where(x => x.Exists).Select(x => (Country: x, Wealth: Rules.WealthPerPerson(_game, x))).ToList();
+            var sorted = all.Select(x => x.Wealth).OrderBy(v => v).ToList();
+            double median = sorted.Count > 0 ? sorted[sorted.Count / 2] : 0;
+            foreach (var (country, wealth) in all) _wealth[country] = median > 0 ? Math.Clamp(wealth / median, 0, 3) : 1;
+        }
+        return _wealth.GetValueOrDefault(c, 1);
     }
 
     private Dictionary<string, double> ComputeModifiers(Country c)
@@ -550,6 +580,7 @@ public sealed partial class PoliticsSystem
             foreach (var ac in _game.World.Countries.Where(x => x.Exists && !x.IsPlayer).ToList()) AiMonthly(ac);
         _aiCalled = false;
         _monthsTicked++;
+        _mods.Clear(); // wealth, government support and lost land move stability (rule StabilitySources)
         foreach (var c in _game.World.Countries.ToList()) // scripts may add countries (start_civil_war)
         {
             if (!c.Exists) continue;
@@ -558,6 +589,7 @@ public sealed partial class PoliticsSystem
             foreach (var kv in drift)
                 if (p.Popularity.ContainsKey(kv.Key)) p.Popularity[kv.Key] = Math.Max(0, p.Popularity[kv.Key] + kv.Value / 100.0);
             Normalize(p);
+            if (HoldsElections(c, p) && !InCivilWar(c) && Rules.CallsSnapElection(_game, c)) HoldElection(c);
             // ministers who died or left the country leave the cabinet
             foreach (var kv in p.Ministers.ToList())
                 if (!kv.Value.Alive || kv.Value.Country != c) { p.Ministers.Remove(kv.Key); _modsDirty.Add(c); }

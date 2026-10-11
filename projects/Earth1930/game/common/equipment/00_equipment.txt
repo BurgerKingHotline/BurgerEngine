@@ -3,7 +3,9 @@
 #   category        army / naval / air (naval equipment is built in dockyards)
 #   default_for     unit categories that need it when a unit type lists no 'equipment = { ... }'
 #   default_amount  how many such a unit needs
+#   commodities     what one unit uses up (commodities feature); requires_tech = a technology that is needed to build it
 # A unit type can also list exactly what it needs:  equipment = { infantry_equipment = 100 support_equipment = 10 }
+# (Ships and planes are equipment too: their types in common/ships and common/planes list commodities and requires_tech.)
 
 infantry_equipment = {
 	name = "Infantry Equipment"
@@ -11,6 +13,7 @@ infantry_equipment = {
 	category = army
 	default_for = { infantry cavalry }
 	default_amount = 100
+	commodities = { steel = 0.0035 }
 }
 support_equipment = {
 	name = "Support Equipment"
@@ -18,6 +21,7 @@ support_equipment = {
 	category = army
 	default_for = { support }
 	default_amount = 25
+	commodities = { steel = 0.012 rubber = 0.0015 }
 }
 artillery_equipment = {
 	name = "Artillery"
@@ -25,4 +29,54 @@ artillery_equipment = {
 	category = army
 	default_for = { support artillery }
 	default_amount = 12
+	commodities = { steel = 0.035 }
 }
+motor_equipment = {
+	name = "Trucks and Motor Transport"
+	cost = 2.5
+	category = army
+	default_amount = 30
+	commodities = { steel = 0.02 rubber = 0.004 oil = 0.002 }
+	requires_tech = mechanisation_1
+}
+light_tank_equipment = {
+	name = "Light Tanks"
+	cost = 6
+	category = army
+	default_amount = 40
+	commodities = { steel = 0.08 rubber = 0.006 aluminium = 0.004 oil = 0.004 }
+	requires_tech = light_tank_1
+}
+medium_tank_equipment = {
+	name = "Medium Tanks"
+	cost = 9
+	category = army
+	default_amount = 40
+	commodities = { steel = 0.14 rubber = 0.008 chromium = 0.003 tungsten = 0.001 oil = 0.006 }
+	requires_tech = medium_tank_1
+}
+heavy_tank_equipment = {
+	name = "Heavy Tanks"
+	cost = 14
+	category = army
+	default_amount = 30
+	commodities = { steel = 0.22 rubber = 0.01 chromium = 0.005 tungsten = 0.003 oil = 0.01 }
+	requires_tech = heavy_tank_1
+}
+anti_tank_equipment = {
+	name = "Anti-tank Guns"
+	cost = 3
+	category = army
+	default_amount = 12
+	commodities = { steel = 0.03 tungsten = 0.001 }
+	requires_tech = anti_tank_1
+}
+anti_air_equipment = {
+	name = "Anti-air Guns"
+	cost = 3.5
+	category = army
+	default_amount = 12
+	commodities = { steel = 0.035 }
+	requires_tech = anti_air_1
+}
+# stat_aggregation says how stats combine when unit types form a division (default for anything not listed: sum)

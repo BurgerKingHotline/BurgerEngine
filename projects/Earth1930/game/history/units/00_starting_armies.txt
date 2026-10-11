@@ -1,447 +1,713 @@
-# Starting armies, created when the military feature was added. Edit freely.
-# TAG = { army = { name general division = { template location count } } }
+# Starting armies of 1930 (military feature): divisions at the strength of the peacetime armies and their ready reserves,
+# about 15,000 men each. The templates are in common/units. TAG = { army = { name division = { template location count } } }
 
 ENG = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = london count = 24 }
+		division = { template = artillery_division location = southend_on_sea count = 2 }
+		division = { template = infantry_division location = southend_on_sea count = 3 }
+		division = { template = cavalry_division location = southend_on_sea count = 1 }
+	}
+	army = {
+		name = "2nd Army"
+		division = { template = artillery_division location = south_highlands_and_islands count = 2 }
+		division = { template = infantry_division location = south_highlands_and_islands count = 3 }
+		division = { template = armoured_division location = south_highlands_and_islands count = 1 }
 	}
 }
 FRA = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = paris count = 24 }
+		division = { template = artillery_division location = cayenne count = 2 }
+		division = { template = infantry_division location = cayenne count = 4 }
+		division = { template = armoured_division location = cayenne count = 1 }
+	}
+	army = {
+		name = "2nd Army"
+		division = { template = artillery_division location = brest_bretagne count = 2 }
+		division = { template = infantry_division location = brest_bretagne count = 4 }
+		division = { template = mountain_division location = brest_bretagne count = 1 }
+	}
+	army = {
+		name = "3rd Army"
+		division = { template = artillery_division location = caen count = 2 }
+		division = { template = infantry_division location = caen count = 3 }
+		division = { template = cavalry_division location = caen count = 1 }
+		division = { template = mountain_division location = caen count = 1 }
+	}
+	army = {
+		name = "4th Army"
+		division = { template = artillery_division location = agen count = 2 }
+		division = { template = infantry_division location = agen count = 3 }
+		division = { template = cavalry_division location = agen count = 1 }
+		division = { template = mountain_division location = agen count = 1 }
+	}
+	army = {
+		name = "5th Army"
+		division = { template = artillery_division location = east_centre_val_de_loire count = 2 }
+		division = { template = infantry_division location = east_centre_val_de_loire count = 3 }
+		division = { template = cavalry_division location = east_centre_val_de_loire count = 1 }
+	}
+	army = {
+		name = "6th Army"
+		division = { template = artillery_division location = bourges count = 2 }
+		division = { template = infantry_division location = bourges count = 3 }
+		division = { template = armoured_division location = bourges count = 1 }
 	}
 }
 SOV = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = moscow count = 24 }
+		division = { template = artillery_division location = krasnoyarsk count = 3 }
+		division = { template = infantry_division location = krasnoyarsk count = 4 }
+		division = { template = cavalry_division location = krasnoyarsk count = 1 }
 	}
-}
-CHI = {
 	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = nanjing count = 24 }
+		name = "2nd Army"
+		division = { template = artillery_division location = bodaybo count = 3 }
+		division = { template = infantry_division location = bodaybo count = 4 }
+		division = { template = cavalry_division location = bodaybo count = 1 }
+	}
+	army = {
+		name = "3rd Army"
+		division = { template = artillery_division location = buzuluk count = 3 }
+		division = { template = infantry_division location = buzuluk count = 4 }
+		division = { template = armoured_division location = buzuluk count = 1 }
+	}
+	army = {
+		name = "4th Army"
+		division = { template = artillery_division location = khabarovsk count = 2 }
+		division = { template = infantry_division location = khabarovsk count = 4 }
+		division = { template = cavalry_division location = khabarovsk count = 1 }
+		division = { template = armoured_division location = khabarovsk count = 1 }
+	}
+	army = {
+		name = "5th Army"
+		division = { template = artillery_division location = lesozavodsk count = 2 }
+		division = { template = infantry_division location = lesozavodsk count = 4 }
+		division = { template = cavalry_division location = lesozavodsk count = 1 }
+		division = { template = mountain_division location = lesozavodsk count = 1 }
+	}
+	army = {
+		name = "6th Army"
+		division = { template = artillery_division location = qarshi count = 2 }
+		division = { template = infantry_division location = qarshi count = 4 }
+		division = { template = cavalry_division location = qarshi count = 1 }
+		division = { template = mountain_division location = qarshi count = 1 }
 	}
 }
 USA = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = washington_d_c count = 24 }
+		division = { template = artillery_division location = roswell count = 2 }
+		division = { template = infantry_division location = roswell count = 2 }
+		division = { template = cavalry_division location = roswell count = 1 }
 	}
-}
-RAJ = {
 	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = delhi count = 21 }
+		name = "2nd Army"
+		division = { template = artillery_division location = ely count = 1 }
+		division = { template = infantry_division location = ely count = 3 }
+		division = { template = armoured_division location = ely count = 1 }
 	}
-}
-TUR = {
 	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = ankara count = 17 }
-	}
-}
-BRA = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = rio_de_janeiro count = 15 }
-	}
-}
-POR = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = lisbon count = 13 }
-	}
-}
-SPA = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = madrid count = 13 }
-	}
-}
-ITA = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = rome count = 12 }
-	}
-}
-JAP = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = yokohama count = 11 }
-	}
-}
-HOL = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = amsterdam count = 10 }
-	}
-}
-PER = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = tehran count = 8 }
+		name = "3rd Army"
+		division = { template = artillery_division location = pueblo count = 1 }
+		division = { template = infantry_division location = pueblo count = 3 }
 	}
 }
 GER = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = berlin count = 7 }
+		division = { template = artillery_division location = northwest_brandenburg count = 1 }
+		division = { template = infantry_division location = northwest_brandenburg count = 2 }
+		division = { template = cavalry_division location = northwest_brandenburg count = 1 }
+	}
+	army = {
+		name = "2nd Army"
+		division = { template = artillery_division location = giessen count = 1 }
+		division = { template = infantry_division location = giessen count = 1 }
+		division = { template = cavalry_division location = giessen count = 2 }
 	}
 }
-MEX = {
+ITA = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = mexico_city count = 7 }
+		division = { template = artillery_division location = turin count = 2 }
+		division = { template = infantry_division location = turin count = 2 }
+		division = { template = mountain_division location = turin count = 1 }
+	}
+	army = {
+		name = "2nd Army"
+		division = { template = artillery_division location = lecce count = 2 }
+		division = { template = infantry_division location = lecce count = 2 }
+		division = { template = mountain_division location = lecce count = 1 }
+	}
+	army = {
+		name = "3rd Army"
+		division = { template = artillery_division location = trento count = 1 }
+		division = { template = infantry_division location = trento count = 2 }
+		division = { template = cavalry_division location = trento count = 1 }
+		division = { template = mountain_division location = trento count = 1 }
+	}
+	army = {
+		name = "4th Army"
+		division = { template = artillery_division location = southeast_campania count = 1 }
+		division = { template = infantry_division location = southeast_campania count = 2 }
+		division = { template = cavalry_division location = southeast_campania count = 1 }
+		division = { template = mountain_division location = southeast_campania count = 1 }
+	}
+	army = {
+		name = "5th Army"
+		division = { template = artillery_division location = southeast_sardegna count = 1 }
+		division = { template = infantry_division location = southeast_sardegna count = 2 }
+		division = { template = cavalry_division location = southeast_sardegna count = 1 }
+	}
+	army = {
+		name = "6th Army"
+		division = { template = artillery_division location = florence_florence count = 1 }
+		division = { template = infantry_division location = florence_florence count = 2 }
+		division = { template = armoured_division location = florence_florence count = 1 }
 	}
 }
-AST = {
+JAP = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = canberra count = 7 }
+		division = { template = artillery_division location = kushiro count = 2 }
+		division = { template = infantry_division location = kushiro count = 3 }
+		division = { template = cavalry_division location = kushiro count = 1 }
+	}
+	army = {
+		name = "2nd Army"
+		division = { template = artillery_division location = yamagata count = 2 }
+		division = { template = infantry_division location = yamagata count = 3 }
+		division = { template = armoured_division location = yamagata count = 1 }
+	}
+	army = {
+		name = "3rd Army"
+		division = { template = artillery_division location = south_tohoku count = 2 }
+		division = { template = infantry_division location = south_tohoku count = 3 }
 	}
 }
-ARG = {
+CHI = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = buenos_aires count = 7 }
+		division = { template = artillery_division location = keshan count = 4 }
+		division = { template = infantry_division location = keshan count = 5 }
+		division = { template = cavalry_division location = keshan count = 1 }
 	}
-}
-ROM = {
 	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = bucharest count = 6 }
+		name = "2nd Army"
+		division = { template = artillery_division location = pingliang count = 4 }
+		division = { template = infantry_division location = pingliang count = 5 }
+		division = { template = cavalry_division location = pingliang count = 1 }
 	}
-}
-BEL = {
 	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = antwerpen count = 5 }
+		name = "3rd Army"
+		division = { template = artillery_division location = jixi count = 3 }
+		division = { template = infantry_division location = jixi count = 5 }
+		division = { template = cavalry_division location = jixi count = 1 }
+	}
+	army = {
+		name = "4th Army"
+		division = { template = artillery_division location = dulan count = 3 }
+		division = { template = infantry_division location = dulan count = 5 }
+		division = { template = cavalry_division location = dulan count = 1 }
+	}
+	army = {
+		name = "5th Army"
+		division = { template = artillery_division location = east_south_inner_mongolia count = 3 }
+		division = { template = infantry_division location = east_south_inner_mongolia count = 5 }
+		division = { template = cavalry_division location = east_south_inner_mongolia count = 1 }
+	}
+	army = {
+		name = "6th Army"
+		division = { template = artillery_division location = southeast_southwest_inner_mongolia count = 3 }
+		division = { template = infantry_division location = southeast_southwest_inner_mongolia count = 5 }
+		division = { template = cavalry_division location = southeast_southwest_inner_mongolia count = 1 }
 	}
 }
 POL = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = warsaw count = 5 }
+		division = { template = artillery_division location = north_masovian_voivodeship count = 1 }
+		division = { template = infantry_division location = north_masovian_voivodeship count = 2 }
+		division = { template = cavalry_division location = north_masovian_voivodeship count = 1 }
+		division = { template = armoured_division location = north_masovian_voivodeship count = 1 }
+	}
+	army = {
+		name = "2nd Army"
+		division = { template = artillery_division location = west_greater_poland_voivodeship count = 1 }
+		division = { template = infantry_division location = west_greater_poland_voivodeship count = 2 }
+		division = { template = cavalry_division location = west_greater_poland_voivodeship count = 1 }
+		division = { template = mountain_division location = west_greater_poland_voivodeship count = 1 }
+	}
+	army = {
+		name = "3rd Army"
+		division = { template = artillery_division location = gdynia count = 1 }
+		division = { template = infantry_division location = gdynia count = 2 }
+		division = { template = cavalry_division location = gdynia count = 1 }
+	}
+	army = {
+		name = "4th Army"
+		division = { template = artillery_division location = southeast_lublin_voivodeship count = 1 }
+		division = { template = infantry_division location = southeast_lublin_voivodeship count = 2 }
+		division = { template = cavalry_division location = southeast_lublin_voivodeship count = 1 }
 	}
 }
-CAN = {
+TUR = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = ottawa count = 5 }
+		division = { template = artillery_division location = southeast_van count = 2 }
+		division = { template = infantry_division location = southeast_van count = 2 }
+		division = { template = cavalry_division location = southeast_van count = 1 }
+	}
+	army = {
+		name = "2nd Army"
+		division = { template = artillery_division location = edirne count = 1 }
+		division = { template = infantry_division location = edirne count = 3 }
+	}
+}
+SPA = {
+	army = {
+		name = "1st Army"
+		division = { template = artillery_division location = castello count = 2 }
+		division = { template = infantry_division location = castello count = 3 }
+		division = { template = cavalry_division location = castello count = 1 }
+	}
+	army = {
+		name = "2nd Army"
+		division = { template = artillery_division location = la_coruna count = 1 }
+		division = { template = infantry_division location = la_coruna count = 3 }
+		division = { template = cavalry_division location = la_coruna count = 1 }
+	}
+}
+POR = {
+	army = {
+		name = "1st Army"
+		division = { template = artillery_division location = faro count = 2 }
+		division = { template = infantry_division location = faro count = 3 }
+	}
+}
+ROM = {
+	army = {
+		name = "1st Army"
+		division = { template = artillery_division location = oradea count = 2 }
+		division = { template = infantry_division location = oradea count = 3 }
+		division = { template = cavalry_division location = oradea count = 1 }
+	}
+	army = {
+		name = "2nd Army"
+		division = { template = artillery_division location = targu_jiu count = 2 }
+		division = { template = infantry_division location = targu_jiu count = 3 }
+		division = { template = cavalry_division location = targu_jiu count = 1 }
 	}
 }
 YUG = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = belgrade count = 5 }
+		division = { template = artillery_division location = banja_luka count = 2 }
+		division = { template = infantry_division location = banja_luka count = 2 }
+		division = { template = cavalry_division location = banja_luka count = 1 }
 	}
-}
-COL = {
 	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = bogota count = 5 }
-	}
-}
-SAU = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = riyadh count = 4 }
-	}
-}
-FIN = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = helsinki count = 4 }
-	}
-}
-VEN = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = caracas count = 4 }
-	}
-}
-PRU = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = lima count = 4 }
-	}
-}
-SAF = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = pretoria count = 3 }
+		name = "2nd Army"
+		division = { template = artillery_division location = dubrovnik count = 1 }
+		division = { template = infantry_division location = dubrovnik count = 3 }
 	}
 }
 CZE = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = prague count = 3 }
+		division = { template = artillery_division location = northwest_south_bohemian count = 2 }
+		division = { template = infantry_division location = northwest_south_bohemian count = 3 }
 	}
-}
-GRE = {
 	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = athens_peloponnese count = 3 }
-	}
-}
-SWE = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = stockholm count = 3 }
-	}
-}
-BUL = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = sofia count = 3 }
-	}
-}
-SIA = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = bangkok count = 3 }
-	}
-}
-ETH = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = addis_ababa count = 2 }
-	}
-}
-NZL = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = wellington count = 2 }
-	}
-}
-NOR = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = oslo count = 2 }
-	}
-}
-AFG = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = kabul count = 2 }
-	}
-}
-BOL = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = la_paz count = 2 }
+		name = "2nd Army"
+		division = { template = artillery_division location = jihlava count = 1 }
+		division = { template = infantry_division location = jihlava count = 3 }
+		division = { template = armoured_division location = jihlava count = 1 }
 	}
 }
 HUN = {
 	army = {
 		name = "1st Army"
+		division = { template = artillery_division location = budapest count = 1 }
 		division = { template = infantry_division location = budapest count = 2 }
-	}
-}
-ECU = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = quito count = 2 }
-	}
-}
-DEN = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = kobenhavn count = 2 }
-	}
-}
-SIK = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = urumqi count = 2 }
-	}
-}
-MON = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = ulaanbaatar count = 2 }
 	}
 }
 AUS = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = vienna count = 2 }
+		division = { template = infantry_division location = graz count = 2 }
 	}
 }
-CHL = {
+BEL = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = santiago count = 2 }
+		division = { template = artillery_division location = antwerpen count = 2 }
+		division = { template = infantry_division location = antwerpen count = 3 }
 	}
 }
-PAR = {
+HOL = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = asuncion count = 2 }
+		division = { template = artillery_division location = eindhoven count = 1 }
+		division = { template = infantry_division location = eindhoven count = 2 }
 	}
 }
-TIB = {
+SWE = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = lhasa count = 2 }
+		division = { template = artillery_division location = falun count = 1 }
+		division = { template = infantry_division location = falun count = 2 }
 	}
 }
-OMA = {
+NOR = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = muscat count = 2 }
+		division = { template = infantry_division location = west_hedmark count = 1 }
 	}
 }
-LIT = {
+DEN = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = kaunas count = 2 }
+		division = { template = infantry_division location = aalborg count = 1 }
 	}
 }
-SWI = {
+FIN = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = bern count = 2 }
-	}
-}
-HON = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = tegucigalpa count = 2 }
-	}
-}
-URU = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = montevideo count = 2 }
-	}
-}
-CUB = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = havana count = 2 }
-	}
-}
-NEP = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = kathmandu count = 2 }
-	}
-}
-GUA = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = guatemala count = 2 }
-	}
-}
-YEM = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = sanaa count = 2 }
-	}
-}
-IRE = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = dublin count = 2 }
+		division = { template = infantry_division location = vaasa count = 2 }
 	}
 }
 EST = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = tallinn count = 2 }
+		division = { template = infantry_division location = narva count = 1 }
 	}
 }
 LAT = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = riga count = 2 }
+		division = { template = infantry_division location = liepaga count = 1 }
+	}
+}
+LIT = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = east_siauliai count = 2 }
+	}
+}
+SWI = {
+	army = {
+		name = "1st Army"
+		division = { template = artillery_division location = altdorf count = 1 }
+		division = { template = infantry_division location = altdorf count = 3 }
+		division = { template = mountain_division location = altdorf count = 2 }
+	}
+}
+IRE = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = waterford count = 1 }
 	}
 }
 LUX = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = luxembourg count = 2 }
+		division = { template = infantry_division location = luxembourg count = 1 }
+	}
+}
+CAN = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = moosonee count = 2 }
+	}
+}
+AST = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = weipa count = 2 }
+	}
+}
+NZL = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = wellington count = 1 }
+	}
+}
+SAF = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = kimberley count = 2 }
+	}
+}
+GRE = {
+	army = {
+		name = "1st Army"
+		division = { template = artillery_division location = northeast_west_macedonia count = 2 }
+		division = { template = infantry_division location = northeast_west_macedonia count = 5 }
+	}
+}
+BUL = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = varna count = 2 }
 	}
 }
 ALB = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = tirana count = 2 }
+		division = { template = infantry_division location = gjirokaster count = 1 }
 	}
 }
-TAN = {
+BRA = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = kyzyl count = 2 }
+		division = { template = artillery_division location = manacapuru count = 2 }
+		division = { template = infantry_division location = manacapuru count = 4 }
+	}
+	army = {
+		name = "2nd Army"
+		division = { template = artillery_division location = irece count = 2 }
+		division = { template = infantry_division location = irece count = 3 }
+		division = { template = cavalry_division location = irece count = 1 }
 	}
 }
-LIB = {
+ARG = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = monrovia count = 2 }
+		division = { template = artillery_division location = salta count = 2 }
+		division = { template = infantry_division location = salta count = 2 }
+		division = { template = cavalry_division location = salta count = 1 }
+	}
+	army = {
+		name = "2nd Army"
+		division = { template = artillery_division location = la_paz_mendoza count = 1 }
+		division = { template = infantry_division location = la_paz_mendoza count = 3 }
 	}
 }
-COS = {
+CHL = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = san_jose_puntarenas count = 2 }
+		division = { template = artillery_division location = tocopilla count = 2 }
+		division = { template = infantry_division location = tocopilla count = 3 }
 	}
 }
-BHU = {
+MEX = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = thimphu count = 2 }
+		division = { template = artillery_division location = ojinaga count = 1 }
+		division = { template = infantry_division location = ojinaga count = 3 }
+	}
+	army = {
+		name = "2nd Army"
+		division = { template = artillery_division location = caborca count = 1 }
+		division = { template = infantry_division location = caborca count = 2 }
+		division = { template = cavalry_division location = caborca count = 1 }
 	}
 }
-PAN = {
+COL = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = panama_city count = 2 }
+		division = { template = artillery_division location = pasto count = 1 }
+		division = { template = infantry_division location = pasto count = 3 }
 	}
 }
-NIC = {
+VEN = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = managua count = 2 }
+		division = { template = artillery_division location = ciudad_guayana count = 1 }
+		division = { template = infantry_division location = ciudad_guayana count = 2 }
+	}
+}
+PRU = {
+	army = {
+		name = "1st Army"
+		division = { template = artillery_division location = north_loreto count = 1 }
+		division = { template = infantry_division location = north_loreto count = 3 }
+	}
+}
+BOL = {
+	army = {
+		name = "1st Army"
+		division = { template = artillery_division location = viacha count = 2 }
+		division = { template = infantry_division location = viacha count = 3 }
+	}
+}
+ECU = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = nuevo_rocafuerte count = 2 }
+	}
+}
+PAR = {
+	army = {
+		name = "1st Army"
+		division = { template = artillery_division location = southeast_presidente_hayes count = 1 }
+		division = { template = infantry_division location = southeast_presidente_hayes count = 2 }
+	}
+}
+URU = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = salto count = 2 }
+	}
+}
+CUB = {
+	army = {
+		name = "1st Army"
+		division = { template = artillery_division location = havana count = 1 }
+		division = { template = infantry_division location = havana count = 2 }
+	}
+}
+GUA = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = flores count = 1 }
+	}
+}
+HON = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = san_pedro_sula count = 1 }
 	}
 }
 ELS = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = san_salvador count = 2 }
+		division = { template = infantry_division location = san_salvador count = 1 }
 	}
 }
-NFL = {
+NIC = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = st_john_s count = 2 }
-	}
-}
-ICE = {
-	army = {
-		name = "1st Army"
-		division = { template = infantry_division location = reykjavik count = 2 }
+		division = { template = infantry_division location = puerto_cabezas count = 1 }
 	}
 }
 HAI = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = port_au_prince count = 2 }
+		division = { template = infantry_division location = port_au_prince count = 1 }
 	}
 }
 DOM = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = santo_domingo count = 2 }
+		division = { template = infantry_division location = santo_domingo count = 1 }
 	}
 }
-DNZ = {
+PER = {
 	army = {
 		name = "1st Army"
-		division = { template = infantry_division location = danzig count = 2 }
+		division = { template = artillery_division location = torbat_e_jam count = 2 }
+		division = { template = infantry_division location = torbat_e_jam count = 3 }
+		division = { template = cavalry_division location = torbat_e_jam count = 1 }
+	}
+}
+AFG = {
+	army = {
+		name = "1st Army"
+		division = { template = artillery_division location = herat count = 1 }
+		division = { template = infantry_division location = herat count = 3 }
+		division = { template = cavalry_division location = herat count = 1 }
+	}
+}
+SAU = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = northwest_northwest_eastern count = 2 }
+		division = { template = cavalry_division location = northwest_northwest_eastern count = 1 }
+	}
+}
+YEM = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = dhamar count = 2 }
+	}
+}
+OMA = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = musandam count = 1 }
+	}
+}
+ETH = {
+	army = {
+		name = "1st Army"
+		division = { template = artillery_division location = northwest_southern_nations count = 2 }
+		division = { template = infantry_division location = northwest_southern_nations count = 2 }
+	}
+	army = {
+		name = "2nd Army"
+		division = { template = artillery_division location = east_somali count = 1 }
+		division = { template = infantry_division location = east_somali count = 3 }
+	}
+}
+SIA = {
+	army = {
+		name = "1st Army"
+		division = { template = artillery_division location = tak count = 2 }
+		division = { template = infantry_division location = tak count = 3 }
+	}
+}
+NEP = {
+	army = {
+		name = "1st Army"
+		division = { template = artillery_division location = jumla count = 1 }
+		division = { template = infantry_division location = jumla count = 2 }
+	}
+}
+BHU = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = thimphu count = 1 }
+	}
+}
+TIB = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = xigaze count = 2 }
+		division = { template = cavalry_division location = xigaze count = 1 }
+	}
+}
+SIK = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = shache count = 2 }
+		division = { template = cavalry_division location = shache count = 1 }
+	}
+}
+MON = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = erenhot count = 1 }
+		division = { template = cavalry_division location = erenhot count = 1 }
+	}
+}
+LIB = {
+	army = {
+		name = "1st Army"
+		division = { template = infantry_division location = buchanan count = 1 }
+	}
+}
+RAJ = {
+	army = {
+		name = "1st Army"
+		division = { template = artillery_division location = sikar count = 2 }
+		division = { template = infantry_division location = sikar count = 2 }
+		division = { template = cavalry_division location = sikar count = 1 }
+	}
+	army = {
+		name = "2nd Army"
+		division = { template = artillery_division location = north_chhattisgarh count = 1 }
+		division = { template = infantry_division location = north_chhattisgarh count = 3 }
+		division = { template = mountain_division location = north_chhattisgarh count = 1 }
+	}
+	army = {
+		name = "3rd Army"
+		division = { template = artillery_division location = khammam count = 1 }
+		division = { template = infantry_division location = khammam count = 2 }
+		division = { template = cavalry_division location = khammam count = 1 }
 	}
 }

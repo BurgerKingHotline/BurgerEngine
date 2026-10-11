@@ -77,11 +77,13 @@ public sealed partial class PoliticsSystem
             {
                 if (InGovernment(c, i.Key)) continue;
                 double pop = p.Popularity.GetValueOrDefault(i.Key);
-                if (DemandOf(c, p, i.Key) == null) continue; // it can simply win the next election
-                double coup = Rules.CoupChance(_game, c, i, pop);
-                if (coup > 0 && _game.Rng.NextDouble() < coup) { Coup(c, i.Key); break; }
+                // it can simply win the next election - unless the democracy is falling apart (rule CanSeizePower)
+                if (DemandOf(c, p, i.Key) == null && !Rules.CanSeizePower(_game, c, i)) continue;
+                // (the civil war first: in a poor, unstable or war-weary country it needs less support than a coup)
                 double chance = Rules.CivilWarChance(_game, c, i, pop);
                 if (chance > 0 && _game.Rng.NextDouble() < chance) { Revolt(c, i.Key, pop, "civil war"); break; }
+                double coup = Rules.CoupChance(_game, c, i, pop);
+                if (coup > 0 && _game.Rng.NextDouble() < coup) { Coup(c, i.Key); break; }
             }
         }
     }
@@ -291,8 +293,7 @@ public sealed partial class PoliticsSystem
         {
             if (!_game.World.Wars.Contains(cw.War)) { CivilWars.Remove(cw); continue; }
             bool originBeaten = Beaten(cw.Origin), rebelBeaten = Beaten(cw.Rebel);
-            if (rebelBeaten) EndCivilWar(cw, originWon: true);
-            else if (originBeaten) EndCivilWar(cw, originWon: false);
+            if (Rules.CivilWarVerdict(_game, cw, originBeaten, rebelBeaten) is { } originWon) EndCivilWar(cw, originWon);
         }
     }
 

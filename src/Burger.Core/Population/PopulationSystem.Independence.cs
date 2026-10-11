@@ -80,13 +80,11 @@ public sealed partial class PopulationSystem
 
     public bool InIndependenceWar(Country c) => IndependenceWars.Any(w => w.Origin == c || w.Rebel == c);
 
-    /// <summary>States of <paramref name="c"/> that <paramref name="culture"/> wants to break away with (rule SeparatistCulture: where it is the biggest culture and is not accepted, never the capital state).</summary>
+    /// <summary>States of <paramref name="c"/> that <paramref name="culture"/> breaks away with (rule SeparatistRegion: its heartland, the land around it where it is a big minority, and what the old country would be cut off from).</summary>
     public List<State> SeparatistStates(Country c, string culture)
     {
-        var result = new List<State>();
-        foreach (var s in c.OwnedStates)
-            if (Rules.SeparatistCulture(_game, c, s) == culture) result.Add(s);
-        return result;
+        var parts = Rules.SeparatistRegion(_game, c, culture, false);
+        return parts.Count > 0 ? parts[0].States : new List<State>();
     }
 
     private void MonthlyIndependence()
@@ -131,7 +129,7 @@ public sealed partial class PopulationSystem
                 if (m.Progress >= 100 && !declared)
                 {
                     Independence.Remove(m);
-                    DeclareIndependence(c, culture, states);
+                    DeclareIndependence(c, culture);
                     declared = true; // one a month per country
                 }
             }
@@ -169,11 +167,11 @@ public sealed partial class PopulationSystem
     }
 
     /// <summary>Frees the states of <paramref name="owner"/> where <paramref name="culture"/> is the majority as a country of that people (peace term "release a people").</summary>
-    public Country? ReleaseCulture(Country owner, string culture)
+    public Country? ReleaseCulture(Country owner, string culture, List<State>? states = null)
     {
         if (!Enabled) return null;
-        var states = owner.OwnedStates.Where(s => s != owner.Capital?.State && MajorityCulture(s) == culture).ToList();
-        if (states.Count == 0) return null;
+        states ??= Rules.SeparatistRegion(_game, owner, culture, true).FirstOrDefault()?.States;
+        if (states == null || states.Count == 0) return null;
         Independence.RemoveAll(m => m.Country == owner && m.Culture == culture);
         var free = CreateIndependentCountry(owner, culture, states);
         FreedTotal++;

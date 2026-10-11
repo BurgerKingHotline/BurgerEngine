@@ -1,0 +1,5 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Demilitarized zones"
+category = "Diplomacy"
+order = 83
+description = "States that no armed forces may enter or be raised in (history/demilitarized.txt). A peace term can demilitarize states; the owner remilitarizes them (decision remilitarize_zone) when it feels strong enough, which gives its neighbours an event to challenge it; they open at once when the owner is at war."

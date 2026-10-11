@@ -1,0 +1,365 @@
+# Historical profiles of countries. Countries without one fall back on their generic archetype.
+germany = {
+	countries = { GER }
+	parent = aggressive
+	desc = "A revanchist Germany that wants Versailles undone, its people united and room in the east."
+	aggression = 1.5 expansion = 1.5 risk = 1.4 land = 1.4 air = 1.3 defense = 1.0 diplomacy = 0.9
+	rivals = { FRA = 1.5 POL = 2.5 CZE = 1.5 SOV = 1.5 LIT = 0.8 }
+	friends = { ITA = 1.5 HUN = 1.2 JAP = 0.8 AUS = 0.5 }
+	want = { POL = 3 CZE = 2.5 AUS = 3 DNZ = 3 LIT = 1.5 FRA = 1.0 BEL = 0.4 DEN = 0.5 SOV = 1.2 }
+	timing = { AUS = 1936 CZE = 1937 POL = 1938 DNZ = 1938 LIT = 1938 FRA = 1939 BEL = 1939 DEN = 1939 SOV = 1940 }
+	ideology_hostility = { communist = 1.5 }
+	research = { armor = 1.6 air = 1.3 doctrine = 1.4 infantry = 1.0 naval = 0.6 industry = 1.0 }
+}
+
+italy = {
+	countries = { ITA }
+	parent = expansionist
+	desc = "Mussolini's Italy: empire in Africa, mastery of the Mediterranean and the Adriatic."
+	aggression = 1.4 expansion = 1.6 risk = 1.3 navy = 1.3 land = 1.2 air = 1.1 diplomacy = 1.0
+	rivals = { YUG = 1.5 FRA = 1.2 ETH = 0.8 GRE = 0.5 }
+	friends = { GER = 1.0 HUN = 1.2 AUS = 1.5 ALB = 1.0 }
+	want = { ETH = 3 ALB = 2.5 YUG = 1.5 FRA = 0.7 GRE = 0.8 }
+	timing = { ETH = 1934 ALB = 1937 YUG = 1940 FRA = 1940 GRE = 1939 }
+	research = { naval = 1.3 air = 1.2 armor = 0.7 infantry = 1.0 }
+}
+
+japan = {
+	countries = { JAP }
+	parent = aggressive
+	desc = "Resource-poor Japan, its army and navy factions set on Manchuria, China and the south."
+	aggression = 1.5 expansion = 1.7 risk = 1.5 navy = 1.5 land = 1.3 air = 1.2 diplomacy = 0.8
+	rivals = { USA = 1.2 SOV = 1.5 CHI = 2.0 ENG = 0.8 }
+	friends = { GER = 0.7 ITA = 0.5 }
+	want = { CHI = 3 SOV = 1.0 HOL = 1.2 FRA = 0.8 SIA = 0.6 }
+	timing = { SOV = 1937 HOL = 1939 FRA = 1939 SIA = 1940 }
+	ideology_hostility = { communist = 1.2 }
+	research = { naval = 1.6 air = 1.4 infantry = 1.2 armor = 0.7 }
+}
+
+soviet_union = {
+	countries = { SOV }
+	parent = defensive
+	desc = "Socialism in one country: industrialise, fear encirclement, take back the western borderlands when it is safe."
+	aggression = 0.9 expansion = 1.0 risk = 0.8 land = 1.5 air = 1.2 defense = 1.4 isolation = 1.0 diplomacy = 0.7
+	rivals = { GER = 1.5 JAP = 1.5 POL = 1.5 ENG = 1.0 ROM = 1.0 FIN = 0.8 }
+	friends = { TUR = 0.8 MON = 2.0 PER = 0.4 }
+	want = { ROM = 1.0 POL = 1.5 FIN = 1.0 LIT = 1.2 LAT = 1.2 EST = 1.2 TAN = 0.5 }
+	timing = { ROM = 1940 POL = 1939 FIN = 1939 LIT = 1939 LAT = 1939 EST = 1939 }
+	ideology_hostility = { fascist = 1.5 democratic = 0.5 }
+	research = { armor = 1.4 artillery = 1.4 industry = 1.3 air = 1.0 naval = 0.5 }
+}
+
+france = {
+	countries = { FRA }
+	parent = status_quo
+	desc = "Victorious and fearful France: the alliance system of the east, the Maginot mentality, no appetite for a new war."
+	aggression = 0.5 expansion = 0.5 defense = 1.8 diplomacy = 1.6 land = 1.2 risk = 0.6 navy = 1.0 air = 0.9
+	rivals = { GER = 2.0 ITA = 0.8 }
+	friends = { POL = 1.5 CZE = 1.5 YUG = 1.2 ROM = 1.2 BEL = 1.2 ENG = 1.0 }
+	ideology_hostility = { fascist = 0.5 communist = 0.8 }
+	research = { artillery = 1.3 infantry = 1.2 doctrine = 1.2 armor = 0.8 air = 0.8 }
+}
+
+united_kingdom = {
+	countries = { ENG }
+	parent = imperial
+	desc = "The empire first: the Royal Navy, the Dominions, balance of power in Europe, appeasement before rearmament."
+	aggression = 0.5 expansion = 0.5 isolation = 1.0 diplomacy = 1.2 navy = 1.6 air = 1.1 land = 0.7 colonial = 1.5 risk = 0.7 defense = 1.3
+	rivals = { JAP = 0.8 SOV = 0.8 GER = 0.7 ITA = 0.6 }
+	friends = { FRA = 1.2 USA = 1.0 POR = 1.2 HOL = 1.0 BEL = 1.0 GRE = 0.6 }
+	ideology_hostility = { communist = 0.8 }
+	research = { naval = 1.5 air = 1.3 industry = 1.1 armor = 0.8 infantry = 0.9 }
+}
+
+united_states = {
+	countries = { USA }
+	parent = isolationist
+	desc = "Isolationist America: hemispheric defence, naval treaties, the Depression at home."
+	isolation = 1.8 aggression = 0.3 navy = 1.3 air = 1.2 land = 0.7 diplomacy = 0.6 risk = 0.6 defense = 1.0
+	rivals = { JAP = 0.6 }
+	friends = { ENG = 1.0 CAN = 1.0 FRA = 0.5 }
+	research = { naval = 1.3 air = 1.4 industry = 1.5 armor = 1.0 }
+}
+
+poland = {
+	countries = { POL }
+	parent = defensive
+	desc = "Pilsudski's Poland between two giants: equal distance from both, cavalry pride, French alliance."
+	aggression = 0.9 defense = 1.4 land = 1.4 risk = 1.0 diplomacy = 1.2 expansion = 0.7
+	rivals = { GER = 2.0 SOV = 2.0 CZE = 0.8 LIT = 1.2 }
+	friends = { FRA = 1.5 ROM = 1.2 HUN = 0.8 }
+	want = { LIT = 0.8 CZE = 0.5 }
+	research = { infantry = 1.2 armor = 0.8 artillery = 1.0 }
+}
+
+czechoslovakia = {
+	countries = { CZE }
+	parent = defensive
+	desc = "The democratic fortress of central Europe, armed by Skoda, tied to France and the Little Entente."
+	aggression = 0.3 defense = 1.8 diplomacy = 1.6 land = 1.1 risk = 0.5
+	rivals = { GER = 1.5 HUN = 1.0 POL = 0.5 }
+	friends = { FRA = 2.0 YUG = 1.5 ROM = 1.5 SOV = 0.8 }
+	research = { armor = 1.3 industry = 1.2 artillery = 1.1 }
+}
+
+hungary = {
+	countries = { HUN }
+	parent = opportunist
+	desc = "Revisionist Hungary: Trianon must be undone."
+	aggression = 0.9 expansion = 1.2 risk = 1.0 land = 1.0 diplomacy = 1.0
+	rivals = { CZE = 2.0 ROM = 2.0 YUG = 1.5 }
+	friends = { ITA = 1.5 GER = 1.2 AUS = 1.0 }
+	want = { CZE = 2.0 ROM = 2.0 YUG = 1.5 }
+	timing = { CZE = 1938 ROM = 1940 YUG = 1941 }
+}
+
+romania = {
+	countries = { ROM }
+	parent = defensive
+	desc = "Greater Romania, afraid for Transylvania and Bessarabia."
+	aggression = 0.5 defense = 1.5 diplomacy = 1.3 land = 1.1
+	rivals = { HUN = 1.5 SOV = 1.5 BUL = 0.8 }
+	friends = { FRA = 1.3 CZE = 1.5 YUG = 1.5 POL = 1.2 }
+}
+
+yugoslavia = {
+	countries = { YUG }
+	parent = defensive
+	desc = "The Serb-led kingdom in the Little Entente."
+	aggression = 0.4 defense = 1.5 diplomacy = 1.3
+	rivals = { ITA = 1.5 HUN = 1.5 BUL = 1.0 }
+	friends = { CZE = 1.5 ROM = 1.5 FRA = 1.2 }
+}
+
+bulgaria = {
+	countries = { BUL }
+	parent = opportunist
+	desc = "Defeated Bulgaria wants Macedonia, Thrace and Dobruja back."
+	aggression = 0.7 expansion = 1.0 risk = 1.0
+	rivals = { YUG = 1.0 GRE = 1.0 ROM = 0.8 }
+	friends = { GER = 0.8 ITA = 0.8 HUN = 0.6 }
+	want = { YUG = 1.5 GRE = 1.2 ROM = 1.2 }
+}
+
+turkey = {
+	countries = { TUR }
+	parent = defensive
+	desc = "Kemalist Turkey: modernise, hold the straits, peace at home and abroad."
+	aggression = 0.5 defense = 1.4 isolation = 1.2 land = 1.2 diplomacy = 1.0 expansion = 0.6
+	rivals = { GRE = 0.5 ITA = 0.8 SOV = 0.5 }
+	friends = { SOV = 0.8 GRE = 0.3 }
+	want = { FRA = 0.6 }
+}
+
+china = {
+	countries = { CHI }
+	parent = defensive
+	desc = "Nationalist China: unify the warlords first, then face Japan."
+	aggression = 0.7 defense = 1.4 land = 1.3 diplomacy = 0.8 risk = 0.8
+	rivals = { JAP = 2.0 SOV = 0.4 }
+	friends = { USA = 0.8 GER = 0.8 }
+	ideology_hostility = { communist = 1.2 }
+}
+
+spain = {
+	countries = { SPA }
+	parent = passive
+	desc = "Spain looks inward: monarchy, republic and army."
+	isolation = 1.5 aggression = 0.2 risk = 0.4
+}
+
+portugal = {
+	countries = { POR }
+	parent = isolationist
+	desc = "Old, poor and neutral: the British alliance and the empire."
+	isolation = 1.6 diplomacy = 0.8
+	friends = { ENG = 2.0 SPA = 0.5 }
+}
+
+lithuania = {
+	countries = { LIT }
+	parent = defensive
+	desc = "Vilnius and Memel."
+	aggression = 0.5 defense = 1.3
+	rivals = { POL = 1.5 GER = 0.5 }
+	friends = { SOV = 0.6 LAT = 1.0 EST = 0.8 }
+}
+
+finland = {
+	countries = { FIN }
+	parent = defensive
+	desc = "Finland, wary of its eastern neighbour."
+	aggression = 0.4 defense = 1.6 land = 1.2 diplomacy = 1.0
+	rivals = { SOV = 1.5 }
+	friends = { SWE = 1.2 EST = 1.2 GER = 0.5 }
+}
+
+sweden = {
+	countries = { SWE }
+	parent = isolationist
+	desc = "Swedish neutrality."
+	isolation = 2.0 defense = 1.2 aggression = 0.2
+}
+
+switzerland = {
+	countries = { SWI }
+	parent = isolationist
+	desc = "Armed neutrality."
+	isolation = 2.2 defense = 1.4 aggression = 0.1
+}
+
+ireland = {
+	countries = { IRE }
+	parent = isolationist
+	desc = "The Free State, hoping for a united Ireland."
+	isolation = 1.6 aggression = 0.2
+	rivals = { ENG = 0.5 }
+	want = { ENG = 0.5 }
+}
+
+belgium = {
+	countries = { BEL }
+	parent = defensive
+	desc = "Belgium and its fortress line."
+	aggression = 0.3 defense = 1.5 isolation = 1.0
+	rivals = { GER = 0.8 }
+	friends = { FRA = 1.2 ENG = 1.2 }
+}
+
+netherlands = {
+	countries = { HOL }
+	parent = isolationist
+	desc = "Dutch neutrality and the East Indies."
+	isolation = 1.7 defense = 1.2 aggression = 0.2
+	friends = { ENG = 1.0 }
+}
+
+greece = {
+	countries = { GRE }
+	parent = defensive
+	desc = "Greece between Italy, Bulgaria and Turkey."
+	aggression = 0.4 defense = 1.4
+	rivals = { TUR = 1.0 BUL = 0.8 ITA = 0.5 }
+	friends = { ENG = 1.0 FRA = 0.6 }
+}
+
+albania = {
+	countries = { ALB }
+	parent = passive
+	desc = "Zog's Albania, dependent on Rome."
+	aggression = 0.1
+	friends = { ITA = 1.5 }
+}
+
+argentina = {
+	countries = { ARG }
+	parent = opportunist
+	desc = "The southern cone's richest nation."
+	aggression = 0.5 expansion = 0.6 navy = 1.0 isolation = 1.0
+	rivals = { BRA = 1.2 CHL = 0.8 ENG = 0.3 }
+	want = { ENG = 0.3 }
+}
+
+brazil = {
+	countries = { BRA }
+	parent = opportunist
+	desc = "Brazil."
+	aggression = 0.4 expansion = 0.5 isolation = 1.0
+	rivals = { ARG = 1.0 }
+}
+
+chile = {
+	countries = { CHL }
+	parent = defensive
+	desc = "Chile."
+	aggression = 0.4 defense = 1.3
+	rivals = { PRU = 0.8 ARG = 0.8 BOL = 0.5 }
+}
+
+bolivia = {
+	countries = { BOL }
+	parent = aggressive
+	desc = "Landlocked Bolivia and the Chaco."
+	aggression = 1.0 expansion = 1.0 risk = 1.0 defense = 1.0
+	rivals = { PAR = 2.0 CHL = 1.0 }
+	want = { PAR = 1.5 }
+}
+
+paraguay = {
+	countries = { PAR }
+	parent = defensive
+	desc = "Paraguay and the Chaco."
+	aggression = 0.8 defense = 1.3 risk = 1.0
+	rivals = { BOL = 2.0 }
+	want = { BOL = 1.0 }
+}
+
+peru = {
+	countries = { PRU }
+	parent = opportunist
+	desc = "Peru and its frontiers."
+	aggression = 0.7 expansion = 0.8
+	rivals = { ECU = 1.5 CHL = 0.8 COL = 0.8 }
+	want = { ECU = 0.8 }
+}
+
+ecuador = {
+	countries = { ECU }
+	parent = defensive
+	desc = "Ecuador and its lost Amazon."
+	aggression = 0.4 defense = 1.3
+	rivals = { PRU = 1.5 }
+}
+
+saudi_arabia = {
+	countries = { SAU }
+	parent = opportunist
+	desc = "Ibn Saud: unify Arabia."
+	aggression = 1.0 expansion = 1.3 risk = 1.0 land = 1.2
+	rivals = { YEM = 1.0 }
+	friends = { ENG = 0.5 }
+	want = { YEM = 1.5 OMA = 0.8 }
+}
+
+ethiopia = {
+	countries = { ETH }
+	parent = defensive
+	desc = "Haile Selassie's empire, modernising."
+	aggression = 0.3 defense = 1.6 risk = 0.6
+	rivals = { ITA = 1.5 }
+}
+
+persia = {
+	countries = { PER }
+	parent = defensive
+	desc = "Reza Shah's modernising Iran."
+	aggression = 0.5 defense = 1.4 isolation = 1.2
+	rivals = { SOV = 1.0 ENG = 0.8 }
+	friends = { AFG = 0.8 TUR = 0.6 }
+}
+
+india = {
+	countries = { RAJ }
+	parent = passive
+	desc = "The Raj, an army for the empire."
+	aggression = 0.2 defense = 1.0 isolation = 1.0
+	friends = { ENG = 1.5 }
+}
+
+dominions = {
+	countries = { CAN AST NZL SAF }
+	parent = status_quo
+	desc = "The Dominions, loyal but distant."
+	aggression = 0.3 isolation = 1.3 defense = 1.0
+	friends = { ENG = 1.5 }
+}
+
+mongolia = {
+	countries = { MON TAN }
+	parent = passive
+	desc = "Soviet clients in Inner Asia."
+	aggression = 0.1
+	rivals = { JAP = 1.0 }
+	friends = { SOV = 2.0 }
+}

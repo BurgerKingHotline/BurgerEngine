@@ -61,6 +61,14 @@ public sealed class GameRules
     public Burger.Core.Politics.PoliticsRules Politics = new();
     /// <summary>Population growth, assimilation, conversion, migration, output, cores and colonies (population features).</summary>
     public Burger.Core.Population.PopulationRules Population = new();
+    /// <summary>Research points, slots, costs and what the AI researches (technology feature).</summary>
+    public Burger.Core.Technology.TechRules Tech = new();
+    /// <summary>Commodity output, demand and trade (commodities feature).</summary>
+    public Burger.Core.Production.CommodityRules Commodities = new();
+    /// <summary>How long a focus takes and how often the AI starts one (focus feature).</summary>
+    public Burger.Core.Mechanics.FocusRules Focus = new();
+    /// <summary>Which archetype a country has, what it wants of others, and how strongly history counts (ai_profiles feature).</summary>
+    public Burger.Core.AI.AiProfileRules AiProfile = new();
 }
 
 /// <summary>
@@ -101,6 +109,14 @@ public sealed class Game
     public Burger.Core.Politics.PoliticsSystem Politics { get; }
     /// <summary>Pops, cultures, religions, social classes, cores and claims, colonies (population features).</summary>
     public Burger.Core.Population.PopulationSystem Population { get; }
+    /// <summary>Technologies and research (technology feature).</summary>
+    public Burger.Core.Technology.TechSystem Tech { get; }
+    /// <summary>Strategic commodities: deposits, shortages and trade (commodities feature).</summary>
+    public Burger.Core.Production.CommoditySystem Commodities { get; }
+    /// <summary>National focus trees (focus feature).</summary>
+    public Burger.Core.Mechanics.FocusSystem Focus { get; }
+    /// <summary>AI archetypes and the historical profiles of countries (ai_profiles feature).</summary>
+    public Burger.Core.AI.AiProfileSystem AiProfiles { get; }
     /// <summary>Named formulas from common/script_values (some replace engine formulas).</summary>
     public ScriptValueSystem ScriptValues { get; }
     /// <summary>Modifiers from common/modifiers (timed, permanent and conditional).</summary>
@@ -123,6 +139,13 @@ public sealed class Game
     public readonly List<Notification> Notifications = new();
     public readonly List<Proposal> PendingProposals = new();
     public bool Started { get; private set; }
+
+    /// <summary>
+    /// How strongly the historical motives of the AI (rivals, claims, ambitions in common/ai_profiles) count, 0-1: at 1 games usually
+    /// develop very historically, lower values let countries behave like their generic archetype and alternate history happen.
+    /// Chosen at the start of a game.
+    /// </summary>
+    public double HistoricalBias { get; set; } = 0.75;
 
     /// <summary>Neighbouring countries per country (cache used by NeighborCountries).</summary>
     internal readonly Dictionary<Country, (long Stamp, int Version, List<Country> List)> NeighborCache = new();
@@ -150,6 +173,10 @@ public sealed class Game
         Support = new Burger.Core.Warfare.SupportSystem(this);
         Politics = new Burger.Core.Politics.PoliticsSystem(this);
         Population = new Burger.Core.Population.PopulationSystem(this);
+        Tech = new Burger.Core.Technology.TechSystem(this);
+        Focus = new Burger.Core.Mechanics.FocusSystem(this);
+        Commodities = new Burger.Core.Production.CommoditySystem(this);
+        AiProfiles = new Burger.Core.AI.AiProfileSystem(this);
         ScriptValues = new ScriptValueSystem(this);
         Modifiers = new ModifierSystem(this);
         Resources = new ResourceSystem(this);
@@ -164,6 +191,7 @@ public sealed class Game
         Modifiers.Providers.Add((scope, key) => Politics.ModifierValue(scope, key));
         Modifiers.Providers.Add((scope, key) => Population.ModifierValue(scope, key));
         Modifiers.Providers.Add((scope, key) => Diplomacy.ExhaustionModifierValue(scope, key));
+        Modifiers.Providers.Add((scope, key) => Tech.ModifierValue(scope, key));
         Diplomacy.RegisterScript();
         Politics.RegisterCommands(Commands);
     }
@@ -182,8 +210,14 @@ public sealed class Game
         var sw = System.Diagnostics.Stopwatch.StartNew();
         game.Features = Burger.Core.Modding.FeatureSet.Load(game.Data.Root);
         DataLoader.LoadDefinitions(game);
+        game.Tech.LoadDefinitions(game.Data);
+        game.Focus.Load(game.Data);
+        game.Commodities.LoadDefinitions(game.Data);
+        game.AiProfiles.LoadDefinitions(game.Data);
         if (compileScripts) game.Mods.CompileAndLoad();
         WorldLoader.LoadWorld(game);
+        game.Commodities.LoadWorld();
+        game.Diplomacy.LoadDemilitarized();
         game.Mods.Invoke(m => m.OnLoad());
         ScriptValidator.ValidateAll(game);
         for (int i = 0; i < 5; i++) game.Clock.DaysPerSecond[i + 1] = game.Data.Defines.GameSpeeds[i];
@@ -206,13 +240,53 @@ public sealed class Game
         if (Features.Has(F.Military)) Warfare.DailyTick();
         if (Features.Has(F.Navy)) Navy.OnGameStart();
         if (Features.Has(F.Air)) Air.OnGameStart();
+        Tech.OnGameStart(); // before production sets up its lines: what a country can build depends on what it knows
         if (Features.Has(F.Production)) Production.OnGameStart();
         if (Features.Has(F.Diplomacy)) Diplomacy.UpdateWarScores();
+        AiProfiles.ForgetCache();
+        RefreshNames();
         Mods.Invoke(m => m.OnGameStart());
         foreach (var c in World.Countries.Where(c => c.Exists))
             Events.FireOnAction("on_game_start", c);
         Events.FireOnAction("on_game_start_global", null);
         RaiseMapChanged();
+    }
+
+    /// <summary>
+    /// A country's name follows its government and its dependence (country_names in its definition): ideology_subject, then
+    /// subject, then the ruling ideology, else the name it started with. A name a script set (set_country_name) is left alone.
+    /// </summary>
+    public void RefreshName(Country c)
+    {
+        string? ide = Politics.Enabled ? Politics.Of(c).Ruling : null;
+        bool subject = World.Relations.OverlordOf(c) != null;
+        if (c.NameVariants.Count > 0 && !c.Vars.HasFlag("name_scripted"))
+        {
+            string? name = null;
+            if (subject && ide != null) c.NameVariants.TryGetValue(ide + "_subject", out name);
+            if (name == null && subject) c.NameVariants.TryGetValue("subject", out name);
+            if (name == null && ide != null) c.NameVariants.TryGetValue(ide, out name);
+            string want = name ?? c.DefaultName;
+            if (c.RawName != want) c.Name = want;
+        }
+        // the same for the map color: an own color for the government, else the ideology's tint of the original color
+        // (a country that is red as a communist state is not red when it is not one)
+        if (!c.Dynamic && !c.Vars.HasFlag("color_scripted"))
+        {
+            Rgb? col = null;
+            if (subject && ide != null && c.ColorVariants.TryGetValue(ide + "_subject", out var a)) col = a;
+            if (col == null && subject && c.ColorVariants.TryGetValue("subject", out var b)) col = b;
+            if (col == null && ide != null && c.ColorVariants.TryGetValue(ide, out var d)) col = d;
+            if (col == null && ide != null && Politics.Ideology(ide) is { ColorBlend: { } blend } i) col = c.DefaultColor.Lerp(blend, i.ColorBlendAmount);
+            var wantColor = col ?? c.DefaultColor;
+            if (!c.Color.Equals(wantColor)) { c.Color = wantColor; RaiseMapChanged(); }
+        }
+    }
+
+    public void RefreshNames()
+    {
+        foreach (var c in World.Countries)
+            if (c.Exists) RefreshName(c);
     }
 
     /// <summary>Used by the save loader.</summary>
@@ -237,13 +311,17 @@ public sealed class Game
     /// <summary>Set to measure how long each system takes (milliseconds per system in <see cref="ProfileMs"/>).</summary>
     public bool Profiling { get; set; }
     public readonly Dictionary<string, double> ProfileMs = new();
+    /// <summary>The longest single call per system in milliseconds (what the player feels as a hitch).</summary>
+    public readonly Dictionary<string, double> ProfileMaxMs = new();
 
     public void P(string name, Action a)
     {
         if (!Profiling) { a(); return; }
         long t0 = System.Diagnostics.Stopwatch.GetTimestamp();
         a();
-        ProfileMs[name] = ProfileMs.GetValueOrDefault(name) + (System.Diagnostics.Stopwatch.GetTimestamp() - t0) * 1000.0 / System.Diagnostics.Stopwatch.Frequency;
+        double ms = (System.Diagnostics.Stopwatch.GetTimestamp() - t0) * 1000.0 / System.Diagnostics.Stopwatch.Frequency;
+        ProfileMs[name] = ProfileMs.GetValueOrDefault(name) + ms;
+        if (ms > ProfileMaxMs.GetValueOrDefault(name)) ProfileMaxMs[name] = ms;
     }
 
     /// <summary>Advances the simulation by one hour.</summary>
@@ -312,6 +390,9 @@ public sealed class Game
         if (Features.Has(F.LendLease)) P("Support.MonthlyTick", () => Support.MonthlyTick());
         P("Resources.MonthlyTick", () => Resources.MonthlyTick());
         P("Modifiers.MonthlyTick", () => Modifiers.MonthlyTick());
+        if (Features.Has(F.Technology)) P("Tech.MonthlyTick", () => Tech.MonthlyTick());
+        if (Features.Has(F.Focus)) P("Focus.MonthlyTick", () => Focus.MonthlyTick());
+        if (Features.Has(F.Commodities)) P("Commodities.MonthlyTick", () => Commodities.MonthlyTick());
         if (Features.Has(F.Diplomacy)) P("Diplomacy.MonthlyTick", () => Diplomacy.MonthlyTick());
         if (Features.Has(F.Characters)) P("Characters.MonthlyTick", () => Characters.MonthlyTick());
         if (Features.Has(F.Politics)) P("Politics.MonthlyTick", () => Politics.MonthlyTick());

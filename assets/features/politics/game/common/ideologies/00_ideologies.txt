@@ -4,6 +4,8 @@
 #   party_name     default party name (countries can rename it: history/politics or set_party_name)
 #   elections      countries ruled by this ideology hold elections
 #   extremist      gains popularity when stability is low or a war goes badly
+#   country_color_blend  { color = { r g b } amount = 0.45 }: the map color of countries ruled by it, unless the country has its own (country_colors)
+#   weak_democracy_drift  popularity it gains a month where elections are held but stability or support for the government is low
 #   coalition      parties it will govern with (both sides must list each other)
 #   opinion        opinion its rulers have of countries ruled by each ideology
 #   modifier       modifiers for countries ruled by it (any modifier key: manpower, production, political_power_gain...)
@@ -27,6 +29,8 @@ communist = {
 	party_name = "Communist Party"
 	color = { 190 30 35 }
 	extremist = yes
+	# countries without a color of their own for this ideology are tinted red under it
+	country_color_blend = { color = { 190 30 35 } amount = 0.45 }
 	opinion = { communist = 20 democratic = -15 fascist = -40 neutrality = -10 }
 	modifier = { political_power_gain = 3 manpower = 0.1 }
 	government = socialist_republic
@@ -37,6 +41,7 @@ fascist = {
 	party_name = "National Party"
 	color = { 120 80 45 }
 	extremist = yes
+	weak_democracy_drift = 0.6
 	coalition = { neutrality }
 	opinion = { fascist = 20 democratic = -20 communist = -40 neutrality = -5 }
 	modifier = { political_power_gain = 3 manpower = 0.15 }

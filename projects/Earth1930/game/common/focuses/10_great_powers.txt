@@ -1,0 +1,311 @@
+# Historical trees of the powers. Reasons, not dates: a focus is available when the country's situation allows it, and the AI chooses by its character,
+# its ideology and what it faces. A demand (make_demand) is put to the neighbour, who answers by the acceptance rules of the diplomatic action.
+
+tree_germany = {
+	countries = { GER }
+
+	focus = { id = ger_republic_reform days = 80 x = 0 y = 0
+		name = "Stabilise the Republic" desc = "Emergency decrees, a grand coalition, a way out of the Depression within the constitution."
+		mutually_exclusive = { focus = ger_authoritarian_turn }
+		available = { ruling_ideology = democratic }
+		completion_reward = { add_modifier = { name = economic_stimulus years = 3 } add_stability = 6 add_popularity = { ideology = democratic value = 0.05 } }
+		ai_will_do = { base = 3 modifier = { add = 2 popularity_democratic >= 0.4 } modifier = { factor = 0.3 popularity_fascist >= 0.3 } } }
+	focus = { id = ger_authoritarian_turn days = 60 x = 1 y = 0
+		name = "Rule by Decree" desc = "Parliament sidelined: the government rules by emergency powers and the strong man is called for."
+		mutually_exclusive = { focus = ger_republic_reform }
+		available = { popularity_fascist >= 0.15 }
+		completion_reward = { add_popularity = { ideology = fascist value = 0.06 } add_political_power = 30 }
+		ai_will_do = { base = 0 modifier = { add = 4 popularity_fascist >= 0.3 } modifier = { add = 2 stability < 40 } modifier = { factor = 0.2 ruling_ideology = democratic popularity_democratic >= 0.5 } } }
+	focus = { id = ger_work_creation days = 70 x = 0 y = 1
+		name = "Work Creation" desc = "Public works, motorways and rearmament orders put the unemployed back to work."
+		prerequisite = { focus = ger_republic_reform focus = ger_authoritarian_turn }
+		completion_reward = { add_modifier = { name = industrial_drive years = 5 } add_stability = 3 }
+		ai_will_do = { base = 3 } }
+	focus = { id = ger_secret_rearmament days = 90 x = 1 y = 1
+		name = "Secret Rearmament" desc = "Training and arms behind the screen of the treaty limits."
+		prerequisite = { focus = ger_work_creation }
+		completion_reward = { add_modifier = { name = rearmament years = 6 } set_law = extensive_conscription }
+		ai_will_do = { base = 1 modifier = { add = 3 ai_aggression >= 1.0 } modifier = { add = 3 ruling_ideology = fascist } } }
+	focus = { id = ger_reject_the_zone days = 40 x = 2 y = 1
+		name = "Remilitarise the Rhineland" desc = "The treaty zone is German land. March in, and see whether the guarantors stand to it."
+		prerequisite = { focus = ger_secret_rearmament }
+		available = { has_demilitarized_states = yes NOT = { is_at_war = yes } }
+		completion_reward = { remilitarize_states = yes add_stability = 2 }
+		ai_will_do = { base = 0 modifier = { add = 5 remilitarization_odds >= 0.35 ruling_ideology = fascist } modifier = { add = 4 remilitarization_odds >= 0.7 } modifier = { factor = 0 remilitarization_odds < 0.25 } } }
+	focus = { id = ger_four_year_plan days = 100 x = 0 y = 2
+		name = "Four-Year Plan" desc = "Make the country ready for war: synthetic fuel and rubber, steel, self-sufficiency."
+		prerequisite = { focus = ger_work_creation }
+		available = { ruling_ideology = fascist }
+		completion_reward = { add_modifier = { name = autarky_programme years = 6 } }
+		ai_will_do = { base = 2 modifier = { add = 3 commodity_shortage > 0.2 } } }
+	focus = { id = ger_air_power days = 90 x = 1 y = 2
+		name = "Build the Luftwaffe" desc = "An air force in the open."
+		prerequisite = { focus = ger_secret_rearmament }
+		completion_reward = { add_modifier = { name = air_programme years = 6 } }
+		ai_will_do = { base = 2 modifier = { add = 2 ai_aggression >= 1.2 } } }
+	focus = { id = ger_claim_sudeten days = 50 x = 2 y = 2
+		name = "The Sudeten Question" desc = "Three million Germans live under Prague. Press their cause."
+		prerequisite = { focus = ger_secret_rearmament }
+		available = { ruling_ideology = fascist }
+		completion_reward = { add_claim = usti_nad_labem_state add_opinion = { target = CZE value = -30 name = "Sudeten agitation" } }
+		ai_will_do = { base = 1 modifier = { add = 3 stronger_than = { target = CZE ratio = 1.0 } } modifier = { factor = 0 NOT = { ai_ambition = { target = CZE min = 1 } } } } }
+	focus = { id = ger_demand_sudeten days = 30 x = 2 y = 3
+		name = "Demand the Sudetenland" desc = "Put the demand to Prague. What follows is up to Prague and its friends."
+		prerequisite = { focus = ger_claim_sudeten }
+		available = { can_demand = { target = CZE action = demand_state } }
+		completion_reward = { make_demand = CZE }
+		ai_will_do = { base = 0 modifier = { add = 6 stronger_than = { target = CZE ratio = 1.3 } } modifier = { add = 3 stronger_than = { target = CZE ratio = 2 } } modifier = { factor = 0 NOT = { ai_ambition = { target = CZE min = 1.5 } } } } }
+	focus = { id = ger_czech_rump days = 40 x = 2 y = 4
+		name = "The Rump of Czechoslovakia" desc = "What is left of the state in Prague cannot stand alone."
+		prerequisite = { focus = ger_demand_sudeten }
+		available = { can_demand = { target = CZE action = demand_subjugation } }
+		completion_reward = { make_demand = { target = CZE action = demand_subjugation } }
+		ai_will_do = { base = 0 modifier = { add = 5 stronger_than = { target = CZE ratio = 2 } } modifier = { factor = 0 NOT = { ai_ambition = { target = CZE min = 2 } } } } }
+	focus = { id = ger_poland_question days = 50 x = 3 y = 4
+		name = "The Corridor" desc = "The border in the east was drawn in 1919, and is not accepted."
+		prerequisite = { focus = ger_danzig }
+		completion_reward = { add_claim = kuyavian_pomeranian_voivodeship_state add_claim = greater_poland_voivodeship_state add_claim = silesian_voivodeship_state add_opinion = { target = POL value = -40 name = "The corridor" } }
+		ai_will_do = { base = 0 modifier = { add = 4 stronger_than = { target = POL ratio = 1.0 } } modifier = { factor = 0 NOT = { ai_ambition = { target = POL min = 2 } } } } }
+	focus = { id = ger_demand_corridor days = 30 x = 3 y = 5
+		name = "Demand the Corridor" desc = "Put the demand to Warsaw."
+		prerequisite = { focus = ger_poland_question }
+		available = { can_demand = { target = POL action = demand_state } }
+		completion_reward = { make_demand = POL }
+		ai_will_do = { base = 0 modifier = { add = 5 stronger_than = { target = POL ratio = 1.2 } } modifier = { factor = 0 NOT = { ai_ambition = { target = POL min = 2.5 } } } } }
+	focus = { id = ger_anschluss days = 40 x = 3 y = 2
+		name = "Heim ins Reich" desc = "One people, one state: bring Austria under German leadership."
+		prerequisite = { focus = ger_secret_rearmament }
+		available = { can_demand = { target = AUS action = demand_subjugation } ruling_ideology = fascist }
+		completion_reward = { make_demand = { target = AUS action = demand_subjugation } }
+		ai_will_do = { base = 1 modifier = { add = 5 stronger_than = { target = AUS ratio = 2 } } modifier = { factor = 0 NOT = { ai_ambition = { target = AUS min = 1.5 } } } } }
+	focus = { id = ger_danzig days = 40 x = 3 y = 3
+		name = "The Free City" desc = "Danzig must return to the Reich."
+		prerequisite = { focus = ger_anschluss focus = ger_demand_sudeten }
+		available = { can_demand = { target = DNZ action = demand_subjugation } }
+		completion_reward = { make_demand = { target = DNZ action = demand_subjugation } }
+		ai_will_do = { base = 1 modifier = { add = 3 stronger_than = { target = POL ratio = 1.0 } } modifier = { factor = 0 NOT = { ai_ambition = { target = DNZ min = 1.5 } } } } }
+	focus = { id = ger_memel days = 40 x = 4 y = 3
+		name = "The Memel Land" desc = "Press Lithuania for the Memel territory."
+		prerequisite = { focus = ger_anschluss }
+		available = { can_demand = { target = LIT action = demand_state } }
+		completion_reward = { add_claim = klaipeda_state make_demand = LIT }
+		ai_will_do = { base = 1 modifier = { add = 3 stronger_than = { target = LIT ratio = 3 } } modifier = { factor = 0 NOT = { ai_ambition = { target = LIT min = 1 } } } } }
+}
+
+tree_italy = {
+	countries = { ITA }
+
+	focus = { id = ita_corporate_state days = 70 x = 0 y = 0
+		name = "The Corporate State" desc = "Organise labour and capital under the party."
+		available = { ruling_ideology = fascist }
+		completion_reward = { add_modifier = { name = national_unity years = 6 } }
+		ai_will_do = { base = 3 } }
+	focus = { id = ita_battle_for_grain days = 70 x = 1 y = 0
+		name = "The Battle for Grain" desc = "Self-sufficiency in food and heavy industry."
+		prerequisite = { focus = ita_corporate_state }
+		completion_reward = { add_modifier = { name = autarky_programme years = 5 } }
+		ai_will_do = { base = 2 } }
+	focus = { id = ita_regia_marina days = 90 x = 0 y = 1
+		name = "Mare Nostrum" desc = "Fleet of battleships and fast cruisers to command the middle sea."
+		prerequisite = { focus = ita_corporate_state }
+		completion_reward = { add_modifier = { name = naval_expansion years = 6 } }
+		ai_will_do = { base = 2 } }
+	focus = { id = ita_regia_aeronautica days = 80 x = 1 y = 1
+		name = "Regia Aeronautica" desc = "Aviation, the pride of the regime."
+		prerequisite = { focus = ita_corporate_state }
+		completion_reward = { add_modifier = { name = air_programme years = 6 } }
+		ai_will_do = { base = 2 } }
+	focus = { id = ita_african_ambition days = 60 x = 2 y = 1
+		name = "A Place in the Sun" desc = "An empire in East Africa, and revenge for Adwa."
+		prerequisite = { focus = ita_corporate_state }
+		available = { ruling_ideology = fascist }
+		completion_reward = { add_claim = amhara_state add_claim = addis_ababa_state add_claim = southern_nations_state add_opinion = { target = ETH value = -25 name = "Italian designs" } }
+		ai_will_do = { base = 2 modifier = { add = 3 stronger_than = { target = ETH ratio = 1.5 } } modifier = { factor = 0 NOT = { ai_ambition = { target = ETH min = 1.5 } } } } }
+	focus = { id = ita_demand_ethiopia days = 40 x = 2 y = 2
+		name = "The Ethiopian Demands" desc = "Put the claims to the Emperor."
+		prerequisite = { focus = ita_african_ambition }
+		available = { can_demand = { target = ETH action = demand_state } }
+		completion_reward = { make_demand = ETH }
+		ai_will_do = { base = 0 modifier = { add = 6 stronger_than = { target = ETH ratio = 1.5 } } modifier = { factor = 0 NOT = { ai_ambition = { target = ETH min = 1.5 } } } } }
+	focus = { id = ita_adriatic days = 60 x = 2 y = 2
+		name = "The Adriatic Lake" desc = "Albania and the eastern shore."
+		prerequisite = { focus = ita_regia_marina }
+		available = { can_demand = { target = ALB action = demand_subjugation } }
+		completion_reward = { make_demand = { target = ALB action = demand_subjugation } }
+		ai_will_do = { base = 1 modifier = { add = 3 stronger_than = { target = ALB ratio = 4 } } modifier = { factor = 0 NOT = { ai_ambition = { target = ALB min = 1 } } } } }
+	focus = { id = ita_pact_of_steel days = 60 x = 3 y = 2
+		name = "The Axis" desc = "Bind Italy to the other revisionist power."
+		prerequisite = { focus = ita_regia_marina focus = ita_regia_aeronautica }
+		available = { ruling_ideology = fascist GER = { ruling_ideology = fascist } }
+		completion_reward = { propose_action = { target = GER action = offer_alliance } }
+		ai_will_do = { base = 0 modifier = { add = 3 any_neighbor_country = { stronger_than = { target = ROOT ratio = 1.2 } ideological_enemy = ROOT } } modifier = { add = 3 ai_aggression >= 1.2 } } }
+}
+
+tree_japan = {
+	countries = { JAP }
+
+	focus = { id = jap_zaibatsu days = 70 x = 0 y = 0
+		name = "Heavy Industry" desc = "The zaibatsu and the state build the arsenals."
+		completion_reward = { add_modifier = { name = industrial_drive years = 5 } }
+		ai_will_do = { base = 3 } }
+	focus = { id = jap_imperial_navy days = 90 x = 0 y = 1
+		name = "The Imperial Navy" desc = "A fleet second to none in the Pacific."
+		prerequisite = { focus = jap_zaibatsu }
+		completion_reward = { add_modifier = { name = naval_expansion years = 6 } }
+		ai_will_do = { base = 3 } }
+	focus = { id = jap_army_faction days = 80 x = 1 y = 1
+		name = "Strike North or South" desc = "The army's plans for the mainland."
+		prerequisite = { focus = jap_zaibatsu }
+		available = { OR = { ruling_ideology = fascist stability < 55 } }
+		completion_reward = { add_modifier = { name = rearmament years = 6 } add_popularity = { ideology = fascist value = 0.05 } }
+		ai_will_do = { base = 2 modifier = { add = 3 ai_aggression >= 1.2 } } }
+	focus = { id = jap_manchuria days = 60 x = 1 y = 2
+		name = "The Manchurian Question" desc = "The mainland is the answer to scarcity: iron, coal, soybeans."
+		prerequisite = { focus = jap_army_faction }
+		completion_reward = { add_claim = southeast_liaoning_state add_claim = northeast_liaoning_state add_claim = west_liaoning_state add_claim = southwest_jilin_state add_claim = east_jilin_state add_claim = northwest_jilin_state add_opinion = { target = CHI value = -40 name = "Mukden" } }
+		ai_will_do = { base = 2 modifier = { add = 3 stronger_than = { target = CHI ratio = 0.4 } } modifier = { add = 2 commodity_shortage > 0.1 } } }
+	focus = { id = jap_demand_manchuria days = 30 x = 1 y = 3
+		name = "Settle the Manchurian Question" desc = "Put the demand to the Chinese government."
+		prerequisite = { focus = jap_manchuria }
+		available = { can_demand = { target = CHI action = demand_state } }
+		completion_reward = { make_demand = CHI }
+		ai_will_do = { base = 0 modifier = { add = 6 stronger_than = { target = CHI ratio = 0.4 } } modifier = { factor = 0 NOT = { ai_ambition = { target = CHI min = 2 } } } } }
+	focus = { id = jap_aircraft days = 80 x = 0 y = 2
+		name = "Naval Aviation" desc = "Carriers and long-range bombers."
+		prerequisite = { focus = jap_imperial_navy }
+		completion_reward = { add_modifier = { name = air_programme years = 6 } }
+		ai_will_do = { base = 2 } }
+}
+
+tree_soviet_union = {
+	countries = { SOV }
+
+	focus = { id = sov_five_year_plan days = 80 x = 0 y = 0
+		name = "The Five-Year Plan" desc = "Industrialise at any cost."
+		completion_reward = { add_modifier = { name = five_year_plan years = 6 } }
+		ai_will_do = { base = 5 } }
+	focus = { id = sov_collectivisation days = 80 x = 1 y = 0
+		name = "Collectivisation" desc = "Farms into collectives, grain for the cities."
+		prerequisite = { focus = sov_five_year_plan }
+		completion_reward = { add_modifier = { name = economic_stimulus years = 3 } add_stability = -2 }
+		ai_will_do = { base = 2 } }
+	focus = { id = sov_red_army days = 90 x = 0 y = 1
+		name = "Modernise the Red Army" desc = "Tank armies, deep battle, parachute troops."
+		prerequisite = { focus = sov_five_year_plan }
+		completion_reward = { add_modifier = { name = army_reform_programme years = 6 } set_law = extensive_conscription }
+		ai_will_do = { base = 3 modifier = { add = 3 any_neighbor_country = { stronger_than = { target = ROOT ratio = 1.2 } ideological_enemy = ROOT } } } }
+	focus = { id = sov_purges days = 60 x = 1 y = 1
+		name = "Vigilance" desc = "Root out enemies of the state - and weaken the army."
+		prerequisite = { focus = sov_collectivisation }
+		completion_reward = { add_stability = 4 add_political_power = 40 }
+		ai_will_do = { base = 1 modifier = { add = 2 stability < 50 } } }
+	focus = { id = sov_eastern_poland days = 50 x = 1 y = 2
+		name = "The Eastern Provinces" desc = "Demand back the lands taken in 1920."
+		prerequisite = { focus = sov_red_army }
+		available = { can_demand = { target = POL action = demand_state } }
+		completion_reward = { make_demand = POL }
+		ai_will_do = { base = 0 modifier = { add = 4 stronger_than = { target = POL ratio = 1.5 } } modifier = { factor = 0 NOT = { ai_ambition = { target = POL min = 1 } } } } }
+	focus = { id = sov_finnish_border days = 50 x = 2 y = 2
+		name = "Secure Leningrad" desc = "The Finnish border is too close to the city; ask for it to be moved."
+		prerequisite = { focus = sov_red_army }
+		available = { can_demand = { target = FIN action = demand_state } }
+		completion_reward = { add_claim = viipuri_state make_demand = FIN }
+		ai_will_do = { base = 0 modifier = { add = 4 stronger_than = { target = FIN ratio = 3 } } modifier = { factor = 0 NOT = { ai_ambition = { target = FIN min = 0.5 } } } } }
+	focus = { id = sov_western_borderlands days = 60 x = 0 y = 2
+		name = "The Western Borderlands" desc = "Press the Baltic states and Finland about their land."
+		prerequisite = { focus = sov_red_army }
+		available = { can_demand = { target = EST action = demand_subjugation } }
+		completion_reward = { make_demand = { target = EST action = demand_subjugation } make_demand = { target = LAT action = demand_subjugation } }
+		ai_will_do = { base = 0 modifier = { add = 3 stronger_than = { target = EST ratio = 4 } } modifier = { factor = 0 NOT = { ai_ambition = { target = EST min = 0.5 } } } } }
+}
+
+tree_united_kingdom = {
+	countries = { ENG }
+
+	focus = { id = eng_national_government days = 60 x = 2 y = 0
+		name = "The National Government" desc = "The parties close ranks behind a coalition to see the country through the slump."
+		available = { ruling_ideology = democratic }
+		completion_reward = { add_modifier = { name = national_unity years = 6 } add_popularity = { ideology = democratic value = 0.05 } add_popularity = { ideology = fascist value = -0.03 } }
+		ai_will_do = { base = 2 modifier = { add = 4 stability < 55 } modifier = { add = 3 popularity_fascist >= 0.15 } } }
+	focus = { id = eng_imperial_preference days = 70 x = 0 y = 0
+		name = "Imperial Preference" desc = "Bind the Empire's trade together against the slump."
+		completion_reward = { add_modifier = { name = economic_stimulus years = 3 } add_stability = 2 }
+		ai_will_do = { base = 4 } }
+	focus = { id = eng_fleet days = 90 x = 0 y = 1
+		name = "The Two-Power Standard" desc = "A navy for two oceans."
+		prerequisite = { focus = eng_imperial_preference }
+		completion_reward = { add_modifier = { name = naval_expansion years = 6 } }
+		ai_will_do = { base = 3 } }
+	focus = { id = eng_air_defence days = 90 x = 1 y = 1
+		name = "Radar and the Fighter" desc = "Hurricanes, Spitfires and a chain of stations."
+		prerequisite = { focus = eng_imperial_preference }
+		completion_reward = { add_modifier = { name = air_programme years = 6 } add_modifier = { name = scientific_drive years = 4 } }
+		ai_will_do = { base = 2 modifier = { add = 3 any_neighbor_country = { stronger_than = { target = ROOT ratio = 1.2 } ideological_enemy = ROOT } } } }
+	focus = { id = eng_rearm days = 100 x = 1 y = 2
+		name = "Rearm" desc = "Appeasement runs out: put the economy on a war footing."
+		prerequisite = { focus = eng_air_defence focus = eng_fleet }
+		completion_reward = { add_modifier = { name = rearmament years = 6 } set_law = extensive_conscription }
+		ai_will_do = { base = 1 modifier = { add = 4 any_neighbor_country = { stronger_than = { target = ROOT ratio = 1.0 } ideological_enemy = ROOT } } } }
+	focus = { id = eng_transfer_of_power days = 100 x = 3 y = 1
+		name = "Transfer of Power" desc = "The Empire cannot afford the Raj any more; the Indian national movement is too strong to hold."
+		prerequisite = { focus = eng_imperial_preference }
+		available = { is_overlord_of = RAJ }
+		completion_reward = { release_subject = RAJ }
+		ai_will_do = { base = 0 modifier = { add = 2 war_exhaustion >= 3 } modifier = { add = 3 war_exhaustion >= 6 } modifier = { factor = 0 war_exhaustion < 1.5 } } }
+	focus = { id = eng_dominion_levies days = 70 x = 2 y = 1
+		name = "Call on the Dominions" desc = "Raise troops from the Empire."
+		prerequisite = { focus = eng_imperial_preference }
+		completion_reward = { add_modifier = { name = colonial_levies years = 6 } }
+		ai_will_do = { base = 1 } }
+}
+
+tree_france = {
+	countries = { FRA }
+
+	focus = { id = fra_maginot days = 90 x = 0 y = 0
+		name = "The Maginot Line" desc = "Concrete along the German frontier."
+		completion_reward = { add_modifier = { name = national_unity years = 6 } }
+		ai_will_do = { base = 4 } }
+	focus = { id = fra_eastern_allies days = 60 x = 1 y = 0
+		name = "Allies in the East" desc = "Pacts with Poland and the Little Entente."
+		completion_reward = { propose_action = { target = POL action = offer_alliance } }
+		ai_will_do = { base = 1 modifier = { add = 3 any_neighbor_country = { ideological_enemy = ROOT stronger_than = { target = ROOT ratio = 1.0 } } } } }
+	focus = { id = fra_army days = 90 x = 0 y = 1
+		name = "Modernise the Army" desc = "Mechanise the divisions."
+		prerequisite = { focus = fra_maginot }
+		completion_reward = { add_modifier = { name = army_reform_programme years = 6 } }
+		ai_will_do = { base = 2 } }
+	focus = { id = fra_colonial_troops days = 70 x = 1 y = 1
+		name = "The Colonial Armies" desc = "Troops from Africa and Indochina."
+		prerequisite = { focus = fra_maginot }
+		completion_reward = { add_modifier = { name = colonial_levies years = 6 } }
+		ai_will_do = { base = 1 } }
+	focus = { id = fra_front_populaire days = 70 x = 2 y = 0
+		name = "Social Settlement" desc = "Wages, holidays, the forty-hour week."
+		completion_reward = { add_stability = 5 add_popularity = { ideology = democratic value = 0.03 } }
+		ai_will_do = { base = 2 modifier = { add = 3 stability < 50 } } }
+}
+
+tree_united_states = {
+	countries = { USA }
+
+	focus = { id = usa_new_deal days = 80 x = 0 y = 0
+		name = "The New Deal" desc = "Relief, recovery, reform."
+		completion_reward = { add_modifier = { name = economic_stimulus years = 4 } add_stability = 4 add_popularity = { ideology = democratic value = 0.04 } }
+		ai_will_do = { base = 5 } }
+	focus = { id = usa_industrial_mobilisation days = 90 x = 0 y = 1
+		name = "Arsenal of Democracy" desc = "Turn the factories toward arms."
+		prerequisite = { focus = usa_new_deal }
+		completion_reward = { add_modifier = { name = industrial_drive years = 6 } add_modifier = { name = rearmament years = 5 } }
+		ai_will_do = { base = 1 modifier = { add = 4 any_country = { is_at_war = yes ideological_enemy = ROOT } } } }
+	focus = { id = usa_two_ocean_navy days = 100 x = 1 y = 1
+		name = "A Two-Ocean Navy" desc = "Carriers and battleships for both coasts."
+		prerequisite = { focus = usa_new_deal }
+		completion_reward = { add_modifier = { name = naval_expansion years = 6 } }
+		ai_will_do = { base = 2 modifier = { add = 2 any_country = { is_at_war = yes } } } }
+	focus = { id = usa_research days = 80 x = 2 y = 1
+		name = "Science and Industry" desc = "Laboratories for the nation."
+		prerequisite = { focus = usa_new_deal }
+		completion_reward = { add_modifier = { name = scientific_drive years = 6 } }
+		ai_will_do = { base = 2 } }
+}

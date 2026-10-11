@@ -112,6 +112,8 @@ public sealed class State : IScope
     /// <summary>Gold added to the owner's treasury each month.</summary>
     public double Tax;
     public string Category = "";
+    /// <summary>No armed forces may enter or be raised here (demilitarization feature): the Rhineland, straits, islands. Ends when the owner goes to war.</summary>
+    public bool Demilitarized;
     public Dictionary<string, int> Buildings = new(StringComparer.OrdinalIgnoreCase);
     /// <summary>Building levels out of action (strategic bombing); repaired over time.</summary>
     public Dictionary<string, double> Damaged = new(StringComparer.OrdinalIgnoreCase);

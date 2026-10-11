@@ -1,0 +1,520 @@
+# Technologies (technology feature). Everybody starts with the technology of 1930 minus the lag of their industry (history/technologies.txt).
+#   category   infantry artillery armor doctrine air naval industry (the AI weighs categories by its profile)
+#   year       when it was historically available; researching it earlier costs more (rule Cost)
+#   cost       research points
+#   requires   other technologies
+#   modifier   <stat>_factor = 0.05 changes a division stat by 5% (soft_attack hard_attack defense breakthrough armor piercing speed max_organisation ...);
+#              any other key is a country modifier (production, construction_speed, research_speed, extraction, <commodity>_output, manpower ...)
+#   unlocks    text for the interface; the unit types, ships, planes and equipment name the technology with requires_tech
+
+infantry_weapons_1 = {
+	name = "Infantry Weapons 1918"
+	category = infantry
+	year = 1918
+	cost = 20
+}
+infantry_weapons_2 = {
+	name = "Infantry Weapons 1933"
+	category = infantry
+	year = 1933
+	cost = 36
+	requires = { infantry_weapons_1 }
+	modifier = { soft_attack_factor = 0.07 defense_factor = 0.03 }
+}
+infantry_weapons_3 = {
+	name = "Infantry Weapons 1937"
+	category = infantry
+	year = 1937
+	cost = 44
+	requires = { infantry_weapons_2 }
+	modifier = { soft_attack_factor = 0.07 defense_factor = 0.03 }
+}
+infantry_weapons_4 = {
+	name = "Infantry Weapons 1941"
+	category = infantry
+	year = 1941
+	cost = 54
+	requires = { infantry_weapons_3 }
+	modifier = { soft_attack_factor = 0.07 defense_factor = 0.04 }
+}
+infantry_weapons_5 = {
+	name = "Infantry Weapons 1945"
+	category = infantry
+	year = 1945
+	cost = 64
+	requires = { infantry_weapons_4 }
+	modifier = { soft_attack_factor = 0.06 defense_factor = 0.04 }
+}
+mountaineers_1 = {
+	name = "Mountain Troops"
+	category = infantry
+	year = 1926
+	cost = 20
+	requires = { infantry_weapons_1 }
+	unlocks = { "Mountain Infantry" }
+}
+amphibious_1 = {
+	name = "Marines"
+	category = infantry
+	year = 1932
+	cost = 30
+	requires = { infantry_weapons_1 }
+	unlocks = { "Marines" }
+}
+paratroopers_1 = {
+	name = "Paratroopers"
+	category = infantry
+	year = 1936
+	cost = 40
+	requires = { infantry_weapons_2 }
+	unlocks = { "Paratroopers" }
+}
+engineers_1 = {
+	name = "Engineers"
+	category = infantry
+	year = 1926
+	cost = 20
+	requires = { infantry_weapons_1 }
+	unlocks = { "Engineers" }
+}
+support_weapons_2 = {
+	name = "Support Weapons 1934"
+	category = infantry
+	year = 1934
+	cost = 36
+	requires = { engineers_1 }
+	modifier = { breakthrough_factor = 0.05 }
+}
+artillery_1 = {
+	name = "Artillery 1918"
+	category = artillery
+	year = 1918
+	cost = 20
+}
+artillery_2 = {
+	name = "Artillery 1934"
+	category = artillery
+	year = 1934
+	cost = 36
+	requires = { artillery_1 }
+	modifier = { soft_attack_factor = 0.05 }
+}
+artillery_3 = {
+	name = "Artillery 1939"
+	category = artillery
+	year = 1939
+	cost = 46
+	requires = { artillery_2 }
+	modifier = { soft_attack_factor = 0.05 }
+}
+artillery_4 = {
+	name = "Artillery 1943"
+	category = artillery
+	year = 1943
+	cost = 56
+	requires = { artillery_3 }
+	modifier = { soft_attack_factor = 0.05 }
+}
+anti_tank_1 = {
+	name = "Anti-tank Guns"
+	category = artillery
+	year = 1934
+	cost = 34
+	requires = { artillery_1 }
+	modifier = { piercing_factor = 0.04 }
+	unlocks = { "Anti-tank" }
+}
+anti_tank_2 = {
+	name = "Improved Anti-tank Guns"
+	category = artillery
+	year = 1939
+	cost = 44
+	requires = { anti_tank_1 }
+	modifier = { piercing_factor = 0.08 }
+}
+anti_air_1 = {
+	name = "Anti-air Guns"
+	category = artillery
+	year = 1934
+	cost = 34
+	requires = { artillery_1 }
+	unlocks = { "Anti-air" }
+}
+mechanisation_1 = {
+	name = "Motor Transport"
+	category = armor
+	year = 1927
+	cost = 24
+	requires = { infantry_weapons_1 }
+	modifier = { speed_factor = 0.02 }
+	unlocks = { "Motorised Infantry" }
+}
+mechanisation_2 = {
+	name = "Mechanised Infantry"
+	category = armor
+	year = 1938
+	cost = 46
+	requires = { mechanisation_1 }
+	modifier = { speed_factor = 0.05 defense_factor = 0.02 }
+}
+light_tank_1 = {
+	name = "Light Tanks"
+	category = armor
+	year = 1929
+	cost = 30
+	requires = { mechanisation_1 }
+	unlocks = { "Light Tanks" }
+}
+light_tank_2 = {
+	name = "Improved Light Tanks"
+	category = armor
+	year = 1936
+	cost = 40
+	requires = { light_tank_1 }
+	modifier = { armor_factor = 0.15 soft_attack_factor = 0.03 }
+}
+medium_tank_1 = {
+	name = "Medium Tanks"
+	category = armor
+	year = 1935
+	cost = 50
+	requires = { light_tank_1 engineers_1 }
+	modifier = { armor_factor = 0.1 }
+	unlocks = { "Medium Tanks" }
+}
+medium_tank_2 = {
+	name = "Improved Medium Tanks"
+	category = armor
+	year = 1940
+	cost = 60
+	requires = { medium_tank_1 }
+	modifier = { armor_factor = 0.15 piercing_factor = 0.1 soft_attack_factor = 0.03 }
+}
+medium_tank_3 = {
+	name = "Advanced Medium Tanks"
+	category = armor
+	year = 1943
+	cost = 70
+	requires = { medium_tank_2 }
+	modifier = { armor_factor = 0.15 piercing_factor = 0.1 soft_attack_factor = 0.03 }
+}
+heavy_tank_1 = {
+	name = "Heavy Tanks"
+	category = armor
+	year = 1941
+	cost = 66
+	requires = { medium_tank_2 }
+	modifier = { armor_factor = 0.1 }
+	unlocks = { "Heavy Tanks" }
+}
+grand_battle_plan = {
+	name = "Grand Battle Plan"
+	category = doctrine
+	year = 1926
+	cost = 20
+	modifier = { defense_factor = 0.03 max_organisation_factor = 0.03 }
+}
+mass_assault = {
+	name = "Mass Assault"
+	category = doctrine
+	year = 1926
+	cost = 20
+	modifier = { soft_attack_factor = 0.02 manpower = 0.05 }
+}
+superior_firepower = {
+	name = "Superior Firepower"
+	category = doctrine
+	year = 1930
+	cost = 24
+	requires = { artillery_1 }
+	modifier = { soft_attack_factor = 0.03 }
+}
+mobile_warfare = {
+	name = "Mobile Warfare"
+	category = doctrine
+	year = 1933
+	cost = 34
+	requires = { mechanisation_1 }
+	modifier = { breakthrough_factor = 0.08 speed_factor = 0.03 }
+}
+operational_art = {
+	name = "Operational Art"
+	category = doctrine
+	year = 1936
+	cost = 42
+	requires = { grand_battle_plan mobile_warfare }
+	modifier = { breakthrough_factor = 0.06 max_organisation_factor = 0.04 }
+}
+combined_arms = {
+	name = "Combined Arms"
+	category = doctrine
+	year = 1939
+	cost = 50
+	requires = { superior_firepower mobile_warfare }
+	modifier = { soft_attack_factor = 0.04 defense_factor = 0.03 }
+}
+staff_college_1 = {
+	name = "Staff Colleges"
+	category = doctrine
+	year = 1928
+	cost = 24
+	modifier = { max_organisation_factor = 0.03 }
+}
+staff_college_2 = {
+	name = "General Staff Planning"
+	category = doctrine
+	year = 1936
+	cost = 40
+	requires = { staff_college_1 }
+	modifier = { max_organisation_factor = 0.04 }
+}
+fighter_1 = {
+	name = "Biplane Fighters"
+	category = air
+	year = 1918
+	cost = 20
+}
+fighter_2 = {
+	name = "Monoplane Fighters"
+	category = air
+	year = 1934
+	cost = 44
+	requires = { fighter_1 }
+	unlocks = { "Monoplane Fighter" }
+}
+fighter_3 = {
+	name = "Advanced Fighters"
+	category = air
+	year = 1939
+	cost = 56
+	requires = { fighter_2 }
+	unlocks = { "Advanced Fighter" }
+}
+cas_1 = {
+	name = "Army Cooperation"
+	category = air
+	year = 1918
+	cost = 20
+}
+cas_2 = {
+	name = "Dive Bombers"
+	category = air
+	year = 1935
+	cost = 40
+	requires = { cas_1 }
+	unlocks = { "Dive Bomber" }
+}
+cas_3 = {
+	name = "Ground Attack Aircraft"
+	category = air
+	year = 1940
+	cost = 52
+	requires = { cas_2 }
+	unlocks = { "Ground Attack Aircraft" }
+}
+bomber_1 = {
+	name = "Medium Bombers"
+	category = air
+	year = 1925
+	cost = 24
+	requires = { fighter_1 }
+}
+bomber_2 = {
+	name = "Heavy Bombers"
+	category = air
+	year = 1936
+	cost = 48
+	requires = { bomber_1 fighter_2 }
+	unlocks = { "Heavy Bomber" }
+}
+bomber_3 = {
+	name = "Strategic Bombers"
+	category = air
+	year = 1941
+	cost = 62
+	requires = { bomber_2 }
+	unlocks = { "Strategic Bomber" }
+}
+radar_1 = {
+	name = "Radar"
+	category = air
+	year = 1936
+	cost = 46
+	requires = { fighter_2 }
+	modifier = { max_organisation_factor = 0.02 }
+}
+destroyer_1 = {
+	name = "Destroyers 1918"
+	category = naval
+	year = 1918
+	cost = 20
+}
+destroyer_2 = {
+	name = "Fleet Destroyers"
+	category = naval
+	year = 1934
+	cost = 36
+	requires = { destroyer_1 }
+	unlocks = { "Fleet Destroyer" }
+}
+destroyer_3 = {
+	name = "Modern Destroyers"
+	category = naval
+	year = 1940
+	cost = 50
+	requires = { destroyer_2 }
+	unlocks = { "Modern Destroyer" }
+}
+submarine_1 = {
+	name = "Submarines"
+	category = naval
+	year = 1926
+	cost = 24
+	requires = { destroyer_1 }
+	unlocks = { "Submarine" }
+}
+submarine_2 = {
+	name = "Ocean Submarines"
+	category = naval
+	year = 1936
+	cost = 40
+	requires = { submarine_1 }
+	unlocks = { "Ocean Submarine" }
+}
+cruiser_1 = {
+	name = "Cruisers 1920"
+	category = naval
+	year = 1920
+	cost = 20
+	requires = { destroyer_1 }
+}
+cruiser_2 = {
+	name = "Modern Cruisers"
+	category = naval
+	year = 1935
+	cost = 40
+	requires = { cruiser_1 }
+	unlocks = { "Modern Light Cruiser" }
+}
+heavy_cruiser_1 = {
+	name = "Heavy Cruisers"
+	category = naval
+	year = 1926
+	cost = 28
+	requires = { cruiser_1 }
+	unlocks = { "Heavy Cruiser" }
+}
+battleship_1 = {
+	name = "Dreadnoughts"
+	category = naval
+	year = 1915
+	cost = 20
+}
+battleship_2 = {
+	name = "Fast Battleships"
+	category = naval
+	year = 1937
+	cost = 58
+	requires = { battleship_1 heavy_cruiser_1 }
+	unlocks = { "Fast Battleship" }
+}
+naval_doctrine_1 = {
+	name = "Fleet in Being"
+	category = naval
+	year = 1928
+	cost = 24
+}
+industry_1 = {
+	name = "Industry 1918"
+	category = industry
+	year = 1918
+	cost = 20
+}
+industry_2 = {
+	name = "Concentrated Industry"
+	category = industry
+	year = 1934
+	cost = 40
+	requires = { industry_1 }
+	modifier = { production = 0.05 construction_speed = 0.05 building_slots = 1 }
+}
+industry_3 = {
+	name = "Assembly Lines"
+	category = industry
+	year = 1938
+	cost = 52
+	requires = { industry_2 }
+	modifier = { production = 0.06 construction_speed = 0.06 efficiency_growth = 0.1 building_slots = 1 }
+}
+industry_4 = {
+	name = "Mass Production"
+	category = industry
+	year = 1942
+	cost = 64
+	requires = { industry_3 }
+	modifier = { production = 0.06 efficiency_growth = 0.15 building_slots = 1 }
+}
+construction_1 = {
+	name = "Construction Methods"
+	category = industry
+	year = 1928
+	cost = 26
+	requires = { industry_1 }
+	modifier = { construction_speed = 0.1 }
+}
+construction_2 = {
+	name = "Prefabrication"
+	category = industry
+	year = 1936
+	cost = 40
+	requires = { construction_1 }
+	modifier = { construction_speed = 0.1 }
+}
+excavation_1 = {
+	name = "Mining Methods"
+	category = industry
+	year = 1928
+	cost = 26
+	requires = { industry_1 }
+	modifier = { extraction = 0.08 }
+}
+excavation_2 = {
+	name = "Mechanised Mining"
+	category = industry
+	year = 1937
+	cost = 42
+	requires = { excavation_1 }
+	modifier = { extraction = 0.1 }
+}
+electronics_1 = {
+	name = "Electronics"
+	category = industry
+	year = 1930
+	cost = 30
+	requires = { industry_1 }
+	modifier = { research_speed = 0.1 }
+}
+electronics_2 = {
+	name = "Advanced Electronics"
+	category = industry
+	year = 1938
+	cost = 46
+	requires = { electronics_1 }
+	modifier = { research_speed = 0.1 }
+}
+synthetic_fuel = {
+	name = "Synthetic Fuel"
+	category = industry
+	year = 1936
+	cost = 50
+	requires = { excavation_1 }
+	modifier = { oil_output = 0.4 }
+}
+synthetic_rubber = {
+	name = "Synthetic Rubber"
+	category = industry
+	year = 1938
+	cost = 50
+	requires = { excavation_1 }
+	modifier = { rubber_output = 0.5 }
+}

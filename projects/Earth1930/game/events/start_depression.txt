@@ -1,0 +1,35 @@
+# The Great Depression at the start of 1930: the shock has begun, how hard it hits depends on how much of the economy is industry and trade.
+# (This is the starting condition, not a script: how long it lasts and what it does to politics is up to stability, support and the AI.)
+namespace = depression
+
+country_event = {
+	id = depression.1
+	title = "The Depression"
+	desc = "Wall Street has crashed and the world economy is sliding."
+	is_triggered_only = yes
+	trigger = { always = yes }
+	immediate = {
+		if = { limit = { OR = { tag = USA tag = GER tag = AUS tag = POL tag = CAN tag = CHI tag = CHL tag = BOL tag = PRU tag = CUB tag = ARG tag = BRA tag = JAP tag = BEL tag = CZE tag = HUN tag = YUG tag = ROM tag = BUL tag = EST tag = LAT tag = DNZ tag = NZL tag = AST } }
+			add_modifier = { name = great_depression_severe years = 4 } }
+		else_if = { limit = { OR = { tag = ENG tag = FRA tag = HOL tag = SWE tag = NOR tag = DEN tag = FIN tag = SWI tag = SAF tag = ITA tag = SPA tag = RAJ tag = MEX tag = COL tag = VEN tag = LUX tag = IRE tag = NFL tag = GRE tag = TUR tag = LIT } }
+			add_modifier = { name = great_depression_moderate years = 3 } }
+		else = { add_modifier = { name = great_depression_light years = 3 } }
+	}
+	option = { name = "Hard times" }
+}
+
+# Countries whose politics were already shaking in 1930: weak governments, divided armies, strikes and separatists. A starting condition, not a
+# script: what comes of it depends on stability, support and the AI.
+country_event = {
+	id = depression.2
+	title = "Political Turmoil"
+	desc = "The government has little authority."
+	is_triggered_only = yes
+	trigger = { OR = { tag = GER tag = SPA tag = CHI tag = AUS tag = ARG tag = BRA tag = PRU tag = BOL tag = CUB tag = YUG tag = JAP tag = GRE tag = ROM tag = POR tag = POL tag = HUN tag = BUL tag = ITA tag = TUR tag = PER tag = MEX tag = CHL tag = ECU tag = HON tag = NIC tag = ELS tag = HAI tag = DOM tag = SIK } }
+	immediate = {
+		if = { limit = { OR = { tag = GER tag = SPA tag = CHI tag = AUS } } add_modifier = { name = unrest_1930_high years = 5 } }
+		else_if = { limit = { OR = { tag = ARG tag = BRA tag = PRU tag = BOL tag = CUB tag = JAP tag = GRE tag = ROM tag = YUG tag = SIK tag = CHL tag = ECU } } add_modifier = { name = unrest_1930_mid years = 4 } }
+		else = { add_modifier = { name = unrest_1930_low years = 3 } }
+	}
+	option = { name = "A fragile order" }
+}

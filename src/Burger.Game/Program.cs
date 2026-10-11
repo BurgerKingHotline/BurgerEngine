@@ -24,6 +24,9 @@ public sealed class AppOptions
     public string? MapMode;
     public float? Zoom;
     public bool NoFogShading;
+    public bool NoUnits;
+    /// <summary>Historical bias 0-1 for this run (default: the player's setting).</summary>
+    public double? Bias;
     public string? Open;
 }
 
@@ -58,6 +61,8 @@ public static class Program
                     case "--exec": opt.Exec.Add(Next()); break;
                     case "--mapmode": opt.MapMode = Next(); break;
                     case "--no-fog-shading": opt.NoFogShading = true; break;
+                    case "--no-units": opt.NoUnits = true; break;
+                    case "--bias": opt.Bias = double.Parse(Next(), System.Globalization.CultureInfo.InvariantCulture); break;
                     case "--zoom": opt.Zoom = float.Parse(Next(), System.Globalization.CultureInfo.InvariantCulture); break;
                     case "--open": opt.Open = Next(); break;
                     case "--speed": opt.Speed = int.Parse(Next()); break;

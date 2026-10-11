@@ -1,0 +1,5 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "National Focuses"
+category = "Politics"
+order = 85
+description = "Focus trees from common/focuses (HOI4 style): a country works on one focus at a time for some days and gets its reward - an economic drive, a political turn, a demand made on a neighbour. The AI picks focuses by their ai_will_do weights. Trees guide a country; they do not replace its AI or its wars."

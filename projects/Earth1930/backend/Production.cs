@@ -74,8 +74,34 @@ public class GameProductionRules : ProductionRules
         return null;
     }
 
+    /// <summary>
+    /// How many construction projects the AI keeps going: its building capacity (civilian factories left after consumer goods)
+    /// divided by max_factories_per_project, plus two.
+    /// </summary>
+    public override int AiQueueSize(Game game, Country c)
+        => 2 + CivilianForConstruction(game, c) / Math.Max(1, (int)game.Data.Defines.Get("max_factories_per_project", 15));
+
+    /// <summary>
+    /// Which factory the AI builds next: a peacetime country wants ai_peace_military_ratio (0.6) military factories per
+    /// civilian one, a country at war ai_war_military_ratio (1.5); below that it builds military ones, else civilian ones.
+    /// </summary>
+    public override BuildingType? AiNextBuilding(Game game, Country c, BuildingType? civ, BuildingType? mil)
+    {
+        bool war = game.World.WarsOf(c).Any();
+        double ratio = game.Data.Defines.Get(war ? "ai_war_military_ratio" : "ai_peace_military_ratio", war ? 1.5 : 0.6);
+        int queuedCiv = civ == null ? 0 : c.Construction.Count(p => p.Building == civ), queuedMil = mil == null ? 0 : c.Construction.Count(p => p.Building == mil);
+        double haveCiv = Factories(game, c, CivilianFactory) + queuedCiv, haveMil = Factories(game, c, MilitaryFactory) + queuedMil;
+        return haveMil < haveCiv * ratio ? mil ?? civ : civ ?? mil;
+    }
+
     /// <summary>Shared factory slots of a state (HOI4: depends on state size; here: locations + tax).</summary>
-    public override int SlotsOf(Game game, State s) => (int)Math.Clamp(s.Vars.Get("building_slots") > 0 ? s.Vars.Get("building_slots") : 2 + s.Locations.Count + s.Tax / 2, 1, 25);
+    public override int SlotsOf(Game game, State s)
+    {
+        // a state's own number, else its size and wealth; infrastructure (+1 per 3 levels) and the building_slots modifiers of its owner (technology) add to it
+        double baseSlots = s.Vars.Get("building_slots") > 0 ? s.Vars.Get("building_slots") : 2 + s.Locations.Count + s.Tax / 2;
+        if (s.Owner != null) baseSlots += s.Buildings.GetValueOrDefault("infrastructure") / 3.0 + game.Modifiers.Sum(s.Owner, "building_slots");
+        return (int)Math.Clamp(baseSlots, 1, 30);
+    }
 }
 
 /// <summary>Installs the production rules.</summary>

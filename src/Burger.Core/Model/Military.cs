@@ -89,7 +89,7 @@ public sealed class Division
     public bool InBattle => Battle != null;
     public Location? NextLocation => Path.Count > 0 ? Path[0] : null;
 
-    public double Stat(string key, double def = 0) => Template.Stat(key, def);
+    public double Stat(string key, double def = 0) => Template.Stat(key, def) * Owner.StatFactor(key);
 
     public override string ToString() => $"{Name} ({Owner.Tag}) @ {Location.Key}";
 }

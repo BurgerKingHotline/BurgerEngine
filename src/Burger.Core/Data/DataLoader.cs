@@ -451,6 +451,7 @@ public static class DataLoader
                     Name = n.GetString("name") ?? Localisation.GetOrPretty(n.Key),
                     IncomeShare = n.GetDouble("income_share", 0.1),
                     JoinsOverlordWars = n.GetBool("joins_overlord_wars", true),
+                    CountsAsRelation = n.GetBool("counts_as_relation", true),
                     CanDeclareWar = n.GetBool("can_declare_war", false),
                     LibertyDesire = n.GetDouble("liberty_desire", 0),
                     Definition = n,

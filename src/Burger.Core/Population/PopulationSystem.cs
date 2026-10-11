@@ -484,6 +484,36 @@ public sealed partial class PopulationSystem
         }
     }
 
+    /// <summary>The groups of the given states that touch each other (by land or strait).</summary>
+    public List<List<State>> Components(IEnumerable<State> states)
+    {
+        var left = states.ToHashSet();
+        var result = new List<List<State>>();
+        while (left.Count > 0)
+        {
+            var start = left.OrderBy(s => s.Index).First();
+            var comp = Reachable(start, left).ToList();
+            foreach (var s in comp) left.Remove(s);
+            result.Add(comp);
+        }
+        return result;
+    }
+
+    /// <summary>The states among <paramref name="within"/> that can be reached from <paramref name="start"/> through states of the set.</summary>
+    public HashSet<State> Reachable(State start, IEnumerable<State> within)
+    {
+        var set = within as HashSet<State> ?? within.ToHashSet();
+        var seen = new HashSet<State>();
+        if (!set.Contains(start)) return seen;
+        var q = new Queue<State>();
+        seen.Add(start);
+        q.Enqueue(start);
+        while (q.Count > 0)
+            foreach (var n in NeighbourStates(q.Dequeue()))
+                if (set.Contains(n) && seen.Add(n)) q.Enqueue(n);
+        return seen;
+    }
+
     private readonly Dictionary<State, List<State>> _neighbours = new();
 
     public List<State> NeighbourStates(State s)

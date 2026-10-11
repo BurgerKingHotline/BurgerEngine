@@ -37,12 +37,94 @@ public sealed class CountryLabels
         game.MapChanged += () => _dirty = true;
     }
 
-    public void MarkDirty() => _dirty = true;
+    public void MarkDirty() { _dirty = true; _signature = 0; }
 
     // ------------------------------------------------------------------------------------- building
-    private void Rebuild()
+    // Fitting a name is slow (a second for a whole world map), and the map changes all the time in a war. So a name is
+    // only fitted again when the land it lies on changed (or the country was renamed), and that work runs in the
+    // background while the old names stay on the map.
+
+    /// <summary>One block of land that gets a name: the name is fitted again only when this changes.</summary>
+    private readonly record struct GroupKey(Country Country, string Name, int Count, ulong Hash);
+
+    private sealed class Plan
     {
+        public readonly List<GroupKey> Keys = new();
+        public readonly List<(int Index, Country Country, List<Location> Locs, int GroupId)> Missing = new();
+        public Label?[] Fitted = Array.Empty<Label?>();
+        public int[] Block = Array.Empty<int>(), BlockGroup = Array.Empty<int>();
+    }
+
+    private Dictionary<GroupKey, Label?> _cache = new();
+    private Plan? _plan;
+    private System.Threading.Tasks.Task? _fitting;
+    private ulong _signature;
+    private bool _built;
+
+    /// <summary>Owners of all land, and the names and capitals of the countries: the names on the map depend on nothing else.</summary>
+    private ulong Signature()
+    {
+        ulong h = 1469598103934665603UL;
+        void Mix(int v) { h = (h ^ (uint)v) * 1099511628211UL; }
+        foreach (var l in _game.World.Locations) Mix(l.Owner != null && !l.IsWater ? l.Owner.Index + 1 : 0);
+        foreach (var c in _game.World.Countries) { Mix(c.Name.GetHashCode()); Mix(c.Capital?.Index ?? -1); }
+        return h == 0 ? 1 : h;
+    }
+
+    private void Update()
+    {
+        if (_fitting != null)
+        {
+            if (!_fitting.IsCompleted) return;
+            if (_fitting.IsFaulted) Log.Warn("Country names: " + _fitting.Exception?.GetBaseException().Message);
+            _fitting = null;
+            Apply();
+        }
+        if (!_dirty || Raylib.GetTime() - _lastBuild < 0.5) return;
+        _lastBuild = Raylib.GetTime();
+        _dirty = false;
+        ulong sig = Signature();
+        if (sig == _signature) return; // occupations and map modes do not move names
+        _signature = sig;
+        var plan = _plan = MakePlan();
+        var md = _game.World.Map;
+        void FitMissing()
+        {
+            // BURGER_LABEL_DEBUG writes a file: one at a time then
+            var options = new System.Threading.Tasks.ParallelOptions { MaxDegreeOfParallelism = Environment.GetEnvironmentVariable("BURGER_LABEL_DEBUG") != null ? 1 : Math.Max(1, Environment.ProcessorCount - 2) };
+            System.Threading.Tasks.Parallel.For(0, plan.Missing.Count, options, i =>
+            {
+                var (index, c, locs, groupId) = plan.Missing[i];
+                plan.Fitted[index] = Fit(c, plan.Keys[index].Name, locs, groupId, plan.Block, plan.BlockGroup, md);
+            });
+        }
+        if (plan.Missing.Count == 0) Apply();
+        else if (!_built) { FitMissing(); Apply(); } // the first time (loading): the names are there at once
+        else _fitting = System.Threading.Tasks.Task.Run(FitMissing);
+    }
+
+    /// <summary>Puts the fitted names on the map and forgets names of land that no longer exists.</summary>
+    private void Apply()
+    {
+        var plan = _plan;
+        if (plan == null) return;
+        _plan = null;
+        _built = true;
+        var cache = new Dictionary<GroupKey, Label?>();
         _labels.Clear();
+        for (int i = 0; i < plan.Keys.Count; i++)
+        {
+            var label = plan.Fitted[i];
+            cache[plan.Keys[i]] = label;
+            if (label != null) _labels.Add(label);
+        }
+        _cache = cache;
+    }
+
+    /// <summary>Finds the blocks of land that get a name and which of them have to be fitted (the others keep their name).</summary>
+    private Plan MakePlan()
+    {
+        var plan = new Plan();
         var w = _game.World;
         var md = w.Map;
         int n = w.Locations.Count;
@@ -112,14 +194,22 @@ public sealed class CountryLabels
                 long px = grp.Sum(i => blocks[i].Px);
                 bool wanted = grp.Key == home || (locs.Count >= 2 && px >= 400);
                 if (!wanted) continue;
-                var label = Fit(c, locs, grp.Key, block, blockGroup, md);
-                if (label != null) _labels.Add(label);
+                ulong hash = 0;
+                foreach (var l in locs) hash += ((ulong)l.Index + 1) * 0x9E3779B97F4A7C15UL ^ ((ulong)l.Index << 32);
+                var key = new GroupKey(c, c.Name, locs.Count, hash);
+                if (!_cache.ContainsKey(key)) plan.Missing.Add((plan.Keys.Count, c, locs, grp.Key));
+                plan.Keys.Add(key);
             }
         }
-        _dirty = false;
+        plan.Fitted = new Label?[plan.Keys.Count];
+        for (int i = 0; i < plan.Keys.Count; i++) plan.Fitted[i] = _cache.GetValueOrDefault(plan.Keys[i]);
+        plan.Block = block;
+        plan.BlockGroup = blockGroup;
+        return plan;
     }
 
-    private Label? Fit(Country c, List<Location> locs, int groupId, int[] block, int[] blockGroup, Burger.Core.Map.MapData md)
+    // runs in the background: reads only the map's pixels and heights and what it is given
+    private Label? Fit(Country c, string name, List<Location> locs, int groupId, int[] block, int[] blockGroup, Burger.Core.Map.MapData md)
     {
         int minX = int.MaxValue, minY = int.MaxValue, maxX = 0, maxY = 0;
         foreach (var l in locs) { minX = Math.Min(minX, l.MinX); minY = Math.Min(minY, l.MinY); maxX = Math.Max(maxX, l.MaxX); maxY = Math.Max(maxY, l.MaxY); }
@@ -260,7 +350,7 @@ public sealed class CountryLabels
         double maxThick = 0;
         for (int b = 0; b < bins; b++) { thick[b] = cnt[b] > 0 ? vmax[b] - vmin[b] + step : 0; maxThick = Math.Max(maxThick, thick[b]); }
         double binW = (u1 - u0) / bins;
-        string text = c.Name.ToUpperInvariant();
+        string text = name.ToUpperInvariant();
         var across = new Vector2((float)-sa, (float)ca);
         float limit = (float)Math.Max(8, maxThick * 1.2);
         float stepPx = Math.Max(1f, step * 0.75f);
@@ -531,7 +621,7 @@ public sealed class CountryLabels
 
     public void Draw(Camera3D cam, float minScreenFont = 3f)
     {
-        if (_dirty && Raylib.GetTime() - _lastBuild > 1.5) { Rebuild(); _lastBuild = Raylib.GetTime(); }
+        Update();
         float ppu = _game.World.Map.Settings.PixelsPerUnit;
         var font = Assets.HeaderFont;
         var scr = new Vector2[24];
@@ -543,7 +633,7 @@ public sealed class CountryLabels
             for (int i = 0; i < n; i++)
             {
                 var p = lb.Points[i];
-                scr[i] = Viewport.SnapToScreen(new Vector3(p.X / ppu, lb.Heights[i], p.Y / ppu), cam);
+                scr[i] = Viewport.ToScreen(new Vector3(p.X / ppu, lb.Heights[i], p.Y / ppu), cam); // not snapped to pixels: rounding the points makes the length, the letter size and every angle jump while the map moves
                 minX = Math.Min(minX, scr[i].X); maxX = Math.Max(maxX, scr[i].X); minY = Math.Min(minY, scr[i].Y); maxY = Math.Max(maxY, scr[i].Y);
             }
             if (maxX < -100 || minX > Viewport.W + 100 || maxY < -100 || minY > Viewport.H + 100) continue;
@@ -580,7 +670,8 @@ public sealed class CountryLabels
                 while (k < n - 1 && cum[k] < center) k++;
                 float t = (center - cum[k - 1]) / Math.Max(0.001f, cum[k] - cum[k - 1]);
                 var p = Vector2.Lerp(scr[k - 1], scr[k], Math.Clamp(t, 0, 1));
-                var d = scr[k] - scr[k - 1];
+                // direction from a stretch of the line, not from two neighbouring points a few pixels apart
+                var d = scr[Math.Min(n - 1, k + 2)] - scr[Math.Max(0, k - 3)];
                 float rot = MathF.Atan2(d.Y, d.X) * 180f / MathF.PI;
                 var origin = new Vector2(adv[i] / 2, fs / 2);
                 string s = ch.ToString();

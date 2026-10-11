@@ -1,0 +1,5 @@
+# Feature package. Everything next to this file is copied into a project when the feature is added.
+name = "Technology"
+category = "Military"
+order = 80
+description = "Technologies from common/technologies: a country researches them with points from its industry (slots grow with it). They change division stats (stat factors), unlock unit types, ships, planes and equipment (requires_tech) and carry modifiers. Everybody starts with the technology of 1930 minus their lag (history/technologies.txt)."

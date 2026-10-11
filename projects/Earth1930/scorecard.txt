@@ -1,0 +1,75 @@
+# Historical scorecard for 1930-1950 (burger validate Earth1930 --days 7300 --seeds 1,2,3,4,5,6 --scorecard).
+# These are QUESTIONS asked of every simulated world, not things the game makes happen. Each line asks once per world; the hit rate over the
+# worlds is compared with the band `expect = low-high`. Where history was one possible outcome among several the band is wide; where the
+# outcome was heavily favoured (Italy against Ethiopia) the band is narrow. A line marked 'given' is only asked in worlds where the war arose.
+#   kinds: war a b | war_result a b (a's side takes at least `share` of b's land within two years) | war_holds | ruling a=tag b=ideology year |
+#          ruling_ever | exists | gone | owns a=tag b=state year | owns_country a b year | alliance a b | alliance_at | independent |
+#          civil_war | countries min max year | wars min max | world_war | tech a=tag b=tech year | industry_rank | growth | remilitarized b=state year
+
+# ---------------------------------------------------------------------------------------------------------------- politics
+germany_fascist_by_1936 = { kind = ruling a = GER b = fascist year = 1936 expect = 0.35-0.85 note = "the Nazis in power by 1936" }
+germany_fascist_ever = { kind = ruling_ever a = GER b = fascist from = 1930 to = 1945 expect = 0.5-0.95 note = "a fascist Germany at some time" }
+germany_not_democratic_1938 = { kind = ruling_not a = GER b = democratic year = 1938 expect = 0.6-0.95 note = "Weimar did not last" }
+italy_fascist_1940 = { kind = ruling a = ITA b = fascist year = 1940 expect = 0.7-1.0 note = "Mussolini stays" }
+soviet_communist_1945 = { kind = ruling a = SOV b = communist year = 1945 expect = 0.85-1.0 note = "the USSR stays communist" }
+france_democratic_1938 = { kind = ruling a = FRA b = democratic year = 1938 expect = 0.5-0.95 note = "the Third Republic" }
+britain_democratic_1945 = { kind = ruling a = ENG b = democratic year = 1945 expect = 0.65-1.0 note = "Britain holds" }
+usa_democratic_1945 = { kind = ruling a = USA b = democratic year = 1945 expect = 0.85-1.0 note = "the USA holds" }
+japan_not_democratic_1938 = { kind = ruling_not a = JAP b = democratic year = 1938 expect = 0.6-0.95 note = "the military takes over politics" }
+austria_not_democratic_1936 = { kind = ruling_not a = AUS b = democratic year = 1936 expect = 0.4-0.85 note = "Austrofascism" }
+portugal_authoritarian_1940 = { kind = ruling_not a = POR b = democratic year = 1940 expect = 0.75-1.0 note = "the Estado Novo" }
+spain_civil_war = { kind = civil_war a = SPA from = 1931 to = 1940 expect = 0.35-0.8 note = "the Spanish Civil War" }
+china_civil_war = { kind = civil_war a = CHI from = 1930 to = 1949 expect = 0.3-0.8 note = "Nationalists against Communists" }
+china_communist_ever = { kind = ruling_ever a = CHI b = communist from = 1930 to = 1950 expect = 0.15-0.6 note = "the communists win in China" }
+india_independent_1950 = { kind = independent a = RAJ year = 1950 expect = 0.35-0.8 note = "India free by 1950" }
+yugoslavia_survives_1940 = { kind = exists a = YUG year = 1940 expect = 0.6-1.0 note = "Yugoslavia survives to 1940" }
+spain_not_democratic_1945 = { kind = ruling_not a = SPA b = democratic year = 1945 expect = 0.5-0.95 note = "Franco or something like it" }
+# ---------------------------------------------------------------------------------------------------------------- diplomacy
+italy_germany_alliance = { kind = alliance a = GER b = ITA from = 1932 to = 1945 expect = 0.35-0.8 note = "the Axis" }
+japan_germany_alliance = { kind = alliance a = GER b = JAP from = 1934 to = 1945 expect = 0.25-0.7 note = "the Anti-Comintern/Tripartite world" }
+france_poland_alliance_1936 = { kind = alliance_at a = FRA b = POL year = 1936 expect = 0.75-1.0 note = "French allies in the east" }
+little_entente_1935 = { kind = alliance_at a = CZE b = YUG year = 1935 expect = 0.7-1.0 note = "the Little Entente" }
+britain_france_alliance = { kind = alliance a = ENG b = FRA from = 1930 to = 1945 expect = 0.3-0.8 note = "Entente becomes alliance" }
+usa_britain_alliance = { kind = alliance a = USA b = ENG from = 1936 to = 1950 expect = 0.3-0.8 note = "the Atlantic alliance" }
+germany_soviet_pact = { kind = alliance a = GER b = SOV from = 1930 to = 1945 expect = 0.0-0.3 note = "an alliance between the great enemies is rare" }
+# ---------------------------------------------------------------------------------------------------------------- wars
+japan_china_war = { kind = war a = JAP b = CHI from = 1931 to = 1940 expect = 0.6-0.95 note = "Manchuria and the war with China" }
+japan_takes_china_land = { kind = war_result a = JAP b = CHI from = 1931 to = 1940 share = 0.08 expect = 0.65-1.0 note = "given the war, Japan gains territory" }
+italy_ethiopia_war = { kind = war a = ITA b = ETH from = 1931 to = 1940 expect = 0.5-0.9 note = "the Ethiopian war" }
+italy_wins_ethiopia = { kind = war_result a = ITA b = ETH from = 1931 to = 1940 share = 0.3 expect = 0.8-1.0 note = "given the war, Italy wins - heavily favoured" }
+germany_poland_war = { kind = war a = GER b = POL from = 1936 to = 1943 expect = 0.35-0.75 note = "the invasion of Poland" }
+germany_france_war = { kind = war a = GER b = FRA from = 1935 to = 1946 expect = 0.4-0.8 note = "Germany against France" }
+germany_britain_war = { kind = war a = GER b = ENG from = 1935 to = 1946 expect = 0.4-0.8 note = "Germany against Britain" }
+germany_soviet_war = { kind = war a = GER b = SOV from = 1936 to = 1948 expect = 0.3-0.75 note = "the eastern front" }
+japan_usa_war = { kind = war a = JAP b = USA from = 1936 to = 1948 expect = 0.25-0.7 note = "the Pacific war" }
+japan_britain_war = { kind = war a = JAP b = ENG from = 1936 to = 1948 expect = 0.25-0.7 note = "Japan against the British empire" }
+soviet_finland_war = { kind = war a = SOV b = FIN from = 1932 to = 1946 expect = 0.25-0.65 note = "the Winter War" }
+soviet_poland_war = { kind = war a = SOV b = POL from = 1934 to = 1946 expect = 0.3-0.7 note = "the eastern partition" }
+chaco_war = { kind = war a = BOL b = PAR from = 1930 to = 1938 expect = 0.5-1.0 note = "the Chaco War (it happened)" }
+italy_france_war = { kind = war a = ITA b = FRA from = 1936 to = 1946 expect = 0.3-0.75 note = "Italy against France" }
+hungary_romania_or_czech_war = { kind = war a = HUN b = ROM from = 1932 to = 1946 expect = 0.15-0.6 note = "Hungary and Transylvania" }
+a_world_war = { kind = world_war from = 1936 to = 1949 expect = 0.45-0.9 note = "three great powers on opposite sides of one war" }
+wars_in_twenty_years = { kind = wars min = 30 max = 100 from = 1930 to = 1949 expect = 0.6-1.0 note = "between 30 and 100 wars begin in twenty years" }
+# ---------------------------------------------------------------------------------------------------------------- territory
+germany_gets_sudetenland = { kind = owns a = GER b = usti_nad_labem_state year = 1941 expect = 0.35-0.95 note = "the Sudeten land goes to Germany" }
+germany_gets_austria = { kind = owns_country a = GER b = AUS year = 1941 expect = 0.35-0.8 note = "the Anschluss" }
+germany_gets_danzig = { kind = owns a = GER b = danzig_state year = 1942 expect = 0.35-0.95 note = "Danzig returns to Germany" }
+italy_gets_albania = { kind = owns_country a = ITA b = ALB year = 1942 expect = 0.5-0.95 note = "Albania is Italian by 1942 (it was a client already)" }
+poland_gone_1945 = { kind = gone a = POL year = 1945 expect = 0.25-0.65 note = "Poland partitioned or annexed" }
+czechoslovakia_gone_1945 = { kind = gone a = CZE year = 1945 expect = 0.3-0.75 note = "Czechoslovakia is dismembered" }
+countries_1950 = { kind = countries min = 55 max = 90 year = 1950 expect = 0.6-1.0 note = "the world has 55 to 90 countries in 1950" }
+hungary_gains_land = { kind = owns a = HUN b = nitra_state year = 1942 expect = 0.2-0.6 note = "Hungary takes back southern Slovakia" }
+turkey_gets_hatay = { kind = owns a = TUR b = alexandretta_state year = 1946 expect = 0.2-0.6 note = "Hatay joins Turkey" }
+# ---------------------------------------------------------------------------------------------------------------- demilitarized zones
+rhineland_remilitarized_1938 = { kind = remilitarized b = southwest_north_rhine_westphalia_state year = 1938 expect = 0.55-1.0 note = "Germany remilitarizes the Rhineland" }
+straits_remilitarized_1940 = { kind = remilitarized b = canakkale_state year = 1940 expect = 0.4-1.0 note = "Turkey remilitarizes the Straits" }
+# ---------------------------------------------------------------------------------------------------------------- economy and technology
+usa_first_industry_1940 = { kind = industry_rank a = USA rank = 1 year = 1940 expect = 0.85-1.0 note = "the USA is the first industrial power" }
+germany_top_three_1940 = { kind = industry_rank a = GER rank = 3 year = 1940 expect = 0.7-1.0 note = "Germany is a top-three industrial power" }
+soviet_industrialises = { kind = growth a = SOV factor = 1.4 year = 1941 expect = 0.55-1.0 note = "the Soviet industrial leap" }
+usa_arms_growth = { kind = growth a = USA factor = 1.8 year = 1945 expect = 0.35-0.9 note = "the arsenal of democracy" }
+germany_medium_tanks_1939 = { kind = tech a = GER b = medium_tank_1 year = 1939 expect = 0.6-1.0 note = "medium tanks by 1939" }
+soviet_medium_tanks_1941 = { kind = tech a = SOV b = medium_tank_1 year = 1941 expect = 0.6-1.0 note = "the Soviet medium tank" }
+usa_monoplane_fighters_1940 = { kind = tech a = USA b = fighter_2 year = 1940 expect = 0.75-1.0 note = "the monoplane fighter" }
+japan_fleet_tech_1940 = { kind = tech a = JAP b = destroyer_2 year = 1940 expect = 0.5-1.0 note = "modern destroyers" }
+britain_radar_1940 = { kind = tech a = ENG b = radar_1 year = 1940 expect = 0.5-1.0 note = "radar" }

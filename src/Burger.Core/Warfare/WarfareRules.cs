@@ -12,6 +12,7 @@ public class WarfareRules
     public virtual bool CanEnter(Game game, Country country, Location l)
     {
         if (!l.IsPassable) return false;
+        if (l.State?.Demilitarized == true) return false; // no armed forces in a demilitarized zone
         var ctrl = l.Controller ?? l.Owner;
         if (ctrl == null || ctrl == country) return true;
         var w = game.World;

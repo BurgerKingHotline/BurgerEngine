@@ -497,6 +497,7 @@ public sealed class AirSystem
     public string? CannotBuildReason(Country c, PlaneType t)
     {
         if (BestBase(c) == null) return "You have no air base with room";
+        if (!_game.Tech.CanUse(c, t.Definition)) return "Needs a technology you do not have";
         if (_game.Production.Enabled)
             return c.Stockpile.GetValueOrDefault(t.Key) < Math.Min(10, WingSize) ? $"Needs at least {Math.Min(10, WingSize):0} {t.Name} planes in the stockpile (build them in Production)" : null;
         if (_game.Features.Has(FeatureSet.Economy) && c.Gold < t.Cost) return $"Needs {t.Cost:0} gold";
@@ -551,9 +552,10 @@ public sealed class AirSystem
     /// <summary>Builds planes (production lines or gold) and new wings.</summary>
     public void AiMonthly(Country c)
     {
-        var types = _game.Data.PlaneTypes.Values.ToList();
+        var types = _game.Data.PlaneTypes.Values.Where(t => _game.Tech.CanUse(c, t.Definition)).ToList();
         if (types.Count == 0 || BestBase(c) == null) return;
-        var fighter = types.Where(t => DefaultMission(t) == AirMission.Superiority).OrderBy(t => t.ProductionCost).FirstOrDefault();
+        // the best fighter and ground attacker the country knows how to build
+        var fighter = types.Where(t => DefaultMission(t) == AirMission.Superiority).OrderByDescending(t => t.Stat("air_attack") + 0.5 * t.Stat("air_defense")).FirstOrDefault();
         var cas = types.Where(t => DefaultMission(t) == AirMission.CloseSupport).OrderByDescending(t => t.Stat("ground_attack")).FirstOrDefault();
         int wings = WingsOf(c).Count();
         int want = 1 + c.OwnedStates.Count / 4;

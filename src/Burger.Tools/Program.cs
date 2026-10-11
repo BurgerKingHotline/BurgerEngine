@@ -72,6 +72,7 @@ public static class Program
   burger features <project> remove <id...>  remove features (changed files go to removed_features/)
   burger list                               list projects
   burger validate <project> [--days 60] [--profile]  load everything, report errors, simulate N days headless (--profile: time per system)
+  burger validate <project> --days 36500 --seeds 1,2,3  play several worlds at the same time (--seed N: one other world)
   burger run <project> [--tag TAG]          play the project
   burger export <project> [--name Game] [--out folder] [--rid win-x64]
                                             build <Name>.exe + game/ folder that players can mod
@@ -217,6 +218,12 @@ public static class Program
     private static void PrintFeatureStats(Game game)
     {
         var live = game.World.Countries.Where(c => c.Exists).ToList();
+        if (game.Focus.Enabled)
+        {
+            var done = live.SelectMany(c => game.Focus.FocusesOf(c).Where(f => game.Focus.IsDone(c, f.Key)).Select(f => (c, f))).ToList();
+            Console.WriteLine($"  focuses: {done.Count} completed by {done.Select(d => d.c).Distinct().Count()} countries; " +
+                string.Join(", ", done.Where(d => !d.f.Tree.Default).GroupBy(d => d.c.Tag).Select(g => $"{g.Key} {g.Count()}/{game.Focus.FocusesOf(g.First().c).Count()}")));
+        }
         if (game.Features.Has(FeatureSet.Production))
         {
             int civ = live.Sum(c => game.Production.CivilianFactories(c)), mil = live.Sum(c => game.Production.MilitaryFactories(c));
@@ -261,6 +268,24 @@ public static class Program
                               $", {Pop.BuildingsBuilt} gold buildings" +
                               (Pop.IndependenceEnabled ? $", {Pop.Independence.Count} independence movements (strongest {(Pop.Independence.Count > 0 ? Pop.Independence.Max(m => m.Progress) : 0):0}%), {Pop.IndependenceDeclared} declared independence ({Pop.IndependenceWon} won, {Pop.IndependenceCrushed} crushed, {Pop.IndependenceWars.Count} wars active)" : ""));
         }
+        if (game.Tech.Enabled)
+        {
+            var liveC = game.World.Countries.Where(c => c.Exists).ToList();
+            var top = liveC.OrderByDescending(c => game.Tech.Count(c)).Take(6).Select(c => $"{c.Tag} {game.Tech.Count(c)}");
+            Console.WriteLine($"  technology: average {liveC.Average(c => game.Tech.Count(c)):0} of {game.Tech.Defs.Count} known; most: {string.Join(", ", top)}; {string.Join(", ", new[] { "GER", "USA", "SOV", "JAP", "ITA", "FRA", "ENG" }.Select(t => game.World.GetCountry(t)).Where(c => c != null).Select(c => $"{c!.Tag} {game.Tech.Count(c)}"))}");
+        }
+        if (game.Commodities.Enabled)
+        {
+            foreach (var k in game.Commodities.Defs.Values)
+            {
+                var liveC = game.World.Countries.Where(c => c.Exists).ToList();
+                double world = liveC.Sum(c => game.Commodities.BalanceOf(c, k.Key).Output);
+                var short_ = liveC.Where(c => game.Commodities.BalanceOf(c, k.Key).Satisfied < 0.85).Select(c => $"{c.Tag} {game.Commodities.BalanceOf(c, k.Key).Satisfied:P0}").Take(8);
+                string main = string.Join(" ", new[] { "USA", "GER", "ENG", "FRA", "SOV", "JAP", "ITA" }.Select(t => game.World.GetCountry(t)).Where(c => c != null).Select(c => { var b = game.Commodities.BalanceOf(c!, k.Key); return $"{c!.Tag}:{b.Output:0}/{b.Demand:0}"; }));
+                Console.WriteLine($"  {k.Name}: world {world:0}/month, output/demand {main}; short: {string.Join(", ", short_)}");
+            }
+        }
+        if (game.Features.Has(FeatureSet.Demilitarization)) Console.WriteLine($"  demilitarized states: {game.Diplomacy.DemilitarizedStates.Count()}");
         if (game.Politics.Enabled)
         {
             var P = game.Politics;
@@ -268,6 +293,9 @@ public static class Program
             Console.WriteLine($"  politics: rulers {string.Join(", ", alive.GroupBy(c => P.Of(c).Ruling).OrderByDescending(g => g.Count()).Select(g => $"{g.Key} {g.Count()}"))}; " +
                               $"{alive.Count(P.HoldsElections)} hold elections, {P.ElectionsHeld} elections, {P.GovernmentChanges} government changes, {P.LawsChanged} laws changed" +
                               (P.CivilWarsEnabled ? $", {P.Movements.Count} movements, {P.CivilWarsStarted} civil wars ({P.CivilWars.Count} active), {P.Revolutions} revolutions ({P.Coups} coups)" : ""));
+            if (alive.Count > 0)
+                Console.WriteLine($"  popularity: average {string.Join(", ", P.Ideologies.Select(i => $"{i.Key} {alive.Average(c => P.Of(c).Popularity.GetValueOrDefault(i.Key)):P0}"))}; " +
+                                  $"{alive.Count(c => P.Of(c).Popularity.Values.DefaultIfEmpty(0).Max() > 0.9)} of {alive.Count} countries have one ideology above 90%");
         }
         if (game.Features.Has(FeatureSet.Diplomacy))
         {
@@ -371,16 +399,81 @@ public static class Program
         }
     }
 
+    /// <summary>
+    /// Plays the project once per seed, all at the same time (one process each, so a long simulation of several worlds
+    /// takes as long as one), and prints the worlds one after the other. One world is one roll of the dice: compare a few.
+    /// </summary>
+    private static int ValidateSeeds(List<string> args, string seedList)
+    {
+        var seeds = seedList.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        string exe = Environment.ProcessPath ?? "dotnet";
+        var sw = Stopwatch.StartNew();
+        var runs = seeds.Select(seed =>
+        {
+            var psi = new ProcessStartInfo(exe) { RedirectStandardOutput = true, UseShellExecute = false };
+            if (Path.GetFileNameWithoutExtension(exe).Equals("dotnet", StringComparison.OrdinalIgnoreCase)) psi.ArgumentList.Add(typeof(Program).Assembly.Location);
+            psi.ArgumentList.Add("validate");
+            foreach (var a in args) psi.ArgumentList.Add(a);
+            psi.ArgumentList.Add("--seed");
+            psi.ArgumentList.Add(seed);
+            var process = Process.Start(psi)!;
+            return (Seed: seed, Process: process, Output: process.StandardOutput.ReadToEndAsync());
+        }).ToList();
+        int worst = 0;
+        var results = new Dictionary<string, List<string>>();
+        foreach (var run in runs)
+        {
+            string text = run.Output.Result;
+            run.Process.WaitForExit();
+            worst = Math.Max(worst, run.Process.ExitCode);
+            Console.WriteLine($"=== seed {run.Seed}");
+            var textLines = text.Split((char)10);
+            Console.Write(string.Join(((char)10).ToString(), textLines.Where(l => !l.StartsWith("SCORE|"))));
+            foreach (var l in textLines.Where(l => l.StartsWith("SCORE|")))
+            {
+                var parts = l.Trim().Split('|');
+                if (parts.Length == 3) { if (!results.TryGetValue(parts[1], out var lst)) results[parts[1]] = lst = new List<string>(); lst.Add(parts[2]); }
+            }
+        }
+        Console.WriteLine($"{seeds.Length} worlds in {sw.Elapsed.TotalSeconds:0} s");
+        if (args.Contains("--scorecard") && results.Count > 0) PrintScorecard(args, results, seeds.Length);
+        return worst;
+    }
+
+    private static void PrintScorecard(List<string> args, Dictionary<string, List<string>> results, int worlds)
+    {
+        string project = args.FirstOrDefault(x => !x.StartsWith("--") && !int.TryParse(x, out _)) ?? "";
+        string path = Path.Combine(Path.GetDirectoryName(GameDir(ResolveProject(project)))!, "scorecard.txt");
+        var lines = ScorecardRecorder.Parse(path);
+        int ok = 0, low = 0, high = 0, na = 0;
+        double okW = 0, allW = 0;
+        Console.WriteLine();
+        Console.WriteLine($"HISTORICAL SCORECARD over {worlds} worlds (hit rate / band):");
+        foreach (var l in lines)
+        {
+            var r = results.GetValueOrDefault(l.Name) ?? new List<string>();
+            int hits = r.Count(x => x == "1"), n = r.Count(x => x != "NA");
+            if (n == 0) { na++; Console.WriteLine($"  [ n/a] {l.Name,-34} did not arise in any world   ({l.Note})"); continue; }
+            double rate = hits / (double)n;
+            string verdict = rate < l.Min - 1e-9 ? "LOW " : rate > l.Max + 1e-9 ? "HIGH" : "ok  ";
+            if (verdict == "ok  ") ok++; else if (verdict == "LOW ") low++; else high++;
+            allW += l.Weight; if (verdict == "ok  ") okW += l.Weight;
+            Console.WriteLine($"  [{verdict}] {l.Name,-34} {hits}/{n} = {rate:P0}  band {l.Min:P0}-{l.Max:P0}   {l.Note}");
+        }
+        Console.WriteLine($"  within band {ok}, too rare {low}, too common {high}, not arisen {na}; weighted score {(allW > 0 ? okW / allW : 0):P0}");
+    }
+
     // ===============================================================================================
     private static int Validate(List<string> args)
     {
+        if (Opt(args, "--seeds") is { } seedList) return ValidateSeeds(args, seedList);
         bool selftest = Flag(args, "--selftest");
         int days = int.Parse(Opt(args, "--days") ?? (selftest ? "365" : "60"));
         string project = ResolveProject(RequireProjectArg(args, "burger validate <project> [--days N]"));
         Log.EchoToConsole = false;
         Console.WriteLine($"Validating {GameDir(project)}");
         var sw = Stopwatch.StartNew();
-        var game = Game.Load(GameDir(project), compileScripts: true, seed: 1234);
+        var game = Game.Load(GameDir(project), compileScripts: true, seed: int.Parse(Opt(args, "--seed") ?? "1234"));
         Console.WriteLine($"  loaded in {sw.ElapsedMilliseconds} ms: {game.World.Countries.Count} countries, {game.World.States.Count} states, " +
                           $"{game.World.Locations.Count} locations, {game.World.Characters.Count} characters, {game.World.Divisions.Count} divisions, " +
                           $"{game.Data.Events.Count} events, {game.Mods.Scripts.Count} C# scripts");
@@ -388,19 +481,38 @@ public static class Program
         int loadErrors = Log.ErrorCount;
 
         Console.WriteLine($"Simulating {days} days (all AI)...");
+        if (Opt(args, "--bias") is { } biasText) game.HistoricalBias = double.Parse(biasText, System.Globalization.CultureInfo.InvariantCulture);
         game.StartNewGame(null);
         sw.Restart();
         int battles = 0, wars = 0;
         game.Mods.Add(new CountingScript(() => battles++, () => wars++));
         int errorsBefore = Log.ErrorCount;
+        bool scorecard = args.Contains("--scorecard");
+        string[] watchTags = (Opt(args, "--watch") ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries);
+        ScorecardRecorder? recorder = null;
+        if (scorecard) { recorder = new ScorecardRecorder(game); game.Mods.Add(recorder); }
         game.Profiling = args.Contains("--profile");
         int warsAtDecade = 0;
         for (int d = 0; d < days; d++)
         {
             for (int h = 0; h < 24; h++) game.Tick();
+            recorder?.Daily();
+            if (watchTags.Length > 0 && game.World.Date.Day == 1 && game.World.Date.Month % 6 == 1 && game.World.Date.Hour == 0 && game.Politics.Enabled)
+                foreach (var wt in watchTags.Select(t => game.World.GetCountry(t)).Where(c => c != null))
+                    Console.WriteLine($"  watch {game.World.Date.ToDisplay()} {wt!.Tag} {game.Politics.Of(wt).Ruling} stab {game.Rules.Politics.StabilityOf(game, wt):0} " +
+                                      $"pop {string.Join("/", game.Politics.Ideologies.Select(i => game.Politics.Of(wt).Popularity.GetValueOrDefault(i.Key).ToString("P0")))} wealth {game.Politics.WealthIndex(wt):0.0} war {game.World.WarsOf(wt).Count()} exh {game.Diplomacy.WarExhaustion(wt):0.0} div {game.World.DivisionsOf(wt).Count()}");
             if (days >= 3650 && (d + 1) % 3650 == 0)
             {
                 Console.WriteLine($"  year {(d + 1) / 365}: {wars - warsAtDecade} wars declared in the last 10 years, {game.World.Wars.Count} active, {game.World.Countries.Count(c => c.Exists)} countries");
+                if (game.Politics.Enabled)
+                {
+                    var P = game.Politics;
+                    var alive = game.World.Countries.Where(c => c.Exists).ToList();
+                    var stab = alive.Select(c => game.Rules.Politics.StabilityOf(game, c)).OrderBy(v => v).ToList();
+                    Console.WriteLine($"    rulers {string.Join(", ", alive.GroupBy(c => P.Of(c).Ruling).OrderByDescending(g => g.Count()).Select(g => $"{g.Key} {g.Count()}"))}; " +
+                                      $"stability lowest {stab[0]:0}, median {stab[stab.Count / 2]:0}, {stab.Count(v => v < 45)} under 45, {stab.Count(v => v < 30)} under 30; " +
+                                      $"{P.CivilWarsStarted} civil wars, {P.Coups} coups, {game.World.Relations.Subjects.Count} subjects so far");
+                }
                 warsAtDecade = wars;
             }
         }
@@ -421,8 +533,15 @@ public static class Program
                 }
         }
         PrintFeatureStats(game);
+        if (recorder != null)
+        {
+            var lines = ScorecardRecorder.Parse(Path.Combine(Path.GetDirectoryName(GameDir(project))!, "scorecard.txt"));
+            if (Environment.GetEnvironmentVariable("BURGER_FACT_LOG") != null) Console.WriteLine("  factories (civilian + military):\n" + recorder.FactoryTable());
+            foreach (var (name, result) in recorder.EvaluateAll(lines)) Console.WriteLine($"SCORE|{name}|{(result.HasValue ? result.Value.ToString() : "NA")}");
+        }
         if (game.Profiling)
             Console.WriteLine("  time per system (ms per simulated day): " + string.Join(", ", game.ProfileMs.OrderByDescending(kv => kv.Value).Take(12).Select(kv => $"{kv.Key} {kv.Value / days:0.00}")));
+            Console.WriteLine("  longest single call (ms): " + string.Join(", ", game.ProfileMaxMs.OrderByDescending(kv => kv.Value).Take(12).Select(kv => $"{kv.Key} {kv.Value:0.0}")));
 
         if (selftest)
         {
@@ -458,8 +577,10 @@ public static class Program
             }
             if (game.Features.Has(FeatureSet.Military) && game.Features.Has(FeatureSet.Diplomacy)) MilitaryFeatureTests(project);
             if (game.Features.Has(FeatureSet.Military) && game.Features.Has(FeatureSet.Diplomacy)) WarGoalTests(project);
+            if (game.Features.Has(FeatureSet.Diplomacy) && game.Features.Has(FeatureSet.Population)) ReleaseTests(project);
             if (game.Features.Has(FeatureSet.Politics)) PoliticsFeatureTests(project);
             if (game.Features.Has(FeatureSet.Population)) PopulationFeatureTests(project);
+            HistoricalFeatureTests(project);
         }
         int simErrors = Log.ErrorCount - errorsBefore;
         if (simErrors > 0)
@@ -537,6 +658,229 @@ public static class Program
     /// <summary>Growth, assimilation, conversion, cores, colonies and saving of pops (when installed).</summary>
     /// <summary>Casus belli and war goals, ticking war score, faction goals, war exhaustion and AI peace, pacts, liberty desire and
     /// independence wars, diplomatic plays, the end of a country (player becomes an observer, nothing of it keeps acting).</summary>
+    /// <summary>Releases, separations, stranded land, names of governments and who a country accepts.</summary>
+    /// <summary>Technology, commodities, demilitarized zones, AI profiles and the historical scorecard (each only where its feature is installed).</summary>
+    private static void HistoricalFeatureTests(string project)
+    {
+        var g = Game.Load(GameDir(project), compileScripts: true, seed: 5);
+        g.StartNewGame(null);
+        g.Ai.Enabled = false;
+        var live = g.World.Countries.Where(c => c.Exists).ToList();
+        if (g.Tech.Enabled)
+        {
+            var gated = g.Data.Equipment.Values.FirstOrDefault(e => e.Definition.GetList("requires_tech").Any());
+            if (gated != null)
+            {
+                var need = gated.Definition.GetList("requires_tech").ToList();
+                var c = live.FirstOrDefault(x => need.Any(t => !g.Tech.Has(x, t)));
+                if (c != null)
+                {
+                    Check(!g.Tech.CanUse(c, gated.Definition), $"technology: {c.Tag} cannot use {gated.Key} before knowing {string.Join("+", need)}");
+                    foreach (var t in need) g.Tech.Grant(c, t);
+                    Check(g.Tech.CanUse(c, gated.Definition), $"technology: {c.Tag} can use {gated.Key} once it knows it");
+                }
+            }
+            var withFactor = g.Tech.Defs.Values.FirstOrDefault(t => t.Modifier.Keys.Any(k => k.EndsWith("_factor", StringComparison.OrdinalIgnoreCase)));
+            if (withFactor != null)
+            {
+                string key = withFactor.Modifier.Keys.First(k => k.EndsWith("_factor", StringComparison.OrdinalIgnoreCase));
+                var c = live.FirstOrDefault(x => !g.Tech.Has(x, withFactor.Key) && withFactor.Requires.All(r => g.Tech.Has(x, r)));
+                if (c != null)
+                {
+                    double before = c.StatFactor(key.Substring(0, key.Length - "_factor".Length));
+                    g.Tech.Grant(c, withFactor.Key);
+                    double after = c.StatFactor(key.Substring(0, key.Length - "_factor".Length));
+                    Check(Math.Abs(after - before) > 1e-9, $"technology: {withFactor.Key} changes {c.Tag}'s {key} ({before:0.###} -> {after:0.###})");
+                }
+            }
+            Check(live.Any(c => g.Tech.Count(c) > 0), "technology: countries start with the technology of their time");
+        }
+        if (g.Commodities.Enabled && g.Production.Enabled)
+        {
+            var e = g.Data.Equipment.Values.FirstOrDefault(x => g.Commodities.UseOf(x).Count > 0);
+            var c = live.FirstOrDefault();
+            if (e != null && c != null)
+            {
+                string k = g.Commodities.UseOf(e).Keys.First();
+                var balance = g.Commodities.BalanceOf(c, k);
+                double was = balance.Satisfied;
+                balance.Satisfied = 0;
+                double starved = g.Commodities.Factor(c, e);
+                balance.Satisfied = 1;
+                double fed = g.Commodities.Factor(c, e);
+                balance.Satisfied = was;
+                Check(starved < fed && fed >= 0.999, $"commodities: a shortage of {k} slows {e.Key} ({starved:0.00} against {fed:0.00})");
+            }
+        }
+        if (g.Diplomacy.DemilEnabled)
+        {
+            var owner = live.FirstOrDefault(c => c.OwnedStates.Count > 2 && !g.World.WarsOf(c).Any() && c.Capital?.State != null);
+            var enemy = owner == null ? null : Builtins.NeighborCountries(g, owner).FirstOrDefault(x => !g.World.WarsOf(x).Any());
+            var state = owner?.OwnedStates.FirstOrDefault(x => x != owner.Capital?.State && !x.Demilitarized);
+            if (owner != null && enemy != null && state != null)
+            {
+                g.Diplomacy.Demilitarize(state, enemy);
+                Check(state.Demilitarized && g.Diplomacy.ImposedBy(state) == enemy, $"demilitarization: {state.Key} is demilitarized by {enemy.Tag}");
+                string tmp = Path.Combine(Path.GetTempPath(), "burger_demil.sav");
+                SaveGame.Save(g, tmp);
+                var g2 = Game.Load(GameDir(project), compileScripts: true, seed: 5);
+                SaveGame.Load(g2, tmp);
+                Check(g2.World.GetState(state.Key)?.Demilitarized == true, "demilitarization: the zone is saved and loaded");
+                g.Diplomacy.DeclareWar(owner, enemy, null, null, force: true);
+                for (int h = 0; h < 24 * 3; h++) g.Tick();
+                Check(!state.Demilitarized, "demilitarization: the zone opens when its owner goes to war");
+                var other = owner.OwnedStates.FirstOrDefault(x => x != state && x != owner.Capital?.State);
+                if (other != null)
+                {
+                    g.Diplomacy.Demilitarize(other, null);
+                    g.Diplomacy.Remilitarize(other, "decision");
+                    Check(!other.Demilitarized, "demilitarization: the owner can remilitarize");
+                }
+            }
+        }
+        if (g.AiProfiles.Enabled)
+        {
+            var c = live.FirstOrDefault(x => g.AiProfiles.ProfileOf(x) != null);
+            if (c != null)
+            {
+                g.HistoricalBias = 0;
+                double none = g.Rules.AiProfile.HistoryWeight(g, c);
+                g.HistoricalBias = 1;
+                double full = g.Rules.AiProfile.HistoryWeight(g, c);
+                Check(none <= 0 && full > 0, $"AI profiles: the historical bias slider scales the weight of {c.Tag}'s history ({none:0.##} -> {full:0.##})");
+                Check(g.AiProfiles.PersonalityOf(c).Archetype.Length > 0, $"AI profiles: {c.Tag} has an archetype ({g.AiProfiles.PersonalityOf(c).Archetype})");
+            }
+        }
+        if (g.Focus.Enabled)
+        {
+            var lint = g.Focus.Lint();
+            if (project.Contains("Earth1930", StringComparison.OrdinalIgnoreCase)) Check(lint.Count == 0, "focus: the Earth1930 trees check no dates and make no war" + (lint.Count > 0 ? ": " + string.Join("; ", lint.Take(3)) : ""));
+            var c = live.FirstOrDefault(x => g.Focus.TreeOf(x) is { Default: false } && g.Focus.FocusesOf(x).Any(f => g.Focus.CannotStart(x, f) == null));
+            if (c != null)
+            {
+                var f = g.Focus.FocusesOf(c).First(x => g.Focus.CannotStart(c, x) == null);
+                Check(g.Focus.Start(c, f) == null && g.Focus.Current(c) == f, $"focus: {c.Tag} starts {f.Key}");
+                Check(g.Focus.CannotStart(c, g.Focus.FocusesOf(c).First(x => x != f)) != null, "focus: a country works on one focus at a time");
+                for (int i = 0; i < 14 && g.Focus.Current(c) == f; i++) g.Focus.MonthlyTick();
+                Check(g.Focus.IsDone(c, f.Key), $"focus: {f.Key} completes and gives its reward");
+                string tmp = Path.Combine(Path.GetTempPath(), "burger_focus.sav");
+                SaveGame.Save(g, tmp);
+                var g2 = Game.Load(GameDir(project), compileScripts: true, seed: 5);
+                SaveGame.Load(g2, tmp);
+                Check(g2.World.GetCountry(c.Tag) is { } c2 && g2.Focus.IsDone(c2, f.Key), "focus: completed focuses are saved and loaded");
+            }
+        }
+        string card = Path.Combine(Path.GetDirectoryName(GameDir(project))!, "scorecard.txt");
+        if (File.Exists(card)) Check(ScorecardRecorder.Parse(card).Count > 0, "scorecard: scorecard.txt parses");
+    }
+
+    private static void ReleaseTests(string project)
+    {
+        var g = Game.Load(GameDir(project), compileScripts: true, seed: 7);
+        g.StartNewGame(null);
+        g.Ai.Enabled = false;
+        var D = g.Diplomacy;
+        var P = g.Population;
+        // country names follow the government and dependence
+        var named = g.World.Countries.FirstOrDefault(c => c.Exists && c.NameVariants.ContainsKey("communist") && g.World.Relations.OverlordOf(c) == null);
+        if (named != null && g.Politics.Enabled)
+        {
+            g.Politics.SetRulingParty(named, "communist", "coup");
+            Check(named.RawName == named.NameVariants["communist"], $"names: {named.Tag} is '{named.Name}' under communists");
+            g.Politics.SetRulingParty(named, "democratic", "coup");
+            Check(named.RawName == (named.NameVariants.GetValueOrDefault("democratic") ?? named.DefaultName), $"names: {named.Tag} is '{named.Name}' under democrats");
+        }
+        var dependent = g.World.Countries.FirstOrDefault(c => c.Exists && c.NameVariants.ContainsKey("subject") && g.World.Relations.OverlordOf(c) != null);
+        if (dependent != null) Check(dependent.RawName == dependent.NameVariants["subject"], $"names: the dependency {dependent.Tag} is '{dependent.Name}'");
+        if (g.World.GetCountry("RAJ") is { } raj && raj.Exists)
+            Check(P.IsAccepted(raj, "punjabi") && !P.IsAccepted(raj, "bengali") && !P.IsAccepted(raj, "tamil"), "culture: the Raj accepts its own north-west, not all of India");
+        // a people of the winner's own: its land goes to the winner, there is no second country of it
+        var a = g.World.Countries.Where(c => c.Exists && c.Capital != null && Builtins.NeighborCountries(g, c).Count >= 1 && c.OwnedStates.Count >= 3).OrderByDescending(c => c.OwnedStates.Count).First();
+        var b = Builtins.NeighborCountries(g, a).Where(x => x.OwnedStates.Count >= 3 && g.World.Relations.OverlordOf(x) == null).OrderByDescending(x => x.OwnedStates.Count).FirstOrDefault();
+        if (b == null) return;
+        foreach (var t in g.World.Relations.Truces.Keys.ToList()) g.World.Relations.Truces.Remove(t);
+        g.World.Relations.SetAlliance(a, b, false);
+        var war = D.DeclareWar(a, b, null, null, force: true);
+        var st = b.OwnedStates.FirstOrDefault(s => s != b.Capital?.State && D.Touches(a, s));
+        string? own = P.Of(a).Culture;
+        if (war != null && st != null && own != null)
+        {
+            P.Of(st).Pops.Clear();
+            P.Of(st).Pops.Add(new Burger.Core.Population.Pop { Culture = own, Size = 5000 });
+            P.InvalidateMajorities();
+            var plan = D.PlanRelease(war, b, own, a, a, false);
+            Check(plan.Problem != null || plan.Parts.All(p => p.Outcome != Burger.Core.Diplomacy.DiplomacySystem.ReleaseOutcome.NewCountry),
+                  $"release: the {own} land of {b.Tag} goes to {a.Tag}, not to a second country of its own people ({plan.Problem ?? string.Join(", ", plan.Parts.Select(p => p.Outcome))})");
+            // the region of a people is one block, never the capital
+            var other = P.CultureByKey.Keys.FirstOrDefault(k => !g.World.Countries.Any(c => c.Exists && P.Of(c).Culture == k) && !P.IsAccepted(b, k));
+            if (other != null)
+            {
+                foreach (var s in b.OwnedStates.Where(s => s != b.Capital?.State).Take(2)) { P.Of(s).Pops.Clear(); P.Of(s).Pops.Add(new Burger.Core.Population.Pop { Culture = other, Size = 5000 }); }
+                P.InvalidateMajorities();
+                var parts = g.Rules.Population.SeparatistRegion(g, b, other, true);
+                Check(parts.Count == 0 || (parts[0].States.All(s => s != b.Capital?.State) && P.Components(parts[0].States).Count == 1),
+                      $"separation: the land of the {other} people is one block without the capital ({parts.FirstOrDefault()?.States.Count ?? 0} states)");
+                // after the separation the old country is still in one piece
+                if (parts.Count > 0 && b.Capital?.State is { } cap)
+                {
+                    var taken = parts.SelectMany(p => p.States).ToHashSet();
+                    var rest = b.OwnedStates.Where(s => !taken.Contains(s)).ToList();
+                    var linkedBefore = P.Reachable(cap, b.OwnedStates);
+                    var linkedAfter = P.Reachable(cap, rest);
+                    Check(linkedBefore.All(s => taken.Contains(s) || linkedAfter.Contains(s)), $"separation: {b.Tag} keeps no land cut off from its capital");
+                }
+            }
+            // a people that has a country that cannot take the land is not made a second one
+            var third = g.World.Countries.FirstOrDefault(c => c.Exists && c != a && c != b && P.Of(c).Culture != null && P.Of(c).Culture != own && g.Diplomacy.Opinion(a, c) < 25
+                                                              && !D.Touches(c, st) && g.World.Relations.OverlordOf(c) == null);
+            if (third != null)
+            {
+                string tc = P.Of(third).Culture!;
+                P.Of(st).Pops.Clear();
+                P.Of(st).Pops.Add(new Burger.Core.Population.Pop { Culture = tc, Size = 5000 });
+                P.InvalidateMajorities();
+                var plan2 = D.PlanRelease(war, b, tc, a, a, false);
+                Check(plan2.Problem != null || plan2.Parts.All(p => p.Outcome != Burger.Core.Diplomacy.DiplomacySystem.ReleaseOutcome.NewCountry),
+                      $"release: no second country of the {tc} people, {third.Tag} exists ({plan2.Problem ?? "land goes to it"})");
+            }
+        }
+        // colors follow the government: Russia is red only as a communist state
+        var tinted = g.World.Countries.FirstOrDefault(c => c.Exists && c.ColorVariants.ContainsKey("democratic") && c.ColorVariants.ContainsKey("communist") && !c.Dynamic);
+        if (tinted != null && g.Politics.Enabled)
+        {
+            g.Politics.SetRulingParty(tinted, "democratic", "coup");
+            Check(tinted.Color.Equals(tinted.ColorVariants["democratic"]), $"colors: {tinted.Tag} has its democratic color");
+            g.Politics.SetRulingParty(tinted, "communist", "coup");
+            Check(tinted.Color.Equals(tinted.ColorVariants["communist"]), $"colors: {tinted.Tag} has its communist color");
+        }
+        // land without cultural ties is let go (a puppet does not keep what it conquered; a country without its homeland loses its colonies)
+        var foreignPeople = P.CultureByKey.Keys.FirstOrDefault(k => !g.World.Countries.Any(c => c.Exists && P.Of(c).Culture == k) && !P.IsAccepted(b, k));
+        if (foreignPeople != null)
+        {
+            var abroad = b.OwnedStates.Where(s => s != b.Capital?.State).Take(2).ToList();
+            foreach (var s in abroad) { s.Cores.Remove(b); P.Of(s).Pops.Clear(); P.Of(s).Pops.Add(new Burger.Core.Population.Pop { Culture = foreignPeople, Size = 5000 }); }
+            P.InvalidateMajorities();
+            Check(abroad.Count == 0 || abroad.All(s => !g.Rules.Population.HasCulturalTies(g, b, s)), $"ties: {b.Tag} has no ties to land of the {foreignPeople} people");
+            if (abroad.Count > 0 && b.Capital?.State is { } hs) Check(g.Rules.Population.HasCulturalTies(g, b, hs) || P.MajorityCulture(hs) != P.Of(b).Culture, "ties: a country has ties to its own homeland");
+            int let = abroad.Count > 0 ? D.DissolveHoldings(b, abroad) : 0;
+            Check(abroad.Count == 0 || (let > 0 && abroad.All(s => s.Owner != b)), $"ties: {let} states without ties are let go");
+        }
+        // a civil war does not go on for ever: the side far ahead wins, and after three years the side ahead takes the country
+        if (war != null)
+        {
+            var cw = new Burger.Core.Politics.CivilWar { War = war!, Origin = b, Rebel = a };
+            war!.StartDate = g.World.Date.AddYears(-4);
+            war.WarScore = 80; // the attacker (the rebels) far ahead
+            Check(g.Rules.Politics.CivilWarVerdict(g, cw, false, false) == false, "civil war: rebels far ahead win");
+            war.WarScore = -10;
+            Check(g.Rules.Politics.CivilWarVerdict(g, cw, false, false) == true, "civil war: after three years the side ahead (the government) takes the country");
+            war.StartDate = g.World.Date;
+            Check(g.Rules.Politics.CivilWarVerdict(g, cw, false, false) == null, "civil war: a young war with a small lead is not decided");
+        }
+        // the home of a country is the block around its capital
+        Check(b.Capital?.State is not { } cs || D.LinkedHome(b).Contains(cs), $"stranded: the home of {b.Tag} holds its capital");
+    }
+
     private static void WarGoalTests(string project)
     {
         var g = Game.Load(GameDir(project), compileScripts: true, seed: 9);
@@ -547,6 +891,22 @@ public static class Program
         var b = Builtins.NeighborCountries(g, a).Where(x => x.OwnedStates.Count >= 2).OrderByDescending(x => x.OwnedStates.Count).First();
         foreach (var t in g.World.Relations.Truces.Keys.ToList()) g.World.Relations.Truces.Remove(t);
         g.World.Relations.SetAlliance(a, b, false);
+        // nobody takes land it cannot reach: landlocked land that does not touch its own
+        {
+            var far = g.World.States.FirstOrDefault(s => s.Owner != null && s.Owner != a && !s.Locations.Any(l => l.IsCoastal) && !D.Touches(a, s));
+            var near = b.OwnedStates.FirstOrDefault(s => D.Touches(a, s));
+            if (far != null) Check(!D.CanReach(a, far), $"peace: {a.Tag} cannot reach landlocked {far.DisplayName}, which does not touch its land");
+            if (near != null) Check(D.CanReach(a, near), $"peace: {a.Tag} can reach {near.DisplayName} next to its land");
+        }
+        // two countries of one people are rivals
+        if (g.Population.Enabled && g.Population.Of(a).Culture is { } people)
+        {
+            string? was = g.Population.Of(b).Culture;
+            double liked = D.Opinion(a, b);
+            g.Population.Of(b).Culture = people;
+            Check(D.Opinion(a, b) < liked, $"opinion: countries of one people are rivals ({liked:0} -> {D.Opinion(a, b):0})");
+            g.Population.Of(b).Culture = was;
+        }
         // a lost core gives a cheap casus belli
         var core = b.OwnedStates.Where(s => s != b.Capital?.State).OrderBy(s => s.Index).First();
         core.Cores.Add(a);
@@ -638,6 +998,31 @@ public static class Program
         // the ledger knows the world total
         g.Statistics.MonthlyTick();
         Check(g.Statistics.WorldSeries("states").Last() > 0, "ledger: world totals");
+        // subjects have no subjects: what a subject subjugates goes to its overlord
+        {
+            var R = g.World.Relations;
+            var three = g.World.Countries.Where(c => c.Exists && R.OverlordOf(c) == null && !R.SubjectsOf(c).Any()).Take(3).ToList();
+            var st = g.Data.SubjectTypes.Values.FirstOrDefault();
+            if (three.Count == 3 && st != null)
+            {
+                D.MakeSubject(three[1], three[0], st);
+                D.MakeSubject(three[2], three[1], st);
+                Check(R.OverlordOf(three[2]) == three[0] && D.TopOverlord(three[2]) == three[0],
+                      $"subjects: {three[2].Tag}, subjugated by the subject {three[1].Tag}, answers to its overlord {three[0].Tag}");
+            }
+        }
+        // far coasts are only for navies: a country without ships reaches a short hop over sea, each ship adds range
+        if (g.Navy.Enabled)
+        {
+            var sailor = g.World.Countries.Where(c => c.Exists).OrderByDescending(c => g.Rules.Diplomacy.NavalStrength(g, c)).First();
+            var landlubber = g.World.Countries.Where(c => c.Exists && c.OwnedStates.Any(s => s.Locations.Any(l => l.IsCoastal))).OrderBy(c => g.Rules.Diplomacy.NavalStrength(g, c)).First();
+            Check(g.Rules.Diplomacy.SeaReachKm(g, sailor) > g.Rules.Diplomacy.SeaReachKm(g, landlubber) || sailor == landlubber,
+                  $"peace: the navy of {sailor.Tag} reaches {g.Rules.Diplomacy.SeaReachKm(g, sailor):0} km over sea, {landlubber.Tag} only {g.Rules.Diplomacy.SeaReachKm(g, landlubber):0} km");
+            var farCoast = g.World.States.Where(s => s.Owner != null && s.Owner != landlubber && s.Locations.Any(l => l.IsCoastal) && !D.Touches(landlubber, s))
+                .OrderByDescending(s => D.SeaDistanceKm(landlubber, s)).FirstOrDefault();
+            if (farCoast != null && D.SeaDistanceKm(landlubber, farCoast) > g.Rules.Diplomacy.SeaReachKm(g, landlubber))
+                Check(!D.CanReach(landlubber, farCoast), $"peace: {landlubber.Tag} cannot take the coast of {farCoast.DisplayName}, {D.SeaDistanceKm(landlubber, farCoast):0} km away over sea");
+        }
     }
 
     private static void PopulationFeatureTests(string project)
@@ -720,7 +1105,7 @@ public static class Program
         if (P.IndependenceEnabled)
         {
             // a state whose people are all of an unaccepted culture forms an independence movement, then breaks away
-            var sep = c.OwnedStates.Where(s => s != c.Capital?.State && P.HasPops(s)).OrderBy(s => s.Index).LastOrDefault();
+            var sep = c.OwnedStates.Where(s => s != c.Capital?.State && P.HasPops(s)).OrderByDescending(P.TotalOf).FirstOrDefault(); // a big state: the movement needs a share of the country
             var cult = P.CultureByKey.Values.FirstOrDefault(cu => !P.IsAccepted(c, cu.Key) && cu.Group.Key != "auto_cultures");
             if (sep != null && cult != null)
             {
@@ -841,7 +1226,7 @@ public static class Program
         if (Pop.Enabled && demo2 != null)
         {
             var foreign = Pop.CultureByKey.Values.FirstOrDefault(cu => !Pop.IsAccepted(demo2, cu.Key) && cu.Group.Key != "auto_cultures");
-            var st = demo2.OwnedStates.FirstOrDefault(Pop.HasPops);
+            var st = demo2.OwnedStates.FirstOrDefault(x => Pop.HasPops(x) && !Pop.IsColony(x)); // colonies do not vote
             if (foreign != null && st != null)
             {
                 g.RunEffect($"add_pops = {{ culture = {foreign.Key} size = {Pop.TotalOf(demo2) * 0.4:0} }}", st);

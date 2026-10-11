@@ -1,0 +1,8 @@
+# Demilitarized states at the start (demilitarization feature): state = { by = the country that imposed it }
+rhineland_palatinate_state = { by = FRA }
+southwest_north_rhine_westphalia_state = { by = FRA }
+northeast_north_rhine_westphalia_state = { by = FRA }
+hesse_state = { by = FRA }
+southwest_baden_wurttemberg_state = { by = FRA }
+canakkale_state = { by = ENG }
+bilecik_state = { by = ENG }

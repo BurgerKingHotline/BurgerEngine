@@ -48,6 +48,9 @@ public sealed partial class Hud
         if (Raylib.IsKeyPressed(KeyboardKey.KpSubtract) || Raylib.IsKeyPressed(KeyboardKey.Minus)) clock.Speed = Math.Max(1, clock.Speed - 1);
         if (Raylib.IsKeyPressed(KeyboardKey.Tab)) CycleMapMode();
         if (Raylib.IsKeyPressed(KeyboardKey.F) && Has(FeatureSet.FogOfWar)) MapRenderer.FogShading = !MapRenderer.FogShading;
+        if (Raylib.IsKeyPressed(KeyboardKey.H) && (Has(FeatureSet.Military) || Has(FeatureSet.Navy))) MapOverlay.ShowUnits = !MapOverlay.ShowUnits;
+        if (Raylib.IsKeyPressed(KeyboardKey.G) && G.Focus.Enabled && G.World.Player != null) ToggleLeft(LeftPanel.Focus);
+        if (Raylib.IsKeyPressed(KeyboardKey.T) && G.Tech.Enabled && G.World.Player != null) ToggleLeft(LeftPanel.Technology);
         if (G.World.Player != null)
         {
             if (Raylib.IsKeyPressed(KeyboardKey.F1) && Has(FeatureSet.Military)) ToggleLeft(LeftPanel.Military);
@@ -275,6 +278,8 @@ public sealed partial class Hud
                 case LeftPanel.Air: DrawAirPanel(); break;
                 case LeftPanel.Politics: DrawPoliticsPanel(); break;
                 case LeftPanel.Population: DrawPopulationPanel(); break;
+                case LeftPanel.Technology: DrawTechnologyPanel(); break;
+                case LeftPanel.Focus: DrawFocusPanel(); break;
             }
             DrawSupportDialog();
         }
@@ -442,7 +447,8 @@ public sealed partial class Hud
         modes.Add(("Locations", MapMode.Locations));
         var custom = G.Interface.MapModes;
         bool fogToggle = Has(FeatureSet.FogOfWar);
-        int total = modes.Count + custom.Count + (fogToggle ? 1 : 0);
+        bool unitsToggle = Has(FeatureSet.Military) || Has(FeatureSet.Navy);
+        int total = modes.Count + custom.Count + (fogToggle ? 1 : 0) + (unitsToggle ? 1 : 0);
         float bw = 84 * S, gap = 3 * S, pad = 6 * S;
         float maxW = Raylib.GetScreenWidth() * 0.5f;
         if (total * (bw + gap) + 2 * pad > maxW) bw = Math.Max(54 * S, (maxW - 2 * pad) / total - gap);
@@ -456,6 +462,12 @@ public sealed partial class Hud
             // map shading only: units you cannot see stay hidden either way
             if (Gui.Button(new Rectangle(x, y, bw, h), "Fog", true, "Fog of war shading on the map (F)\nTurning it off only clears the map: enemy units you cannot see stay hidden.", MapRenderer.FogShading, 14))
                 MapRenderer.FogShading = !MapRenderer.FogShading;
+            x += bw + gap;
+        }
+        if (unitsToggle)
+        {
+            if (Gui.Button(new Rectangle(x, y, bw, h), "Units", true, "Units on the map (H)\nTurning it off hides divisions, fleets, battles and order arrows, for a clear look at the map.", MapOverlay.ShowUnits, 14))
+                MapOverlay.ShowUnits = !MapOverlay.ShowUnits;
             x += bw + gap;
         }
         foreach (var (name, mode) in modes)

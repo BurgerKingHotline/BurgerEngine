@@ -111,7 +111,7 @@ public sealed partial class DiplomacySystem
             double sf = a.AiAcceptance.GetDouble("strength_factor", 0);
             if (sf != 0)
             {
-                double sa = Rules.MilitaryStrength(_game, actor), sr = Rules.MilitaryStrength(_game, rc);
+                double sa = Strength(actor), sr = Strength(rc);
                 v += sf * Math.Clamp((sa + 1) / (sr + 1) - 1, -3, 3);
             }
             v += Rules.AcceptanceModifier(_game, a, actor, rc);
@@ -150,7 +150,9 @@ public sealed partial class DiplomacySystem
                 if (_game.Data.Defines.PauseOnEvent) _game.Clock.Paused = true;
                 return "Proposal sent";
             }
-            bool accepted = Acceptance(a, actor, recipient) > 0;
+            double accScore = Acceptance(a, actor, recipient);
+            bool accepted = accScore > 0;
+            if (Environment.GetEnvironmentVariable("BURGER_DIPLO_LOG") is { } dl && a.Key.Contains(dl)) Console.WriteLine($"DIPLO {_game.World.Date.ToDisplay()} {actor.Tag} {a.Key} {recipientCountry.Tag}: {accScore:0.0} {(accepted ? "accepted" : "declined")}");
             Resolve(a, ctx, accepted);
             if (actor.IsPlayer) _game.Notify($"{recipientCountry.Name} {(accepted ? "accepted" : "declined")}: {name}", accepted ? NotificationKind.Good : NotificationKind.Bad);
             return accepted ? "Accepted" : "Declined";
@@ -378,6 +380,18 @@ public sealed partial class DiplomacySystem
     }
 
     /// <summary>Recomputes war score for all wars (called daily).</summary>
+    private readonly Dictionary<Country, double> _strength = new();
+    private int _strengthDay = int.MinValue;
+
+    /// <summary>Military strength of a country (rule MilitaryStrength), counted once a day: scripts and the AI ask for it constantly.</summary>
+    public double Strength(Country c)
+    {
+        int today = _game.World.Date.TotalDays;
+        if (today != _strengthDay) { _strength.Clear(); _strengthDay = today; }
+        if (!_strength.TryGetValue(c, out var v)) _strength[c] = v = Rules.MilitaryStrength(_game, c);
+        return v;
+    }
+
     public void UpdateWarScores()
     {
         foreach (var war in _game.World.Wars) war.WarScore = ComputeWarScore(war);
@@ -456,15 +470,18 @@ public sealed partial class DiplomacySystem
                 case PeaceTermType.TransferState:
                     if (t.State == null || t.State.Owner == null) return "Invalid state";
                     if (!war.SideOf(loser).Contains(t.State.Owner)) return $"{t.State.DisplayName} is not owned by the losing side";
-                    if (t.Beneficiary == null || !war.SideOf(winner).Contains(t.Beneficiary)) return "Invalid receiver";
+                    // the winning side, or a country of the state's own people that stayed out of the war
+                    if (t.Beneficiary == null || !(war.SideOf(winner).Contains(t.Beneficiary) || IsKinOutsideWar(war, t.Beneficiary, t.State))) return "Invalid receiver";
                     break;
                 case PeaceTermType.Subjugate:
                 case PeaceTermType.Annex:
                     if (t.Beneficiary == null || !war.SideOf(winner).Contains(t.Beneficiary)) return "Invalid overlord";
-                    if (t.Type == PeaceTermType.Subjugate && R.OverlordOf(loser) == t.Beneficiary) return $"{loser.Name} is already our subject";
-                    if (t.Type == PeaceTermType.Subjugate && R.OverlordOf(t.Beneficiary) != null) return $"{t.Beneficiary.Name} is a subject itself and cannot have subjects";
-                    if (t.Type == PeaceTermType.Subjugate && HoldsHomelandOf(t.Beneficiary, loser))
-                        return $"{t.Beneficiary.Name} already rules the homeland of {loser.Name}: annex them instead";
+                    // a subject has no subjects of its own: what it subjugates becomes a subject of its overlord
+                    if (t.Type == PeaceTermType.Subjugate && TopOverlord(t.Beneficiary) is var lord && lord != loser)
+                    {
+                        if (R.OverlordOf(loser) == lord) return $"{loser.Name} is already a subject of {lord.Name}";
+                        if (HoldsHomelandOf(lord, loser)) return $"{lord.Name} already rules the homeland of {loser.Name}: annex them instead";
+                    }
                     break;
                 case PeaceTermType.Gold:
                     if (t.Amount <= 0) return "Invalid amount";
@@ -525,18 +542,27 @@ public sealed partial class DiplomacySystem
         if (o.Terms.Count == 0) o.Terms.Add(new PeaceTerm { Type = PeaceTermType.WhitePeace });
         PeaceDeals++;
         if (o.Terms.All(t => t.Type == PeaceTermType.WhitePeace)) WhitePeaces++;
+        var homes = SnapshotHomes(war);
         foreach (var t in o.Terms)
         {
             switch (t.Type)
             {
                 case PeaceTermType.TransferState:
-                    if (t.State != null && t.Beneficiary != null) TransferState(t.State, t.Beneficiary);
+                    if (t.State != null && t.Beneficiary != null)
+                    {
+                        bool gift = !war.Involves(t.Beneficiary);
+                        TransferState(t.State, t.Beneficiary);
+                        if (gift) AddOpinion(t.Beneficiary, winner, "Gave us our people's land", 50, 0.5);
+                    }
                     break;
                 case PeaceTermType.Subjugate:
                     if (t.Beneficiary != null)
                     {
                         var type = _game.Data.SubjectTypes.TryGetValue(t.SubjectType, out var st) ? st : _game.Data.SubjectTypes.Values.First();
                         MakeSubject(loser, t.Beneficiary, type);
+                        // a puppet keeps the land its people has ties to (and colonies), not what it conquered from others
+                        var foreign = loser.OwnedStates.Where(s => !_game.Population.IsColony(s) && !_game.Rules.Population.HasCulturalTies(_game, loser, s)).ToList();
+                        if (foreign.Count > 0) DissolveHoldings(loser, foreign, t.Beneficiary);
                     }
                     break;
                 case PeaceTermType.Annex:
@@ -550,7 +576,7 @@ public sealed partial class DiplomacySystem
                         break;
                     }
                 default:
-                    ApplyNewTerm(t, winner, loser);
+                    ApplyNewTerm(war, t, winner, loser);
                     break;
             }
         }
@@ -559,6 +585,8 @@ public sealed partial class DiplomacySystem
         _game.Events.FireOnAction("on_peace", winner, new Dictionary<string, IScope?>(StringComparer.OrdinalIgnoreCase) { ["loser"] = loser, ["war"] = war });
         _game.Mods.Invoke(m => m.OnPeace(o));
 
+        SettleStranded(homes, war.SideOf(winner));
+        _game.RefreshNames();
         bool leadersPeace = war.LeaderOf(o.From) == o.From && war.LeaderOf(o.To) == o.To;
         if (!_game.World.Wars.Contains(war)) return; // e.g. annexation ended it
         if (leadersPeace) EndWar(war);
@@ -601,6 +629,7 @@ public sealed partial class DiplomacySystem
     {
         UpdateWarScores();
         CheckEliminated();
+        CheckDemilitarizedAtWar();
     }
 
     public void MonthlyTick()
@@ -611,6 +640,8 @@ public sealed partial class DiplomacySystem
         MonthlyLiberty();
         MonthlySubjects();
         _goalStates.Clear();
+        CheckHoldingsCollapse();
+        _game.RefreshNames();
     }
 
     /// <summary>Removes countries that lost all their land from wars and relations.</summary>

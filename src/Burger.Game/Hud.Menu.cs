@@ -39,6 +39,10 @@ public sealed partial class Hud
             items.Add(("People", "Population, cultures, religions and colonies (U)", Ui.Left == LeftPanel.Population, () => ToggleLeft(LeftPanel.Population), MenuIcon.Population, null, 0));
         if (G.Politics.Enabled)
             items.Add(("Politics", "Government, parliament, laws, cabinet and political movements (O)", Ui.Left == LeftPanel.Politics, () => ToggleLeft(LeftPanel.Politics), MenuIcon.Politics, null, G.Politics.MovementsOf(player).Count()));
+        if (G.Focus.Enabled && G.Focus.TreeOf(player) != null)
+            items.Add(("Focus", "National focus: the goals your country works toward (G)", Ui.Left == LeftPanel.Focus, () => ToggleLeft(LeftPanel.Focus), MenuIcon.Politics, null, G.Focus.Current(player) == null ? 1 : 0));
+        if (G.Tech.Enabled)
+            items.Add(("Technology", "Research: technologies unlock units, ships and planes and strengthen your divisions (T)", Ui.Left == LeftPanel.Technology, () => ToggleLeft(LeftPanel.Technology), MenuIcon.Designer, null, G.Tech.SlotsOf(player).Count() < G.Rules.Tech.Slots(G, player) ? 1 : 0));
         if (Has(FeatureSet.Characters))
             items.Add(("Characters", "Ruler, heir, family and interactions (F3)", Ui.Left == LeftPanel.Characters, () => ToggleLeft(LeftPanel.Characters), MenuIcon.Characters, null, 0));
         if (G.Decisions.Defs.Count > 0)

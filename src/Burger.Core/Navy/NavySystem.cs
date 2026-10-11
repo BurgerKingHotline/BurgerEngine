@@ -404,6 +404,7 @@ public sealed class NavySystem
     public string? CannotBuyReason(Country c, ShipType t)
     {
         if (MainPort(c) == null) return "You have no port";
+        if (!_game.Tech.CanUse(c, t.Definition)) return "Needs a technology you do not have";
         if (_game.Features.Has(FeatureSet.Economy) && c.Gold < t.Cost) return $"Needs {t.Cost:0} gold";
         if (c.Manpower < t.Manpower) return $"Needs {t.Manpower:0} manpower";
         return null;
@@ -449,8 +450,9 @@ public sealed class NavySystem
     {
         var w = _game.World;
         bool atWar = w.WarsOf(c).Any();
-        var types = _game.Data.ShipTypes.Values.ToList();
+        var types = _game.Data.ShipTypes.Values.Where(t => _game.Tech.CanUse(c, t.Definition)).ToList();
         if (types.Count == 0 || MainPort(c) == null) return;
+        var personality = _game.AiProfiles.PersonalityOf(c);
         var screen = types.Where(t => t.Category.Equals("screen", StringComparison.OrdinalIgnoreCase)).OrderBy(t => t.ProductionCost).FirstOrDefault();
         var transport = types.FirstOrDefault(t => t.Stat("transport") > 0);
         int ships = FleetsOf(c).Sum(f => f.Ships.Count);

@@ -95,6 +95,9 @@ public static partial class Builtins
         s.RegisterTrigger("is_guaranteeing", (ctx, n) => C(ctx.This) is { } a && s.ArgCountry(n, ctx) is { } b && R.IsGuaranteeing(a, b));
         s.RegisterTrigger("borders", (ctx, n) => C(ctx.This) is { } a && s.ArgCountry(n, ctx) is { } b && NeighborCountries(game, a).Contains(b),
             (ctx, n) => $"Borders {s.ArgScope(n, ctx)?.DisplayName}");
+        // enclave_held_by = scope:recipient: they hold a state that lies inside our land, with nobody else around it
+        s.RegisterTrigger("enclave_held_by", (ctx, n) => C(ctx.This) is { } a && s.ArgCountry(n, ctx) is { } b && game.Diplomacy.EnclaveHolders(a).Contains(b),
+            (ctx, n) => $"{s.ArgScope(n, ctx)?.DisplayName} holds an enclave in our land");
         // stronger_than = { target = scope:recipient ratio = 1.5 }: our military strength is at least ratio x theirs
         s.RegisterTrigger("stronger_than", (ctx, n) =>
         {
@@ -103,7 +106,7 @@ public static partial class Builtins
             Country? b = tn != null && s.TryResolveScope(tn.Value ?? "", ctx, out var t) ? t as Country : null;
             if (b == null) return false;
             double ratio = n.Children != null ? n.GetDouble("ratio", 1) : 1;
-            return game.Rules.Diplomacy.MilitaryStrength(game, a) >= ratio * Math.Max(1, game.Rules.Diplomacy.MilitaryStrength(game, b));
+            return game.Diplomacy.Strength(a) >= ratio * Math.Max(1, game.Diplomacy.Strength(b));
         }, (ctx, n) => $"Much stronger than {(n.Children != null ? n.GetString("target") : n.Value)}");
         s.RegisterTrigger("is_neighbor_of", (ctx, n) => C(ctx.This) is { } a && s.ArgCountry(n, ctx) is { } b && NeighborCountries(game, a).Contains(b));
         s.RegisterTrigger("can_declare_war_on", (ctx, n) => C(ctx.This) is { } a && s.ArgCountry(n, ctx) is { } b

@@ -44,12 +44,13 @@ uniform float borderScale;
 uniform float stateBorders; // 1 up close, fades to 0 when zoomed out
 uniform float showProvinceBorders;
 uniform float tintStrength;
+uniform float stripePeriod;  // occupation stripes: width in world units, steps by powers of two with the zoom (never a per pixel value)
 uniform float fogStrength;   // 0 when zoomed far out (strategic view)   // how strongly map mode colors cover the terrain (stronger when zoomed out)
 uniform vec3 viewPos;
 
 out vec4 finalColor;
 
-// flags (lut block 2 alpha): 1 water, 2 occupied stripes, 4 selected, 8 hovered, 16 lake, 32 hidden by fog of war, 64 highlighted state
+// flags (lut block 2 alpha): 1 water, 2 occupied stripes, 4 selected, 8 hovered, 16 lake, 32 hidden by fog of war, 64 highlighted state, 128 demilitarized zone
 
 ivec2 clampPix(ivec2 p) { return clamp(p, ivec2(0), ivec2(mapSize) - ivec2(1)); }
 
@@ -234,13 +235,24 @@ void main()
             float band = 1.0 - smoothstep(0.0, 9.0 * borderScale, dCountry);
             col = mix(col, mc.rgb * 0.8, band * 0.35 * mc.a);
         }
+        if ((flags & 128) != 0)
+        {
+            // demilitarized zone: a pale cross-hatch fixed to the map
+            float hp = (fragPos.x - fragPos.z) / (stripePeriod * 1.6);
+            float hq = (fragPos.x + fragPos.z) / (stripePeriod * 1.6);
+            float h = max(smoothstep(0.42, 0.5, abs(fract(hp) - 0.5)), smoothstep(0.42, 0.5, abs(fract(hq) - 0.5)));
+            col = mix(col, vec3(0.88, 0.93, 1.0), h * 0.45);
+        }
         if ((flags & 2) != 0)
         {
-            // occupied: stripes about 10 pixels wide on screen at any zoom level
-            float k = fragPos.x + fragPos.z;
-            float period = max(fwidth(k) * 12.0, 0.08);
-            float s = smoothstep(0.45, 0.55, fract(k / period));
-            col = mix(col, lut(loc, 2).rgb, s * 0.6);
+            // occupied: diagonal stripes of the occupier's color, fixed to the map (a pattern that depends on the pixel's
+            // own screen size shimmers like z-fighting while the camera moves) and a band of that color along the border
+            float ph = (fragPos.x + fragPos.z) / stripePeriod;
+            float edge = clamp(fwidth(ph) * 1.5, 0.015, 0.2);
+            float s = smoothstep(0.5 - edge, 0.5 + edge, fract(ph));
+            vec3 occ = lut(loc, 2).rgb;
+            col = mix(col, occ, s * 0.55);
+            col = mix(col, occ * 0.85, line(dProv, 1.6) * 0.55);
         }
         col = mix(col, vec3(0.06), line(dProv, 0.6) * 0.30 * showProvinceBorders);
         col = mix(col, vec3(0.08), line(dState, 0.9) * 0.55 * stateBorders);

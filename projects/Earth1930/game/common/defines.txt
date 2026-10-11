@@ -14,3 +14,10 @@ recruit_gold_cost = no
 fog_of_war = yes
 
 occupation_hours = 0
+
+# politics: democracies below this stability look for a strong hand (fascists gain, see weak_democracy_drift in the ideologies)
+weak_democracy_stability = 55
+weak_democracy_support = 0.5
+
+# alliances, guarantees and subjects a country can have (the great powers of the 1930s had many more ties than the engine default of 3)
+base_diplomatic_relations = 7

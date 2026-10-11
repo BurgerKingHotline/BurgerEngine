@@ -1,15 +1,124 @@
-# Relations at the start of 1930 (used with the diplomacy feature).
-subject = { overlord = ENG subject = CAN type = client_state }
-subject = { overlord = ENG subject = NFL type = client_state }
-subject = { overlord = ENG subject = AST type = client_state }
-subject = { overlord = ENG subject = NZL type = client_state }
-subject = { overlord = ENG subject = SAF type = client_state }
-subject = { overlord = ENG subject = IRE type = client_state }
-subject = { overlord = ENG subject = RAJ type = client_state }
+# Relations at the start of 1930 (diplomacy feature): subjects, alliances, guarantees, non-aggression pacts and grievances.
+
+subject = { overlord = ENG subject = CAN type = dominion }
+subject = { overlord = ENG subject = NFL type = dominion }
+subject = { overlord = ENG subject = AST type = dominion }
+subject = { overlord = ENG subject = NZL type = dominion }
+subject = { overlord = ENG subject = SAF type = dominion }
+subject = { overlord = ENG subject = IRE type = dominion }
+subject = { overlord = ENG subject = RAJ type = colony }
 subject = { overlord = SOV subject = MON type = client_state }
 subject = { overlord = SOV subject = TAN type = client_state }
+subject = { overlord = ITA subject = ALB type = client_state }
 alliance = { first = FRA second = POL }
+alliance = { first = FRA second = CZE }
+alliance = { first = FRA second = YUG }
+alliance = { first = FRA second = ROM }
+alliance = { first = FRA second = BEL }
 alliance = { first = CZE second = YUG }
 alliance = { first = CZE second = ROM }
 alliance = { first = ROM second = YUG }
-alliance = { first = FRA second = CZE }
+alliance = { first = POL second = ROM }
+alliance = { first = ENG second = POR }
+alliance = { first = SOV second = TUR }
+alliance = { first = ITA second = HUN }
+alliance = { first = PER second = AFG }
+alliance = { first = EST second = LAT }
+guarantee = { guarantor = ENG guaranteed = BEL }
+guarantee = { guarantor = ITA guaranteed = BEL }
+guarantee = { guarantor = FRA guaranteed = LUX }
+guarantee = { guarantor = ENG guaranteed = NOR }
+guarantee = { guarantor = FRA guaranteed = GRE }
+pact = { first = SOV second = PER until = 1937.1.1 }
+pact = { first = SOV second = AFG until = 1937.1.1 }
+pact = { first = SOV second = LIT until = 1937.1.1 }
+pact = { first = GER second = SOV until = 1937.1.1 }
+pact = { first = ITA second = AUS until = 1937.1.1 }
+pact = { first = GER second = DEN until = 1937.1.1 }
+pact = { first = DEN second = SWE until = 1937.1.1 }
+pact = { first = NOR second = SWE until = 1937.1.1 }
+pact = { first = FIN second = SWE until = 1937.1.1 }
+pact = { first = FRA second = SWI until = 1937.1.1 }
+opinion = { from = GER to = FRA value = -60 name = "Versailles and the Ruhr" }
+opinion = { from = GER to = POL value = -70 name = "The Corridor and Upper Silesia" }
+opinion = { from = GER to = CZE value = -30 name = "The Sudeten Germans" }
+opinion = { from = FRA to = GER value = -30 name = "Fear of revenge" }
+opinion = { from = POL to = GER value = -40 name = "Revisionism" }
+opinion = { from = HUN to = CZE value = -60 name = "Trianon" }
+opinion = { from = HUN to = ROM value = -60 name = "Trianon" }
+opinion = { from = HUN to = YUG value = -40 name = "Trianon" }
+opinion = { from = CZE to = HUN value = -40 name = "Revisionism" }
+opinion = { from = ROM to = HUN value = -40 name = "Revisionism" }
+opinion = { from = YUG to = HUN value = -30 name = "Revisionism" }
+opinion = { from = ITA to = YUG value = -40 name = "Dalmatia and Fiume" }
+opinion = { from = YUG to = ITA value = -40 name = "Italian ambitions" }
+opinion = { from = BUL to = GRE value = -30 name = "Neuilly" }
+opinion = { from = BUL to = YUG value = -30 name = "Macedonia" }
+opinion = { from = BUL to = ROM value = -20 name = "Dobruja" }
+opinion = { from = LIT to = POL value = -70 name = "Vilnius" }
+opinion = { from = POL to = LIT value = -30 name = "Vilnius" }
+opinion = { from = BOL to = PAR value = -50 name = "The Chaco" }
+opinion = { from = PAR to = BOL value = -50 name = "The Chaco" }
+opinion = { from = PRU to = ECU value = -40 name = "Border dispute" }
+opinion = { from = ECU to = PRU value = -40 name = "Border dispute" }
+opinion = { from = BOL to = CHL value = -50 name = "The sea lost" }
+opinion = { from = PRU to = CHL value = -30 name = "The War of the Pacific" }
+opinion = { from = CHI to = JAP value = -50 name = "Twenty-one Demands" }
+opinion = { from = JAP to = CHI value = -30 name = "Manchurian interests" }
+opinion = { from = SOV to = POL value = -30 name = "The war of 1920" }
+opinion = { from = POL to = SOV value = -40 name = "Bolshevism" }
+opinion = { from = SOV to = ENG value = -30 name = "Intervention" }
+opinion = { from = ENG to = SOV value = -30 name = "Bolshevism" }
+opinion = { from = FRA to = SOV value = -30 name = "Unpaid debts" }
+opinion = { from = USA to = SOV value = -20 name = "No recognition" }
+opinion = { from = SOV to = ROM value = -30 name = "Bessarabia" }
+opinion = { from = ROM to = SOV value = -30 name = "Bessarabia" }
+opinion = { from = SOV to = JAP value = -20 name = "Intervention" }
+opinion = { from = TUR to = GRE value = -15 name = "Population exchange" }
+opinion = { from = GRE to = TUR value = -15 name = "Smyrna" }
+opinion = { from = ITA to = FRA value = -20 name = "Colonial disputes" }
+opinion = { from = FRA to = ITA value = -20 name = "Tunisia and Nice" }
+opinion = { from = ARG to = BRA value = -20 name = "Rivalry" }
+opinion = { from = BRA to = ARG value = -20 name = "Rivalry" }
+opinion = { from = IRE to = ENG value = -30 name = "Partition" }
+opinion = { from = SPA to = ENG value = -10 name = "Gibraltar" }
+opinion = { from = ARG to = ENG value = -15 name = "The Falklands" }
+opinion = { from = TUR to = FRA value = -15 name = "Alexandretta" }
+opinion = { from = AFG to = RAJ value = -15 name = "The Durand Line" }
+opinion = { from = SAU to = YEM value = -30 name = "Asir" }
+opinion = { from = YEM to = SAU value = -30 name = "Asir" }
+opinion = { from = ETH to = ITA value = -30 name = "Italian Somaliland" }
+opinion = { from = FIN to = SOV value = -30 name = "Karelia" }
+opinion = { from = SOV to = FIN value = -20 name = "Borders" }
+opinion = { from = EST to = SOV value = -20 name = "Border" }
+opinion = { from = ENG to = POR value = 30 name = "The oldest alliance" }
+opinion = { from = POR to = ENG value = 30 name = "The oldest alliance" }
+opinion = { from = FRA to = POL value = 40 name = "The alliance" }
+opinion = { from = POL to = FRA value = 40 name = "The alliance" }
+opinion = { from = CZE to = FRA value = 40 name = "The alliance" }
+opinion = { from = FRA to = CZE value = 30 name = "The alliance" }
+opinion = { from = ITA to = HUN value = 30 name = "Friendship treaty" }
+opinion = { from = HUN to = ITA value = 30 name = "Friendship treaty" }
+opinion = { from = ITA to = ALB value = 30 name = "Protector" }
+opinion = { from = ALB to = ITA value = 40 name = "Protector" }
+opinion = { from = SOV to = TUR value = 20 name = "Common isolation" }
+opinion = { from = TUR to = SOV value = 20 name = "Common isolation" }
+opinion = { from = ENG to = USA value = 20 name = "Common language" }
+opinion = { from = USA to = ENG value = 20 name = "Common language" }
+opinion = { from = ENG to = FRA value = 10 name = "Entente" }
+opinion = { from = FRA to = ENG value = 10 name = "Entente" }
+opinion = { from = GER to = SOV value = 15 name = "Rapallo" }
+opinion = { from = SOV to = GER value = 15 name = "Rapallo" }
+opinion = { from = GER to = ITA value = 10 name = "Anti-Versailles" }
+opinion = { from = ITA to = GER value = 10 name = "Anti-Versailles" }
+opinion = { from = CHI to = USA value = 15 name = "Missionaries and trade" }
+opinion = { from = JAP to = ENG value = 10 name = "Old alliance" }
+opinion = { from = ENG to = JAP value = 10 name = "Old alliance" }
+opinion = { from = SWE to = NOR value = 20 name = "Scandinavia" }
+opinion = { from = NOR to = SWE value = 20 name = "Scandinavia" }
+opinion = { from = SWE to = DEN value = 20 name = "Scandinavia" }
+opinion = { from = DEN to = SWE value = 20 name = "Scandinavia" }
+opinion = { from = FIN to = SWE value = 20 name = "Kinship" }
+opinion = { from = SWE to = FIN value = 20 name = "Kinship" }
+opinion = { from = EST to = FIN value = 25 name = "Kinship" }
+opinion = { from = FIN to = EST value = 25 name = "Kinship" }

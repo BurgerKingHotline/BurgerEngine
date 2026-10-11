@@ -12,6 +12,7 @@ public static partial class Builtins
         RegisterValues(game);
         RegisterTriggers(game);
         RegisterEffects(game);
+        RegisterExtras(game);
     }
 
     private static Country? C(IScope? s) => ScopeHelpers.CountryOf(s);
@@ -108,7 +109,7 @@ public static partial class Builtins
         s.RegisterValue("num_of_wars", (ctx, x) => C(x) is { } c ? game.World.WarsOf(c).Count() : null);
         s.RegisterValue("num_of_characters", (ctx, x) => C(x) is { } c ? game.World.CharactersOf(c).Count() : null);
         s.RegisterValue("num_of_children", (ctx, x) => (x as Character)?.Children.Count(ch => ch.Alive));
-        s.RegisterValue("military_strength", (ctx, x) => C(x) is { } c ? game.Rules.Diplomacy.MilitaryStrength(game, c) : null);
+        s.RegisterValue("military_strength", (ctx, x) => C(x) is { } c ? game.Diplomacy.Strength(c) : null);
         s.RegisterValue("free_relations", (ctx, x) => C(x) is { } c ? game.Diplomacy.MaxRelations(c) - game.Diplomacy.RelationsUsed(c) : null);
         s.RegisterValue("age", (ctx, x) => (x as Character)?.Age(game.World.Date));
         s.RegisterValue("loyalty", (ctx, x) => (x as Character)?.Loyalty);

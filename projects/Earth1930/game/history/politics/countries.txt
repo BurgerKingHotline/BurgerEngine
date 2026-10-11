@@ -1,0 +1,420 @@
+# Starting politics of 1930, per country: the ruling party, the support of each ideology, laws and party names.
+# democratic = liberals, social democrats and republicans; communist = the Comintern left; fascist = fascists and ultranationalists;
+# neutrality = the non-aligned: monarchists, conservatives, the military, authoritarian modernisers and traditional rulers.
+
+ENG = {
+	ruling_party = democratic
+	popularity = { democratic = 60 communist = 5 fascist = 5 neutrality = 30 }
+	parties = { democratic = "Labour Party" neutrality = "Conservative Party" fascist = "British Union of Fascists" communist = "Communist Party of Great Britain" }
+	laws = { political_parties = multi_party press = free_press conscription = volunteer_only }
+}
+FRA = {
+	ruling_party = democratic
+	popularity = { democratic = 52 communist = 12 fascist = 8 neutrality = 28 }
+	parties = { democratic = "Radical-Socialists" neutrality = "Alliance Democratique" fascist = "Croix-de-Feu" communist = "French Communist Party" }
+	laws = { political_parties = multi_party press = free_press conscription = limited_conscription }
+}
+SOV = {
+	ruling_party = communist
+	popularity = { democratic = 4 communist = 86 fascist = 2 neutrality = 8 }
+	parties = { communist = "All-Union Communist Party (Bolsheviks)" }
+	laws = { political_parties = single_party press = state_press conscription = extensive_conscription }
+}
+USA = {
+	ruling_party = democratic
+	popularity = { democratic = 68 communist = 3 fascist = 5 neutrality = 24 }
+	parties = { democratic = "Republican Party" neutrality = "Democratic Party" communist = "Communist Party USA" }
+	laws = { political_parties = multi_party press = free_press conscription = volunteer_only }
+}
+GER = {
+	ruling_party = democratic
+	popularity = { democratic = 48 communist = 14 fascist = 9 neutrality = 29 }
+	parties = { democratic = "Social Democrats and Centre" neutrality = "German National People's Party" fascist = "NSDAP" communist = "KPD" }
+	laws = { political_parties = multi_party press = free_press conscription = volunteer_only }
+}
+ITA = {
+	ruling_party = fascist
+	popularity = { democratic = 4 communist = 3 fascist = 71 neutrality = 22 }
+	parties = { fascist = "National Fascist Party" }
+	laws = { political_parties = single_party press = propaganda_ministry conscription = limited_conscription }
+}
+JAP = {
+	ruling_party = democratic
+	popularity = { democratic = 33 communist = 4 fascist = 26 neutrality = 37 }
+	parties = { democratic = "Rikken Minseito" neutrality = "Rikken Seiyukai" fascist = "Kokuhonsha and the Army factions" communist = "Japanese Communist Party" }
+	laws = { political_parties = restricted_parties press = free_press conscription = extensive_conscription }
+}
+CHI = {
+	ruling_party = neutrality
+	popularity = { democratic = 14 communist = 20 fascist = 14 neutrality = 52 }
+	parties = { neutrality = "Kuomintang" communist = "Chinese Communist Party" fascist = "Blue Shirts" }
+	laws = { political_parties = single_party press = state_press conscription = extensive_conscription }
+}
+POL = {
+	ruling_party = neutrality
+	popularity = { democratic = 20 communist = 9 fascist = 14 neutrality = 57 }
+	parties = { neutrality = "Sanacja (BBWR)" democratic = "PPS and the centre" fascist = "National Democrats" communist = "KPP" }
+	laws = { political_parties = restricted_parties press = state_press conscription = extensive_conscription }
+}
+TUR = {
+	ruling_party = neutrality
+	popularity = { democratic = 22 communist = 4 fascist = 9 neutrality = 65 }
+	parties = { neutrality = "Republican People's Party" }
+	laws = { political_parties = single_party press = state_press conscription = extensive_conscription }
+}
+SPA = {
+	ruling_party = neutrality
+	popularity = { democratic = 38 communist = 14 fascist = 12 neutrality = 36 }
+	parties = { neutrality = "Monarchist government" democratic = "Republicans and Socialists" communist = "PCE" fascist = "Falange precursors" }
+	laws = { political_parties = restricted_parties press = state_press conscription = limited_conscription }
+}
+POR = {
+	ruling_party = neutrality
+	popularity = { democratic = 14 communist = 4 fascist = 14 neutrality = 68 }
+	parties = { neutrality = "National Union" }
+	laws = { political_parties = restricted_parties press = state_press conscription = limited_conscription }
+}
+ROM = {
+	ruling_party = democratic
+	popularity = { democratic = 44 communist = 6 fascist = 17 neutrality = 33 }
+	parties = { democratic = "National Peasant Party" neutrality = "National Liberal Party" fascist = "Iron Guard" }
+	laws = { political_parties = multi_party press = free_press conscription = extensive_conscription }
+}
+YUG = {
+	ruling_party = neutrality
+	popularity = { democratic = 14 communist = 8 fascist = 5 neutrality = 73 }
+	parties = { neutrality = "Royal dictatorship" }
+	laws = { political_parties = restricted_parties press = state_press conscription = extensive_conscription }
+}
+CZE = {
+	ruling_party = democratic
+	popularity = { democratic = 62 communist = 11 fascist = 5 neutrality = 22 }
+	parties = { democratic = "Agrarians and Social Democrats" neutrality = "National Democrats" fascist = "Vlajka" communist = "KSC" }
+	laws = { political_parties = multi_party press = free_press conscription = extensive_conscription }
+}
+HUN = {
+	ruling_party = neutrality
+	popularity = { democratic = 14 communist = 4 fascist = 15 neutrality = 67 }
+	parties = { neutrality = "Unity Party (Bethlen)" fascist = "Arrow Cross precursors" }
+	laws = { political_parties = restricted_parties press = state_press conscription = limited_conscription }
+}
+AUS = {
+	ruling_party = democratic
+	popularity = { democratic = 40 communist = 12 fascist = 14 neutrality = 34 }
+	parties = { democratic = "Social Democrats" neutrality = "Christian Social Party" fascist = "Heimwehr and Nazis" }
+	laws = { political_parties = multi_party press = free_press conscription = limited_conscription }
+}
+BEL = {
+	ruling_party = democratic
+	popularity = { democratic = 58 communist = 6 fascist = 6 neutrality = 30 }
+	parties = { democratic = "Catholic-Liberal coalition" }
+	laws = { political_parties = multi_party press = free_press conscription = extensive_conscription }
+}
+HOL = {
+	ruling_party = democratic
+	popularity = { democratic = 58 communist = 4 fascist = 6 neutrality = 32 }
+	parties = { democratic = "Catholic and Liberal coalition" }
+	laws = { political_parties = multi_party press = free_press conscription = extensive_conscription }
+}
+SWE = {
+	ruling_party = democratic
+	popularity = { democratic = 62 communist = 4 fascist = 4 neutrality = 30 }
+	parties = { democratic = "Social Democrats" neutrality = "Conservatives and Farmers" }
+	laws = { political_parties = multi_party press = free_press conscription = limited_conscription }
+}
+NOR = {
+	ruling_party = democratic
+	popularity = { democratic = 62 communist = 4 fascist = 4 neutrality = 30 }
+	parties = { democratic = "Labour and Liberals" }
+	laws = { political_parties = multi_party press = free_press conscription = limited_conscription }
+}
+DEN = {
+	ruling_party = democratic
+	popularity = { democratic = 62 communist = 3 fascist = 3 neutrality = 32 }
+	parties = { democratic = "Social Democrats and Radicals" }
+	laws = { political_parties = multi_party press = free_press conscription = limited_conscription }
+}
+FIN = {
+	ruling_party = democratic
+	popularity = { democratic = 50 communist = 6 fascist = 14 neutrality = 30 }
+	parties = { democratic = "Agrarians and Social Democrats" fascist = "Lapua Movement" }
+	laws = { political_parties = multi_party press = free_press conscription = extensive_conscription }
+}
+EST = {
+	ruling_party = democratic
+	popularity = { democratic = 52 communist = 8 fascist = 8 neutrality = 32 }
+	parties = { democratic = "Farmers and coalition" }
+	laws = { political_parties = multi_party press = free_press conscription = extensive_conscription }
+}
+LAT = {
+	ruling_party = democratic
+	popularity = { democratic = 48 communist = 8 fascist = 8 neutrality = 36 }
+	parties = { democratic = "Farmers' Union" }
+	laws = { political_parties = multi_party press = free_press conscription = extensive_conscription }
+}
+LIT = {
+	ruling_party = neutrality
+	popularity = { democratic = 14 communist = 6 fascist = 12 neutrality = 68 }
+	parties = { neutrality = "Nationalist Union (Smetona)" }
+	laws = { political_parties = restricted_parties press = state_press conscription = extensive_conscription }
+}
+SWI = {
+	ruling_party = democratic
+	popularity = { democratic = 66 communist = 3 fascist = 3 neutrality = 28 }
+	parties = { democratic = "Federal Council coalition" }
+	laws = { political_parties = multi_party press = free_press conscription = extensive_conscription }
+}
+IRE = {
+	ruling_party = democratic
+	popularity = { democratic = 60 communist = 2 fascist = 3 neutrality = 35 }
+	parties = { democratic = "Cumann na nGaedheal" neutrality = "Fianna Fail" }
+	laws = { political_parties = multi_party press = free_press conscription = volunteer_only }
+}
+ICE = {
+	ruling_party = democratic
+	popularity = { democratic = 64 communist = 3 fascist = 3 neutrality = 30 }
+	laws = { political_parties = multi_party press = free_press conscription = volunteer_only }
+}
+LUX = {
+	ruling_party = democratic
+	popularity = { democratic = 58 communist = 4 fascist = 3 neutrality = 35 }
+	laws = { political_parties = multi_party press = free_press conscription = volunteer_only }
+}
+CAN = {
+	ruling_party = democratic
+	popularity = { democratic = 66 communist = 3 fascist = 3 neutrality = 28 }
+	parties = { democratic = "Liberal Party" neutrality = "Conservative Party" }
+	laws = { political_parties = multi_party press = free_press conscription = volunteer_only }
+}
+AST = {
+	ruling_party = democratic
+	popularity = { democratic = 68 communist = 3 fascist = 2 neutrality = 27 }
+	parties = { democratic = "Labor Party" }
+	laws = { political_parties = multi_party press = free_press conscription = volunteer_only }
+}
+NZL = {
+	ruling_party = democratic
+	popularity = { democratic = 68 communist = 2 fascist = 2 neutrality = 28 }
+	laws = { political_parties = multi_party press = free_press conscription = volunteer_only }
+}
+SAF = {
+	ruling_party = democratic
+	popularity = { democratic = 58 communist = 2 fascist = 6 neutrality = 34 }
+	parties = { democratic = "National Party (Hertzog)" }
+	laws = { political_parties = multi_party press = free_press conscription = volunteer_only }
+}
+NFL = {
+	ruling_party = democratic
+	popularity = { democratic = 60 communist = 2 fascist = 2 neutrality = 36 }
+	laws = { political_parties = multi_party press = free_press conscription = volunteer_only }
+}
+GRE = {
+	ruling_party = democratic
+	popularity = { democratic = 50 communist = 8 fascist = 10 neutrality = 32 }
+	parties = { democratic = "Liberal Party (Venizelos)" neutrality = "People's Party" }
+	laws = { political_parties = multi_party press = free_press conscription = extensive_conscription }
+}
+BUL = {
+	ruling_party = neutrality
+	popularity = { democratic = 22 communist = 10 fascist = 10 neutrality = 58 }
+	parties = { neutrality = "Liapchev government" }
+	laws = { political_parties = restricted_parties press = state_press conscription = extensive_conscription }
+}
+ALB = {
+	ruling_party = neutrality
+	popularity = { democratic = 6 communist = 2 fascist = 4 neutrality = 88 }
+	laws = { political_parties = single_party press = state_press conscription = extensive_conscription }
+}
+DNZ = {
+	ruling_party = democratic
+	popularity = { democratic = 50 communist = 6 fascist = 24 neutrality = 20 }
+	parties = { democratic = "Senate parties" fascist = "NSDAP Danzig" }
+	laws = { political_parties = multi_party press = free_press conscription = limited_conscription }
+}
+BRA = {
+	ruling_party = neutrality
+	popularity = { democratic = 28 communist = 5 fascist = 5 neutrality = 62 }
+	parties = { neutrality = "Republican Party (oligarchy)" }
+	laws = { political_parties = restricted_parties press = state_press conscription = extensive_conscription }
+}
+ARG = {
+	ruling_party = democratic
+	popularity = { democratic = 50 communist = 4 fascist = 10 neutrality = 36 }
+	parties = { democratic = "Radical Civic Union" neutrality = "Conservatives" }
+	laws = { political_parties = multi_party press = free_press conscription = extensive_conscription }
+}
+CHL = {
+	ruling_party = neutrality
+	popularity = { democratic = 26 communist = 10 fascist = 5 neutrality = 59 }
+	parties = { neutrality = "Ibanez government" }
+	laws = { political_parties = restricted_parties press = state_press conscription = extensive_conscription }
+}
+MEX = {
+	ruling_party = neutrality
+	popularity = { democratic = 24 communist = 14 fascist = 6 neutrality = 56 }
+	parties = { neutrality = "National Revolutionary Party" }
+	laws = { political_parties = single_party press = state_press conscription = limited_conscription }
+}
+COL = {
+	ruling_party = democratic
+	popularity = { democratic = 55 communist = 3 fascist = 4 neutrality = 38 }
+	laws = { political_parties = multi_party press = free_press conscription = limited_conscription }
+}
+VEN = {
+	ruling_party = neutrality
+	popularity = { democratic = 10 communist = 3 fascist = 5 neutrality = 82 }
+	parties = { neutrality = "Gomez regime" }
+	laws = { political_parties = restricted_parties press = state_press conscription = limited_conscription }
+}
+PRU = {
+	ruling_party = neutrality
+	popularity = { democratic = 24 communist = 8 fascist = 6 neutrality = 62 }
+	parties = { neutrality = "Leguia regime" }
+	laws = { political_parties = restricted_parties press = state_press conscription = limited_conscription }
+}
+BOL = {
+	ruling_party = neutrality
+	popularity = { democratic = 26 communist = 8 fascist = 6 neutrality = 60 }
+	laws = { political_parties = restricted_parties press = state_press conscription = limited_conscription }
+}
+ECU = {
+	ruling_party = neutrality
+	popularity = { democratic = 30 communist = 6 fascist = 4 neutrality = 60 }
+	laws = { political_parties = restricted_parties press = state_press conscription = limited_conscription }
+}
+PAR = {
+	ruling_party = democratic
+	popularity = { democratic = 48 communist = 4 fascist = 6 neutrality = 42 }
+	laws = { political_parties = multi_party press = free_press conscription = extensive_conscription }
+}
+URU = {
+	ruling_party = democratic
+	popularity = { democratic = 54 communist = 4 fascist = 4 neutrality = 38 }
+	laws = { political_parties = multi_party press = free_press conscription = limited_conscription }
+}
+CUB = {
+	ruling_party = neutrality
+	popularity = { democratic = 20 communist = 10 fascist = 4 neutrality = 66 }
+	parties = { neutrality = "Machado regime" }
+	laws = { political_parties = restricted_parties press = state_press conscription = limited_conscription }
+}
+GUA = {
+	ruling_party = neutrality
+	popularity = { democratic = 24 communist = 3 fascist = 5 neutrality = 68 }
+	laws = { political_parties = restricted_parties press = state_press conscription = limited_conscription }
+}
+HON = {
+	ruling_party = democratic
+	popularity = { democratic = 44 communist = 2 fascist = 4 neutrality = 50 }
+	laws = { political_parties = multi_party press = free_press conscription = limited_conscription }
+}
+ELS = {
+	ruling_party = neutrality
+	popularity = { democratic = 30 communist = 4 fascist = 4 neutrality = 62 }
+	laws = { political_parties = restricted_parties press = state_press conscription = limited_conscription }
+}
+NIC = {
+	ruling_party = neutrality
+	popularity = { democratic = 30 communist = 3 fascist = 4 neutrality = 63 }
+	laws = { political_parties = restricted_parties press = state_press conscription = limited_conscription }
+}
+COS = {
+	ruling_party = democratic
+	popularity = { democratic = 62 communist = 3 fascist = 3 neutrality = 32 }
+	laws = { political_parties = multi_party press = free_press conscription = volunteer_only }
+}
+PAN = {
+	ruling_party = neutrality
+	popularity = { democratic = 38 communist = 3 fascist = 4 neutrality = 55 }
+	laws = { political_parties = restricted_parties press = free_press conscription = limited_conscription }
+}
+HAI = {
+	ruling_party = neutrality
+	popularity = { democratic = 22 communist = 3 fascist = 3 neutrality = 72 }
+	laws = { political_parties = restricted_parties press = state_press conscription = limited_conscription }
+}
+DOM = {
+	ruling_party = neutrality
+	popularity = { democratic = 30 communist = 2 fascist = 3 neutrality = 65 }
+	laws = { political_parties = restricted_parties press = state_press conscription = limited_conscription }
+}
+PER = {
+	ruling_party = neutrality
+	popularity = { democratic = 10 communist = 5 fascist = 15 neutrality = 70 }
+	parties = { neutrality = "Reza Shah's court" }
+	laws = { political_parties = single_party press = state_press conscription = extensive_conscription }
+}
+AFG = {
+	ruling_party = neutrality
+	popularity = { democratic = 4 communist = 2 fascist = 3 neutrality = 91 }
+	laws = { political_parties = single_party press = state_press conscription = limited_conscription }
+}
+SAU = {
+	ruling_party = neutrality
+	popularity = { democratic = 3 communist = 2 fascist = 3 neutrality = 92 }
+	laws = { political_parties = single_party press = state_press conscription = limited_conscription }
+}
+YEM = {
+	ruling_party = neutrality
+	popularity = { democratic = 2 communist = 1 fascist = 2 neutrality = 95 }
+	laws = { political_parties = single_party press = state_press conscription = limited_conscription }
+}
+OMA = {
+	ruling_party = neutrality
+	popularity = { democratic = 2 communist = 1 fascist = 2 neutrality = 95 }
+	laws = { political_parties = single_party press = state_press conscription = limited_conscription }
+}
+ETH = {
+	ruling_party = neutrality
+	popularity = { democratic = 4 communist = 1 fascist = 3 neutrality = 92 }
+	laws = { political_parties = single_party press = state_press conscription = limited_conscription }
+}
+SIA = {
+	ruling_party = neutrality
+	popularity = { democratic = 14 communist = 4 fascist = 4 neutrality = 78 }
+	laws = { political_parties = restricted_parties press = state_press conscription = limited_conscription }
+}
+NEP = {
+	ruling_party = neutrality
+	popularity = { democratic = 2 communist = 1 fascist = 1 neutrality = 96 }
+	laws = { political_parties = single_party press = state_press conscription = limited_conscription }
+}
+BHU = {
+	ruling_party = neutrality
+	popularity = { democratic = 1 communist = 1 fascist = 1 neutrality = 97 }
+	laws = { political_parties = single_party press = state_press conscription = limited_conscription }
+}
+TIB = {
+	ruling_party = neutrality
+	popularity = { democratic = 1 communist = 1 fascist = 1 neutrality = 97 }
+	laws = { political_parties = single_party press = state_press conscription = limited_conscription }
+}
+SIK = {
+	ruling_party = neutrality
+	popularity = { democratic = 6 communist = 12 fascist = 4 neutrality = 78 }
+	laws = { political_parties = single_party press = state_press conscription = extensive_conscription }
+}
+MON = {
+	ruling_party = communist
+	popularity = { democratic = 4 communist = 82 fascist = 2 neutrality = 12 }
+	parties = { communist = "Mongolian People's Revolutionary Party" }
+	laws = { political_parties = single_party press = state_press conscription = extensive_conscription }
+}
+TAN = {
+	ruling_party = communist
+	popularity = { democratic = 3 communist = 85 fascist = 2 neutrality = 10 }
+	parties = { communist = "Tuvan People's Revolutionary Party" }
+	laws = { political_parties = single_party press = state_press conscription = extensive_conscription }
+}
+LIB = {
+	ruling_party = democratic
+	popularity = { democratic = 40 communist = 3 fascist = 3 neutrality = 54 }
+	parties = { democratic = "True Whig Party" }
+	laws = { political_parties = restricted_parties press = state_press conscription = limited_conscription }
+}
+RAJ = {
+	ruling_party = neutrality
+	popularity = { democratic = 30 communist = 4 fascist = 2 neutrality = 64 }
+	parties = { neutrality = "The Viceroy and the Indian Civil Service" democratic = "Indian National Congress" }
+	laws = { political_parties = restricted_parties press = state_press conscription = limited_conscription }
+}

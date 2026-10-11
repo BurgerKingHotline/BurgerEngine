@@ -1,4 +1,4 @@
-# How stats combine when unit types form a division (default for anything not listed: sum)
+# Stat aggregation: how stats combine when unit types form a division (default for anything not listed: sum)
 stat_aggregation = {
 	max_organisation = average
 	hardness = average
@@ -9,7 +9,7 @@ stat_aggregation = {
 	armor = max
 }
 
-# Battalions / regiments. Any number you add here becomes a stat that combat models can read.
+# Battalions / regiments. requires_tech = a technology the country must know (technology feature).
 #   HOI4 model:      soft_attack hard_attack defense breakthrough hardness armor piercing combat_width
 #   EU4 model:       fire shock morale discipline
 #   Imperator model: offense defensive morale
@@ -38,27 +38,6 @@ unit_types = {
 		offense = 1
 		defensive = 1.5
 	}
-	artillery = {
-		name = "Artillery"
-		category = support
-		cost = 14
-		manpower = 500
-		build_days = 60
-		max_strength = 6
-		max_organisation = 20
-		soft_attack = 25
-		hard_attack = 2
-		defense = 6
-		breakthrough = 6
-		piercing = 5
-		combat_width = 3
-		speed = 4
-		fire = 2.5
-		shock = 0.2
-		morale = 2
-		offense = 2
-		defensive = 0.5
-	}
 	cavalry = {
 		name = "Cavalry"
 		category = cavalry
@@ -71,6 +50,8 @@ unit_types = {
 		hard_attack = 1
 		defense = 12
 		breakthrough = 8
+		hardness = 0
+		armor = 0
 		piercing = 1
 		combat_width = 2
 		speed = 8
@@ -80,20 +61,338 @@ unit_types = {
 		offense = 1.5
 		defensive = 1
 	}
+	artillery = {
+		name = "Artillery"
+		category = support
+		cost = 14
+		manpower = 500
+		build_days = 60
+		max_strength = 6
+		max_organisation = 20
+		soft_attack = 25
+		hard_attack = 2
+		defense = 6
+		breakthrough = 6
+		hardness = 0
+		armor = 0
+		piercing = 5
+		combat_width = 3
+		speed = 4
+		fire = 2.5
+		shock = 0.2
+		morale = 2
+		offense = 2
+		defensive = 0.5
+	}
+	mountaineers = {
+		name = "Mountain Infantry"
+		category = infantry
+		cost = 10
+		manpower = 1000
+		build_days = 50
+		requires_tech = mountaineers_1
+		max_strength = 25
+		max_organisation = 65
+		soft_attack = 6
+		hard_attack = 1
+		defense = 26
+		breakthrough = 3
+		hardness = 0
+		armor = 0
+		piercing = 1
+		combat_width = 2
+		speed = 4
+		fire = 0.5
+		shock = 0.6
+		morale = 4
+		offense = 1
+		defensive = 1.7
+	}
+	marines = {
+		name = "Marines"
+		category = infantry
+		cost = 11
+		manpower = 1000
+		build_days = 55
+		requires_tech = amphibious_1
+		max_strength = 25
+		max_organisation = 65
+		soft_attack = 6
+		hard_attack = 1
+		defense = 22
+		breakthrough = 4
+		hardness = 0
+		armor = 0
+		piercing = 1
+		combat_width = 2
+		speed = 4
+		fire = 0.5
+		shock = 0.7
+		morale = 4
+		offense = 1.2
+		defensive = 1.5
+	}
+	paratroopers = {
+		name = "Paratroopers"
+		category = infantry
+		cost = 14
+		manpower = 900
+		build_days = 70
+		requires_tech = paratroopers_1
+		max_strength = 22
+		max_organisation = 70
+		soft_attack = 8
+		hard_attack = 1
+		defense = 18
+		breakthrough = 6
+		hardness = 0
+		armor = 0
+		piercing = 1
+		combat_width = 2
+		speed = 4
+		fire = 0.6
+		shock = 0.8
+		morale = 5
+		offense = 1.4
+		defensive = 1.2
+	}
+	motorized = {
+		name = "Motorized Infantry"
+		category = infantry
+		cost = 11
+		manpower = 900
+		build_days = 55
+		requires_tech = mechanisation_1
+		equipment = { infantry_equipment = 80 motor_equipment = 25 }
+		max_strength = 25
+		max_organisation = 55
+		soft_attack = 6
+		hard_attack = 1
+		defense = 22
+		breakthrough = 5
+		hardness = 0.1
+		armor = 0
+		piercing = 1
+		combat_width = 2
+		speed = 9
+		fire = 0.5
+		shock = 0.8
+		morale = 3
+		offense = 1.2
+		defensive = 1.2
+	}
+	light_tank = {
+		name = "Light Tanks"
+		category = armor
+		cost = 18
+		manpower = 400
+		build_days = 70
+		requires_tech = light_tank_1
+		equipment = { light_tank_equipment = 40 }
+		max_strength = 15
+		max_organisation = 40
+		soft_attack = 12
+		hard_attack = 5
+		defense = 8
+		breakthrough = 12
+		hardness = 0.5
+		armor = 2
+		piercing = 4
+		combat_width = 2
+		speed = 12
+		fire = 1.5
+		shock = 2.5
+		morale = 3
+		offense = 2
+		defensive = 0.8
+	}
+	medium_tank = {
+		name = "Medium Tanks"
+		category = armor
+		cost = 28
+		manpower = 450
+		build_days = 90
+		requires_tech = medium_tank_1
+		equipment = { medium_tank_equipment = 40 }
+		max_strength = 18
+		max_organisation = 45
+		soft_attack = 18
+		hard_attack = 12
+		defense = 14
+		breakthrough = 20
+		hardness = 0.6
+		armor = 5
+		piercing = 9
+		combat_width = 2
+		speed = 10
+		fire = 2.5
+		shock = 4
+		morale = 3
+		offense = 3
+		defensive = 1
+	}
+	heavy_tank = {
+		name = "Heavy Tanks"
+		category = armor
+		cost = 40
+		manpower = 500
+		build_days = 110
+		requires_tech = heavy_tank_1
+		equipment = { heavy_tank_equipment = 30 }
+		max_strength = 20
+		max_organisation = 45
+		soft_attack = 22
+		hard_attack = 18
+		defense = 20
+		breakthrough = 22
+		hardness = 0.7
+		armor = 9
+		piercing = 14
+		combat_width = 2
+		speed = 7
+		fire = 3.2
+		shock = 4.2
+		morale = 3
+		offense = 3.4
+		defensive = 1.4
+	}
+	anti_tank = {
+		name = "Anti-tank"
+		category = support
+		cost = 14
+		manpower = 400
+		build_days = 60
+		requires_tech = anti_tank_1
+		equipment = { anti_tank_equipment = 12 }
+		max_strength = 6
+		max_organisation = 20
+		soft_attack = 3
+		hard_attack = 12
+		defense = 10
+		breakthrough = 2
+		hardness = 0.1
+		armor = 0
+		piercing = 10
+		combat_width = 1
+		speed = 4
+		fire = 1.2
+		shock = 0.1
+		morale = 2
+		offense = 0.8
+		defensive = 1
+	}
+	anti_air = {
+		name = "Anti-air"
+		category = support
+		cost = 12
+		manpower = 300
+		build_days = 55
+		requires_tech = anti_air_1
+		equipment = { anti_air_equipment = 12 }
+		max_strength = 6
+		max_organisation = 15
+		soft_attack = 3
+		hard_attack = 0
+		defense = 8
+		breakthrough = 1
+		hardness = 0
+		armor = 0
+		piercing = 3
+		combat_width = 1
+		speed = 4
+		fire = 0.8
+		shock = 0.1
+		morale = 2
+		offense = 0.6
+		defensive = 0.8
+	}
+	engineers = {
+		name = "Engineers"
+		category = support
+		cost = 8
+		manpower = 300
+		build_days = 40
+		requires_tech = engineers_1
+		equipment = { support_equipment = 10 }
+		max_strength = 6
+		max_organisation = 25
+		soft_attack = 2
+		hard_attack = 0
+		defense = 14
+		breakthrough = 8
+		hardness = 0
+		armor = 0
+		piercing = 1
+		combat_width = 1
+		speed = 4
+		fire = 0.3
+		shock = 0.3
+		morale = 3
+		offense = 0.8
+		defensive = 1.4
+	}
 }
 
-# Divisions (HOI4) / armies (EU4): built from unit types
+# Divisions (HOI4) / armies (EU4): built from unit types. ai_role: line (the backbone), mobile (armour, motorised), special.
 division_templates = {
 	infantry_division = {
 		name = "Infantry Division"
+		ai_role = line
 		units = { infantry = 6 }
 	}
 	artillery_division = {
 		name = "Combined Arms Division"
+		ai_role = line
 		units = { infantry = 5 artillery = 1 }
 	}
 	cavalry_division = {
 		name = "Cavalry Division"
+		ai_role = line
 		units = { cavalry = 4 }
+	}
+	engineer_division = {
+		name = "Support Division"
+		ai_role = line
+		units = { infantry = 4 artillery = 1 engineers = 1 }
+	}
+	modern_infantry_division = {
+		name = "Modern Infantry Division"
+		ai_role = line
+		units = { infantry = 5 artillery = 2 anti_tank = 1 anti_air = 1 }
+	}
+	mountain_division = {
+		name = "Mountain Division"
+		ai_role = special
+		units = { mountaineers = 5 artillery = 1 }
+	}
+	marine_division = {
+		name = "Marine Division"
+		ai_role = special
+		units = { marines = 5 artillery = 1 }
+	}
+	paratrooper_division = {
+		name = "Paratrooper Division"
+		ai_role = special
+		units = { paratroopers = 5 engineers = 1 }
+	}
+	motorized_division = {
+		name = "Motorised Division"
+		ai_role = mobile
+		units = { motorized = 5 artillery = 1 }
+	}
+	armoured_division = {
+		name = "Light Armoured Division"
+		ai_role = mobile
+		units = { light_tank = 4 motorized = 2 }
+	}
+	panzer_division = {
+		name = "Armoured Division"
+		ai_role = mobile
+		units = { medium_tank = 4 motorized = 2 artillery = 1 }
+	}
+	heavy_armoured_division = {
+		name = "Heavy Armoured Division"
+		ai_role = mobile
+		units = { heavy_tank = 3 medium_tank = 2 motorized = 1 anti_tank = 1 }
 	}
 }

@@ -1,0 +1,23 @@
+# Modifiers used by decisions and events of 1930.
+rearmament = { name = "Rearmament Programme" production = 0.10 manpower = 0.15 stability_target = -2 }
+industrial_drive = { name = "Industrial Drive" construction_speed = 0.25 production = 0.04 stability_target = -1 }
+five_year_plan = { name = "Five-Year Plan" construction_speed = 0.35 production = 0.06 stability_target = -3 }
+autarky_programme = { name = "Autarky Programme" extraction = 0.20 oil_output = 0.10 rubber_output = 0.10 stability_target = -1 }
+economic_stimulus = { name = "Economic Stimulus" construction_speed = 0.12 stability_target = 4 }
+colonial_development = { name = "Colonial Development" extraction = 0.12 stability_target = -1 }
+naval_programme = { name = "Naval Programme" production = 0.04 stability_target = -1 }
+military_reform = { name = "Military Reform" research_speed = 0.06 max_organisation_factor = 0.03 }
+great_depression_severe = { name = "The Great Depression" stability_target = -14 production = -0.10 construction_speed = -0.25 research_speed = -0.10 }
+great_depression_moderate = { name = "The Great Depression" stability_target = -8 production = -0.05 construction_speed = -0.15 }
+great_depression_light = { name = "The Great Depression" stability_target = -3 construction_speed = -0.06 }
+unrest_1930_high = { name = "Political Turmoil" stability_target = -14 }
+unrest_1930_mid = { name = "Political Turmoil" stability_target = -9 }
+unrest_1930_low = { name = "Political Turmoil" stability_target = -5 }
+national_unity = { name = "National Unity" stability_target = 6 manpower = 0.05 }
+army_reform_programme = { name = "Military Reform" manpower = 0.10 production = 0.03 }
+naval_expansion = { name = "Naval Programme" production = 0.04 construction_speed = 0.05 }
+air_programme = { name = "Air Power Programme" production = 0.05 research_speed = 0.05 }
+scientific_drive = { name = "Scientific Drive" research_speed = 0.20 }
+colonial_levies = { name = "Colonial Levies" manpower = 0.10 }
+reformed_state = { name = "Reformed State" stability_target = 4 focus_speed = 0.10 }
+land_reform_strife = { name = "Land Reform Strife" stability_target = -6 }

@@ -18,6 +18,11 @@ public sealed class IdeologyDef
     public bool Elections;
     /// <summary>Gains support when stability is low or a war goes badly.</summary>
     public bool Extremist;
+    /// <summary>Countries without a color of their own for this ideology are tinted towards this color (country_color_blend) by <see cref="ColorBlendAmount"/>.</summary>
+    public Rgb? ColorBlend;
+    public double ColorBlendAmount;
+    /// <summary>Popularity it gains each month (points) in a weak democracy: elections, but low stability or a government with little support (weak_democracy_drift; fascists).</summary>
+    public double WeakDemocracyDrift;
     /// <summary>Winning wars, countries ruled by this ideology set up subjects (puppets) of the peoples they defeat instead of
     /// taking foreign land (peace_puppets; default: ideologies that hold elections, i.e. democracies).</summary>
     public bool PeacePuppets;

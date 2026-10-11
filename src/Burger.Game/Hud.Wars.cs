@@ -118,6 +118,7 @@ public sealed partial class Hud
                 offer.Terms.Add(new PeaceTerm { Type = PeaceTermType.Independence, Beneficiary = c });
         if (p.RegimeChange && G.Politics.Enabled) offer.Terms.Add(new PeaceTerm { Type = PeaceTermType.RegimeChange, Beneficiary = winner, Ideology = G.Politics.Of(winner).Ruling });
         if (p.Humiliate) offer.Terms.Add(new PeaceTerm { Type = PeaceTermType.Humiliate, Beneficiary = winner });
+        foreach (var s in p.Demilitarize.Where(s => s.Owner != null && !p.States.Contains(s))) offer.Terms.Add(new PeaceTerm { Type = PeaceTermType.Demilitarize, State = s, Beneficiary = winner });
         if (p.Gold > 0) offer.Terms.Add(new PeaceTerm { Type = PeaceTermType.Gold, Amount = p.Gold, Beneficiary = winner });
         if (offer.Terms.Count == 0) offer.Terms.Add(new PeaceTerm { Type = PeaceTermType.WhitePeace });
         return offer;
@@ -171,6 +172,18 @@ public sealed partial class Hud
         if (Gui.Button(new Rectangle(x + bw3 + 4, y, bw3, 26 * S), "Regime change", regime, regime ? $"Put the {G.Politics.Ideology(G.Politics.Of(winner).Ruling)?.Name} party in power in {loser.Name}" : "Same ideology (or no politics)", p.RegimeChange, 13)) p.RegimeChange = !p.RegimeChange;
         if (Gui.Button(new Rectangle(x + 2 * (bw3 + 4), y, bw3, 26 * S), "Humiliate", true, $"{loser.Name} loses stability and political power to {winner.Name}", p.Humiliate, 13)) p.Humiliate = !p.Humiliate;
         y += 32 * S;
+        if (G.Diplomacy.DemilEnabled && !p.Annex)
+        {
+            // demilitarize the state that is highlighted (click it in the list above or on the map first)
+            var hl = Map.HighlightState;
+            bool can = hl?.Owner != null && loserSide.Contains(hl.Owner) && !hl.Demilitarized && hl != hl.Owner.Capital?.State;
+            bool on = hl != null && p.Demilitarize.Contains(hl);
+            string text = hl != null ? (on ? $"Keep {hl.DisplayName} armed" : $"Demilitarize {hl.DisplayName}") : "Demilitarize the selected state";
+            if (Gui.Button(new Rectangle(x, y, w, 24 * S), text, can || on, "No armed forces may enter or be raised there; it ends when its owner goes to war, or remilitarizes it (and risks the answer of its neighbours)", on, 13))
+            { if (hl != null && !p.Demilitarize.Remove(hl)) p.Demilitarize.Add(hl!); }
+            if (p.Demilitarize.Count > 0) Gui.Label($"{p.Demilitarize.Count} state(s) demilitarized", x + w - 150 * S, y + 4 * S, 12, Gui.TextDim);
+            y += 30 * S;
+        }
         if (G.Population.Enabled && !p.Annex)
         {
             var peoples = p.War.SideOf(loser).SelectMany(c => c.OwnedStates.Where(s => s != c.Capital?.State).Select(s => (c, cu: G.Population.MajorityCulture(s))))

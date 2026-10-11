@@ -63,6 +63,7 @@ public static class ScriptValidator
         }
         foreach (var m in game.Modifiers.Defs.Values) Trigger(game, m.Trigger);
         game.Politics.Validate();
+        game.Focus.Validate();
         game.Population.Validate();
         foreach (var p in game.Interface.Panels)
         {

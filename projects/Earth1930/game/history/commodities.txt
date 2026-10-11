@@ -1,0 +1,163 @@
+# Yearly deposits per state at full extraction (commodities feature), from the 1929-30 output of each country:
+# steel in 10,000 t, oil in 100,000 t, the rest in 1,000 t.
+
+pennsylvania_state = { steel = 1361.2 }
+ohio_state = { steel = 1008.3 }
+illinois_state = { steel = 800.7 oil = 70.5 }
+indiana_state = { steel = 664.0 }
+southeast_michigan_state = { steel = 567.2 }
+east_new_york_state = { steel = 495.0 aluminium = 26.0 }
+new_jersey_state = { steel = 439.1 }
+alabama_state = { steel = 394.6 }
+southwest_north_rhine_westphalia_state = { steel = 450.4 }
+northeast_north_rhine_westphalia_state = { steel = 333.6 }
+saxony_state = { steel = 264.9 aluminium = 19.0 }
+rhineland_palatinate_state = { steel = 219.7 }
+brandenburg_state = { steel = 187.7 aluminium = 14.0 }
+thuringia_state = { steel = 163.8 }
+yorkshire_and_the_humber_state = { steel = 272.4 }
+west_midlands_state = { steel = 201.8 }
+east_midlands_state = { steel = 160.3 }
+north_east_state = { steel = 132.9 }
+east_wales_state = { steel = 113.5 }
+cumbria_state = { steel = 99.1 aluminium = 6.4 }
+grand_est_state = { steel = 300.0 }
+aisne_state = { steel = 222.2 }
+auvergne_rhone_alpes_state = { steel = 176.5 aluminium = 12.9 }
+normandie_state = { steel = 146.3 }
+bouches_du_rhone_state = { steel = 125.0 aluminium = 9.5 }
+donetsk_state = { steel = 116.4 }
+dnipropetrovsk_state = { steel = 86.2 }
+chelyabinsk_state = { steel = 68.5 }
+luhansk_state = { steel = 56.8 }
+leningrad_state = { steel = 48.5 aluminium = 5.0 }
+sverdlovsk_state = { steel = 42.3 }
+kharkiv_state = { steel = 37.5 }
+southeast_moscow_state = { steel = 33.7 }
+walloon_state = { steel = 400.0 }
+luxembourg_2_state = { steel = 290.0 }
+kinki_state = { steel = 81.7 tungsten = 0.6 }
+kanto_state = { steel = 60.5 }
+chugoku_state = { steel = 48.0 }
+hokkaido_state = { steel = 39.8 }
+lombardia_state = { steel = 74.6 }
+piemonte_state = { steel = 55.2 aluminium = 4.6 }
+turin_state = { steel = 43.9 }
+toscana_state = { steel = 36.4 }
+moravian_silesian_state = { steel = 90.2 }
+central_bohemian_state = { steel = 66.8 }
+usti_nad_labem_state = { steel = 53.0 }
+silesian_voivodeship_state = { steel = 140.0 }
+southeast_ontario_state = { steel = 80.4 }
+new_brunswick_state = { steel = 59.6 }
+dalarna_state = { steel = 38.6 }
+gavleborg_state = { steel = 28.6 }
+orebro_state = { steel = 22.7 }
+asturias_state = { steel = 51.7 }
+barcelona_state = { steel = 38.3 }
+styria_state = { steel = 46.0 aluminium = 7.0 }
+upper_austria_state = { steel = 34.0 }
+pest_state = { steel = 34.5 }
+northern_hungary_state = { steel = 25.5 }
+jharkhand_state = { steel = 30.1 }
+bihar_state = { steel = 22.3 }
+west_bengal_state = { steel = 17.7 }
+northeast_new_south_wales_state = { steel = 34.5 }
+south_new_south_wales_state = { steel = 25.5 }
+southeast_liaoning_state = { steel = 17.2 }
+northeast_liaoning_state = { steel = 12.7 }
+shanghai_state = { steel = 10.1 }
+mpumalanga_state = { steel = 20.0 }
+hunedoara_state = { steel = 20.0 }
+uusimaa_state = { steel = 5.0 }
+telemark_state = { steel = 5.0 aluminium = 10.6 }
+north_brabant_state = { steel = 10.0 }
+bern_state = { steel = 10.0 }
+federacija_bosna_i_hercegovina_state = { steel = 10.0 aluminium = 4.0 }
+oklahoma_state = { oil = 292.8 }
+east_texas_state = { oil = 216.9 }
+northeast_texas_state = { oil = 172.2 }
+south_texas_state = { oil = 142.8 }
+northwest_texas_state = { oil = 122.0 }
+southeast_california_state = { oil = 106.5 }
+southwest_california_state = { oil = 94.4 }
+louisiana_state = { oil = 84.9 }
+kansas_state = { oil = 77.0 }
+kalbajar_state = { oil = 38.6 }
+mangystau_state = { oil = 28.6 }
+republic_of_adygea_state = { oil = 22.7 }
+north_krasnodar_krai_state = { oil = 18.8 }
+bashkortostan_state = { oil = 16.1 }
+perm_krai_state = { oil = 14.1 }
+zulia_state = { oil = 205.0 }
+veracruz_state = { oil = 37.3 }
+tamaulipas_state = { oil = 27.7 }
+khuzestan_state = { oil = 56.0 }
+north_sumatra_state = { oil = 16.4 rubber = 72.3 }
+south_sumatra_state = { oil = 12.1 rubber = 53.5 }
+east_kalimantan_state = { oil = 9.6 }
+jambi_state = { oil = 8.0 rubber = 35.3 }
+riau_state = { oil = 6.8 rubber = 30.1 }
+prahova_state = { oil = 42.0 }
+santander_state = { oil = 13.8 }
+bolivar_2_state = { oil = 10.2 }
+chubut_state = { oil = 8.6 }
+neuquen_state = { oil = 6.4 }
+piura_state = { oil = 15.0 }
+podkarpackie_voivodeship_state = { oil = 2.9 }
+stanislawow_state = { oil = 2.1 }
+nineveh_state = { oil = 10.7 }
+saladin_state = { oil = 7.9 }
+sangre_grande_regional_corporation_state = { oil = 6.3 }
+sarawak_state = { oil = 5.2 }
+magway_state = { oil = 10.0 }
+karafuto_state = { oil = 3.0 }
+johor_state = { rubber = 78.1 }
+perak_state = { rubber = 57.9 tungsten = 0.8 }
+pahang_state = { rubber = 45.9 }
+anuradhapura_state = { rubber = 38.1 }
+west_kalimantan_state = { rubber = 42.5 }
+aceh_state = { rubber = 26.3 }
+ak_lak_state = { rubber = 6.9 }
+bac_giang_state = { rubber = 5.1 }
+tanintharyi_state = { rubber = 6.0 tungsten = 1.1 }
+east_amazonas_state = { rubber = 8.6 }
+northwest_para_state = { rubber = 6.4 }
+grand_gedeh_state = { rubber = 6.0 }
+equateur_state = { rubber = 6.0 }
+southern_3_state = { rubber = 10.0 }
+basilan_state = { rubber = 1.0 }
+tennessee_state = { aluminium = 44.2 }
+arkansas_state = { aluminium = 32.8 }
+occitanie_state = { aluminium = 7.6 }
+south_quebec_state = { aluminium = 41.0 }
+hordaland_state = { aluminium = 14.4 }
+valais_state = { aluminium = 9.2 }
+grisons_state = { aluminium = 6.8 }
+highlands_and_islands_state = { aluminium = 8.6 }
+trentino_state = { aluminium = 3.4 }
+western_transdanubia_state = { aluminium = 3.0 }
+midlands_state = { chromium = 47.2 }
+masvingo_state = { chromium = 35.0 }
+mashonaland_east_state = { chromium = 27.8 }
+north_2_state = { chromium = 80.0 }
+mugla_state = { chromium = 23.0 }
+bursa_state = { chromium = 17.0 }
+aktobe_state = { chromium = 40.0 }
+southwest_odisha_state = { chromium = 20.1 }
+northeast_odisha_state = { chromium = 14.9 }
+camaguey_state = { chromium = 30.0 }
+thessalia_state = { chromium = 14.4 }
+west_macedonia_state = { chromium = 10.6 }
+prilep_state = { chromium = 30.0 }
+oregon_state = { chromium = 3.0 }
+south_jiangxi_state = { tungsten = 2.4 }
+south_jiangxi_2_state = { tungsten = 1.7 }
+southeast_hunan_state = { tungsten = 1.4 }
+shan_state_state = { tungsten = 0.9 }
+potosi_state = { tungsten = 0.6 }
+cochabamba_state = { tungsten = 0.5 }
+viseu_state = { tungsten = 0.7 }
+castelo_branco_state = { tungsten = 0.5 }
+nevada_state = { tungsten = 0.4 }
+salamanca_state = { tungsten = 0.3 }

@@ -21,4 +21,10 @@ features = {
 	cores_claims
 	buildings_modern
 	independence
+	technology
+	commodities
+	ai_profiles
+	demilitarization
+	focus
+	characters
 }

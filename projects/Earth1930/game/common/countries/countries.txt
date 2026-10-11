@@ -1,5 +1,6 @@
 # Countries of 1930. The three letter tag is used everywhere to refer to the country.
 ENG = {
+	ruler = ramsay_macdonald
 	name = "United Kingdom"
 	color = { 200 32 48 }
 	capital = london
@@ -7,16 +8,28 @@ ENG = {
 	culture = english
 	religion = protestant
 	accepted_cultures = { scottish welsh }
+	country_names = {
+		communist = "British Socialist Republic"
+		fascist = "British Union State"
+	}
 }
 FRA = {
+	ruler = andre_tardieu
 	name = "France"
 	color = { 57 96 170 }
 	capital = paris
 	government = republic
 	culture = french
 	religion = catholic
+	country_names = {
+		democratic = "French Republic"
+		communist = "French Soviet Republic"
+		fascist = "French State"
+		neutrality = "Kingdom of France"
+	}
 }
 SOV = {
+	ruler = joseph_stalin
 	name = "Soviet Union"
 	color = { 150 30 30 }
 	capital = moscow
@@ -24,57 +37,116 @@ SOV = {
 	culture = russian
 	religion = irreligious
 	accepted_cultures = { ukrainian belarusian }
+	country_names = {
+		democratic = "Russian Republic"
+		fascist = "Russian National State"
+		neutrality = "Russian Empire"
+	}
+	country_colors = {
+		communist = { 150 30 30 }
+		democratic = { 96 128 176 }
+		fascist = { 92 74 58 }
+		neutrality = { 156 146 104 }
+	}
 }
 CHI = {
+	ruler = chiang_kai_shek
 	name = "China"
 	color = { 220 200 90 }
 	capital = nanjing
 	government = republic
 	culture = han
 	religion = chinese_folk
+	country_names = {
+		democratic = "Republic of China"
+		communist = "Chinese Soviet Republic"
+		fascist = "Chinese State"
+		neutrality = "Chinese Empire"
+	}
+	country_colors = {
+		communist = { 200 48 44 }
+	}
 }
 USA = {
+	ruler = herbert_hoover
 	name = "United States"
 	color = { 40 80 160 }
 	capital = washington_d_c
 	government = republic
 	culture = american
 	religion = protestant
+	country_names = {
+		communist = "United Soviet States of America"
+		fascist = "American Union"
+	}
 }
 RAJ = {
+	ruler = lord_irwin
 	name = "British Raj"
 	color = { 210 150 80 }
 	capital = delhi
 	government = colonial_government
 	culture = hindustani
 	religion = hindu
-	accepted_cultures = { bengali punjabi marathi gujarati tamil telugu kannada malayali oriya }
+	# the Raj is the Hindi belt and the north-west and Bombay (Punjabi, Gujarati, Marathi): Bengal, the Dravidian south and Orissa
+	# are ruled, not accepted - their movements are the road to partition. No acceptance of whole language groups.
+	accepted_cultures = { punjabi gujarati marathi }
+	culture_group_accepted = no
+	country_names = {
+		subject = "British Raj"
+		democratic = "Republic of India"
+		communist = "Indian Soviet Republic"
+		fascist = "Hindustan"
+		neutrality = "Indian Empire"
+	}
 }
 TUR = {
+	ruler = mustafa_kemal
 	name = "Turkey"
 	color = { 190 80 70 }
 	capital = ankara
 	government = republic
 	culture = turkish
 	religion = sunni
+	country_names = {
+		democratic = "Republic of Turkey"
+		communist = "Turkish Soviet Republic"
+		fascist = "Turkish State"
+		neutrality = "Ottoman Empire"
+	}
 }
 BRA = {
+	ruler = washington_luis
 	name = "Brazil"
 	color = { 60 160 60 }
 	capital = rio_de_janeiro
 	government = republic
 	culture = brazilian
 	religion = catholic
+	country_names = {
+		democratic = "United States of Brazil"
+		communist = "Brazilian Soviet Republic"
+		fascist = "Estado Novo of Brazil"
+		neutrality = "Empire of Brazil"
+	}
 }
 POR = {
+	ruler = oscar_carmona
 	name = "Portugal"
 	color = { 40 110 60 }
 	capital = lisbon
 	government = republic
 	culture = portuguese
 	religion = catholic
+	country_names = {
+		democratic = "Portuguese Republic"
+		communist = "Portuguese Soviet Republic"
+		fascist = "Estado Novo"
+		neutrality = "Kingdom of Portugal"
+	}
 }
 SPA = {
+	ruler = alfonso_xiii
 	name = "Spain"
 	color = { 220 190 40 }
 	capital = madrid
@@ -82,80 +154,152 @@ SPA = {
 	culture = spanish
 	religion = catholic
 	accepted_cultures = { catalan galician }
+	country_names = {
+		democratic = "Spanish Republic"
+		communist = "Spanish Soviet Republic"
+		fascist = "Spanish State"
+		neutrality = "Kingdom of Spain"
+	}
 }
 ITA = {
+	ruler = benito_mussolini
 	name = "Italy"
 	color = { 60 140 70 }
 	capital = rome
 	government = kingdom
 	culture = italian
 	religion = catholic
+	country_names = {
+		democratic = "Italian Republic"
+		communist = "Italian Soviet Republic"
+		fascist = "Italian Empire"
+		neutrality = "Kingdom of Italy"
+	}
 }
 JAP = {
+	ruler = hirohito
 	name = "Japan"
 	color = { 240 240 240 }
 	capital = yokohama
 	government = empire
 	culture = japanese
 	religion = shinto
+	country_names = {
+		democratic = "Empire of Japan"
+		communist = "Japanese Soviet Republic"
+		fascist = "Great Japanese Empire"
+		neutrality = "Empire of Japan"
+	}
 }
 HOL = {
+	ruler = wilhelmina
 	name = "Netherlands"
 	color = { 230 120 30 }
 	capital = amsterdam
 	government = kingdom
 	culture = dutch
 	religion = protestant
+	country_names = {
+		democratic = "Netherlands"
+		communist = "Dutch Soviet Republic"
+		fascist = "Dutch State"
+		neutrality = "Kingdom of the Netherlands"
+	}
 }
 PER = {
+	ruler = reza_shah
 	name = "Persia"
 	color = { 90 150 110 }
 	capital = tehran
 	government = kingdom
 	culture = persian
 	religion = shia
+	country_names = {
+		democratic = "Republic of Persia"
+		communist = "Persian Soviet Republic"
+		fascist = "Imperial State of Iran"
+		neutrality = "Persia"
+	}
 }
 GER = {
+	ruler = heinrich_bruening
 	name = "Germany"
 	color = { 96 96 96 }
 	capital = berlin
 	government = republic
 	culture = german
 	religion = protestant
+	country_names = {
+		democratic = "Weimar Republic"
+		communist = "German Socialist Republic"
+		fascist = "German Reich"
+		neutrality = "German Empire"
+	}
+	country_colors = {
+		communist = { 170 40 40 }
+	}
 }
 MEX = {
+	ruler = ortiz_rubio
 	name = "Mexico"
 	color = { 110 160 90 }
 	capital = mexico_city
 	government = republic
 	culture = mexican
 	religion = catholic
+	country_names = {
+		democratic = "United Mexican States"
+		communist = "Mexican Soviet Republic"
+		fascist = "Mexican State"
+		neutrality = "Mexican Empire"
+	}
 }
 AST = {
+	ruler = james_scullin
 	name = "Australia"
 	color = { 70 110 200 }
 	capital = canberra
 	government = dominion
 	culture = australian
 	religion = protestant
+	country_names = {
+		subject = "Commonwealth of Australia"
+		democratic = "Australia"
+		communist = "Australian Soviet Republic"
+		fascist = "Australian State"
+	}
 }
 ARG = {
+	ruler = hipolito_yrigoyen
 	name = "Argentina"
 	color = { 130 180 230 }
 	capital = buenos_aires
 	government = republic
 	culture = rioplatense
 	religion = catholic
+	country_names = {
+		democratic = "Argentine Republic"
+		communist = "Argentine Soviet Republic"
+		fascist = "Argentine State"
+	}
 }
 ROM = {
+	ruler = iuliu_maniu
 	name = "Romania"
 	color = { 220 190 80 }
 	capital = bucharest
 	government = kingdom
 	culture = romanian
 	religion = orthodox
+	country_names = {
+		democratic = "Romanian Republic"
+		communist = "Romanian Soviet Republic"
+		fascist = "Romanian State"
+		neutrality = "Kingdom of Romania"
+	}
 }
 BEL = {
+	ruler = albert_i
 	name = "Belgium"
 	color = { 210 180 60 }
 	capital = antwerpen
@@ -163,16 +307,30 @@ BEL = {
 	culture = flemish
 	religion = catholic
 	accepted_cultures = { walloon }
+	country_names = {
+		democratic = "Belgium"
+		communist = "Belgian Soviet Republic"
+		fascist = "Belgian State"
+		neutrality = "Kingdom of Belgium"
+	}
 }
 POL = {
+	ruler = jozef_pilsudski
 	name = "Poland"
 	color = { 200 70 90 }
 	capital = warsaw
 	government = republic
 	culture = polish
 	religion = catholic
+	country_names = {
+		democratic = "Second Polish Republic"
+		communist = "Polish Soviet Republic"
+		fascist = "Polish State"
+		neutrality = "Poland"
+	}
 }
 CAN = {
+	ruler = mackenzie_king
 	name = "Canada"
 	color = { 205 105 75 }
 	capital = ottawa
@@ -180,8 +338,15 @@ CAN = {
 	culture = anglo_canadian
 	religion = protestant
 	accepted_cultures = { french_canadian }
+	country_names = {
+		subject = "Dominion of Canada"
+		democratic = "Canada"
+		communist = "Canadian Soviet Republic"
+		fascist = "Canadian State"
+	}
 }
 YUG = {
+	ruler = alexander_i
 	name = "Yugoslavia"
 	color = { 90 120 170 }
 	capital = belgrade
@@ -189,48 +354,85 @@ YUG = {
 	culture = serbian
 	religion = orthodox
 	accepted_cultures = { croat slovene }
+	country_names = {
+		democratic = "Yugoslav Republic"
+		communist = "Socialist Yugoslavia"
+		fascist = "Yugoslav State"
+		neutrality = "Kingdom of Yugoslavia"
+	}
 }
 COL = {
+	ruler = abadia_mendez
 	name = "Colombia"
 	color = { 230 200 60 }
 	capital = bogota
 	government = republic
 	culture = colombian
 	religion = catholic
+	country_names = {
+		democratic = "Republic of Colombia"
+		communist = "Colombian Soviet Republic"
+		fascist = "Colombian State"
+	}
 }
 SAU = {
+	ruler = ibn_saud
 	name = "Hejaz and Nejd"
 	color = { 90 160 80 }
 	capital = riyadh
 	government = kingdom
 	culture = gulf_arab
 	religion = sunni
+	country_names = {
+		democratic = "Arabian Republic"
+		communist = "Arabian Soviet Republic"
+		fascist = "Arabian State"
+		neutrality = "Kingdom of Hejaz and Nejd"
+	}
 }
 FIN = {
+	ruler = svinhufvud
 	name = "Finland"
 	color = { 230 240 250 }
 	capital = helsinki
 	government = republic
 	culture = finnish
 	religion = protestant
+	country_names = {
+		democratic = "Republic of Finland"
+		communist = "Finnish Socialist Republic"
+		fascist = "Finnish State"
+		neutrality = "Finland"
+	}
 }
 VEN = {
+	ruler = juan_vicente_gomez
 	name = "Venezuela"
 	color = { 210 170 60 }
 	capital = caracas
 	government = republic
 	culture = venezuelan
 	religion = catholic
+	country_names = {
+		communist = "Venezuelan Soviet Republic"
+		fascist = "Venezuelan State"
+	}
 }
 PRU = {
+	ruler = augusto_leguia
 	name = "Peru"
 	color = { 190 70 70 }
 	capital = lima
 	government = republic
 	culture = andean
 	religion = catholic
+	country_names = {
+		communist = "Peruvian Soviet Republic"
+		fascist = "Peruvian State"
+	}
 }
 SAF = {
+	ruler = jbm_hertzog
 	name = "South Africa"
 	color = { 220 130 40 }
 	capital = pretoria
@@ -238,8 +440,15 @@ SAF = {
 	culture = afrikaner
 	religion = protestant
 	accepted_cultures = { english }
+	country_names = {
+		subject = "Union of South Africa"
+		democratic = "South Africa"
+		communist = "South African Soviet Republic"
+		fascist = "South African State"
+	}
 }
 CZE = {
+	ruler = tomas_masaryk
 	name = "Czechoslovakia"
 	color = { 60 140 160 }
 	capital = prague
@@ -247,168 +456,304 @@ CZE = {
 	culture = czech
 	religion = catholic
 	accepted_cultures = { slovak }
+	country_names = {
+		democratic = "Czechoslovak Republic"
+		communist = "Czechoslovak Socialist Republic"
+		fascist = "Czechoslovak State"
+	}
 }
 GRE = {
+	ruler = venizelos
 	name = "Greece"
 	color = { 100 160 220 }
 	capital = athens_peloponnese
 	government = republic
 	culture = greek
 	religion = orthodox
+	country_names = {
+		democratic = "Hellenic Republic"
+		communist = "Greek Soviet Republic"
+		fascist = "Hellenic State"
+		neutrality = "Kingdom of Greece"
+	}
 }
 SWE = {
+	ruler = gustaf_v
 	name = "Sweden"
 	color = { 40 100 190 }
 	capital = stockholm
 	government = kingdom
 	culture = swedish
 	religion = protestant
+	country_names = {
+		democratic = "Sweden"
+		communist = "Swedish Soviet Republic"
+		fascist = "Swedish State"
+		neutrality = "Kingdom of Sweden"
+	}
 }
 BUL = {
+	ruler = boris_iii
 	name = "Bulgaria"
 	color = { 80 150 80 }
 	capital = sofia
 	government = kingdom
 	culture = bulgarian
 	religion = orthodox
+	country_names = {
+		democratic = "Bulgarian Republic"
+		communist = "People's Republic of Bulgaria"
+		fascist = "Bulgarian State"
+		neutrality = "Kingdom of Bulgaria"
+	}
 }
 SIA = {
+	ruler = prajadhipok
 	name = "Siam"
 	color = { 100 120 200 }
 	capital = bangkok
 	government = kingdom
 	culture = thai
 	religion = buddhist
+	country_names = {
+		democratic = "Republic of Siam"
+		communist = "Siamese Soviet Republic"
+		fascist = "Thai State"
+		neutrality = "Kingdom of Siam"
+	}
 }
 ETH = {
+	ruler = haile_selassie
 	name = "Ethiopia"
 	color = { 90 150 70 }
 	capital = addis_ababa
 	government = empire
 	culture = amhara
 	religion = oriental
+	country_names = {
+		democratic = "Ethiopian Republic"
+		communist = "Ethiopian Soviet Republic"
+		fascist = "Ethiopian State"
+		neutrality = "Ethiopian Empire"
+	}
 }
 NZL = {
+	ruler = joseph_ward
 	name = "New Zealand"
 	color = { 60 90 170 }
 	capital = wellington
 	government = dominion
 	culture = new_zealander
 	religion = protestant
+	country_names = {
+		subject = "Dominion of New Zealand"
+		democratic = "New Zealand"
+		communist = "New Zealand Soviet Republic"
+		fascist = "New Zealand State"
+	}
 }
 NOR = {
+	ruler = haakon_vii
 	name = "Norway"
 	color = { 150 70 70 }
 	capital = oslo
 	government = kingdom
 	culture = norwegian
 	religion = protestant
+	country_names = {
+		democratic = "Norway"
+		communist = "Norwegian Soviet Republic"
+		fascist = "Norwegian State"
+		neutrality = "Kingdom of Norway"
+	}
 }
 AFG = {
+	ruler = nadir_shah
 	name = "Afghanistan"
 	color = { 120 140 90 }
 	capital = kabul
 	government = kingdom
 	culture = pashtun
 	religion = sunni
+	country_names = {
+		democratic = "Republic of Afghanistan"
+		communist = "Afghan Soviet Republic"
+		fascist = "Afghan State"
+		neutrality = "Kingdom of Afghanistan"
+	}
 }
 BOL = {
+	ruler = hernando_siles
 	name = "Bolivia"
 	color = { 140 150 70 }
 	capital = la_paz
 	government = republic
 	culture = andean
 	religion = catholic
+	country_names = {
+		communist = "Bolivian Soviet Republic"
+		fascist = "Bolivian State"
+	}
 }
 HUN = {
+	ruler = miklos_horthy
 	name = "Hungary"
 	color = { 170 110 60 }
 	capital = budapest
 	government = kingdom
 	culture = hungarian
 	religion = catholic
+	country_names = {
+		democratic = "Hungarian Republic"
+		communist = "Hungarian Soviet Republic"
+		fascist = "Hungarian State"
+		neutrality = "Kingdom of Hungary"
+	}
 }
 ECU = {
+	ruler = isidro_ayora
 	name = "Ecuador"
 	color = { 230 210 80 }
 	capital = quito
 	government = republic
 	culture = andean
 	religion = catholic
+	country_names = {
+		communist = "Ecuadorian Soviet Republic"
+		fascist = "Ecuadorian State"
+	}
 }
 DEN = {
+	ruler = christian_x
 	name = "Denmark"
 	color = { 190 60 60 }
 	capital = kobenhavn
 	government = kingdom
 	culture = danish
 	religion = protestant
+	country_names = {
+		democratic = "Denmark"
+		communist = "Danish Soviet Republic"
+		fascist = "Danish State"
+		neutrality = "Kingdom of Denmark"
+	}
 }
 SIK = {
+	ruler = jin_shuren
 	name = "Xinjiang"
 	color = { 140 120 80 }
 	capital = urumqi
 	government = warlord_state
 	culture = uyghur
 	religion = sunni
+	country_names = {
+		democratic = "Republic of Xinjiang"
+		communist = "Xinjiang Soviet Republic"
+		fascist = "Xinjiang State"
+		neutrality = "Xinjiang"
+	}
 }
 MON = {
+	ruler = peljidiin_genden
 	name = "Mongolia"
 	color = { 160 110 60 }
 	capital = ulaanbaatar
 	government = socialist_republic
 	culture = mongol
 	religion = buddhist
+	country_names = {
+		democratic = "Republic of Mongolia"
+		communist = "Mongolian People's Republic"
+		fascist = "Mongolian State"
+		neutrality = "Mongolia"
+	}
 }
 AUS = {
+	ruler = johann_schober
 	name = "Austria"
 	color = { 230 230 230 }
 	capital = vienna
 	government = republic
 	culture = austrian
 	religion = catholic
+	country_names = {
+		democratic = "Republic of Austria"
+		communist = "Austrian Soviet Republic"
+		fascist = "Austrian State"
+		neutrality = "Austrian Empire"
+	}
 }
 CHL = {
+	ruler = carlos_ibanez
 	name = "Chile"
 	color = { 200 90 110 }
 	capital = santiago
 	government = republic
 	culture = chilean
 	religion = catholic
+	country_names = {
+		communist = "Chilean Soviet Republic"
+		fascist = "Chilean State"
+	}
 }
 PAR = {
+	ruler = jose_guggiari
 	name = "Paraguay"
 	color = { 150 110 160 }
 	capital = asuncion
 	government = republic
 	culture = paraguayan
 	religion = catholic
+	country_names = {
+		communist = "Paraguayan Soviet Republic"
+		fascist = "Paraguayan State"
+	}
 }
 TIB = {
+	ruler = dalai_lama_13
 	name = "Tibet"
 	color = { 200 170 140 }
 	capital = lhasa
 	government = theocracy
 	culture = tibetan
 	religion = buddhist
+	country_names = {
+		democratic = "Republic of Tibet"
+		communist = "Tibetan People's Republic"
+		fascist = "Tibetan State"
+		neutrality = "Tibet"
+	}
 }
 OMA = {
+	ruler = said_bin_taimur
 	name = "Muscat and Oman"
 	color = { 180 70 70 }
 	capital = muscat
 	government = sultanate
 	culture = gulf_arab
 	religion = ibadi
+	country_names = {
+		democratic = "Republic of Oman"
+		communist = "Omani Soviet Republic"
+		fascist = "Omani State"
+		neutrality = "Muscat and Oman"
+	}
 }
 LIT = {
+	ruler = antanas_smetona
 	name = "Lithuania"
 	color = { 210 200 60 }
 	capital = kaunas
 	government = republic
 	culture = lithuanian
 	religion = catholic
+	country_names = {
+		communist = "Lithuanian Soviet Republic"
+		fascist = "Lithuanian State"
+	}
 }
 SWI = {
+	ruler = jean_marie_musy
 	name = "Switzerland"
 	color = { 190 40 40 }
 	capital = bern
@@ -416,188 +761,325 @@ SWI = {
 	culture = swiss_german
 	religion = protestant
 	accepted_cultures = { swiss_french italian }
+	country_names = {
+		communist = "Swiss Soviet Republic"
+		fascist = "Swiss State"
+	}
 }
 HON = {
+	ruler = mejia_colindres
 	name = "Honduras"
 	color = { 60 110 190 }
 	capital = tegucigalpa
 	government = republic
 	culture = central_american
 	religion = catholic
+	country_names = {
+		communist = "Honduran Soviet Republic"
+		fascist = "Honduran State"
+	}
 }
 URU = {
+	ruler = juan_campisteguy
 	name = "Uruguay"
 	color = { 120 170 220 }
 	capital = montevideo
 	government = republic
 	culture = rioplatense
 	religion = catholic
+	country_names = {
+		communist = "Uruguayan Soviet Republic"
+		fascist = "Uruguayan State"
+	}
 }
 CUB = {
+	ruler = gerardo_machado
 	name = "Cuba"
 	color = { 70 100 180 }
 	capital = havana
 	government = republic
 	culture = caribbean
 	religion = catholic
+	country_names = {
+		communist = "Cuban Soviet Republic"
+		fascist = "Cuban State"
+	}
 }
 NEP = {
+	ruler = juddha_shamsher
 	name = "Nepal"
 	color = { 180 80 90 }
 	capital = kathmandu
 	government = kingdom
 	culture = nepali
 	religion = hindu
+	country_names = {
+		democratic = "Republic of Nepal"
+		communist = "Nepalese People's Republic"
+		fascist = "Nepalese State"
+		neutrality = "Kingdom of Nepal"
+	}
 }
 GUA = {
+	ruler = lazaro_chacon
 	name = "Guatemala"
 	color = { 90 160 210 }
 	capital = guatemala
 	government = republic
 	culture = native_american
 	religion = catholic
+	country_names = {
+		communist = "Guatemalan Soviet Republic"
+		fascist = "Guatemalan State"
+	}
 }
 YEM = {
+	ruler = imam_yahya
 	name = "Yemen"
 	color = { 170 120 90 }
 	capital = sanaa
 	government = kingdom
 	culture = yemeni
 	religion = sunni
+	country_names = {
+		democratic = "Yemeni Republic"
+		communist = "People's Republic of Yemen"
+		fascist = "Yemeni State"
+		neutrality = "Kingdom of Yemen"
+	}
 }
 IRE = {
+	ruler = wt_cosgrave
 	name = "Irish Free State"
 	color = { 60 160 80 }
 	capital = dublin
 	government = dominion
 	culture = irish
 	religion = catholic
+	country_names = {
+		subject = "Irish Free State"
+		democratic = "Republic of Ireland"
+		communist = "Irish Soviet Republic"
+		fascist = "Irish State"
+	}
 }
 EST = {
+	ruler = konstantin_paets
 	name = "Estonia"
 	color = { 70 120 190 }
 	capital = tallinn
 	government = republic
 	culture = estonian
 	religion = protestant
+	country_names = {
+		communist = "Estonian Soviet Republic"
+		fascist = "Estonian State"
+	}
 }
 LAT = {
+	ruler = karlis_ulmanis
 	name = "Latvia"
 	color = { 140 50 60 }
 	capital = riga
 	government = republic
 	culture = latvian
 	religion = protestant
+	country_names = {
+		communist = "Latvian Soviet Republic"
+		fascist = "Latvian State"
+	}
 }
 LUX = {
+	ruler = charlotte
 	name = "Luxembourg"
 	color = { 120 170 220 }
 	capital = luxembourg
 	government = grand_duchy
 	culture = luxembourgish
 	religion = catholic
+	country_names = {
+		democratic = "Luxembourg"
+		communist = "Luxembourg Soviet Republic"
+		fascist = "Luxembourg State"
+		neutrality = "Grand Duchy of Luxembourg"
+	}
 }
 ALB = {
+	ruler = zog
 	name = "Albania"
 	color = { 150 40 40 }
 	capital = tirana
 	government = kingdom
 	culture = albanian
 	religion = sunni
+	country_names = {
+		democratic = "Albanian Republic"
+		communist = "People's Republic of Albania"
+		fascist = "Albanian State"
+		neutrality = "Kingdom of Albania"
+	}
 }
 TAN = {
+	ruler = salchak_toka
 	name = "Tannu Tuva"
 	color = { 130 160 120 }
 	capital = kyzyl
 	government = socialist_republic
 	culture = mongol
 	religion = buddhist
+	country_names = {
+		communist = "Tuvan Soviet Republic"
+		fascist = "Tuvan State"
+	}
 }
 LIB = {
+	ruler = charles_king
 	name = "Liberia"
 	color = { 200 120 120 }
 	capital = monrovia
 	government = republic
 	culture = kru
 	religion = animist
+	country_names = {
+		communist = "Liberian Soviet Republic"
+		fascist = "Liberian State"
+	}
 }
 COS = {
+	ruler = gonzalez_viquez
 	name = "Costa Rica"
 	color = { 150 60 90 }
 	capital = san_jose_puntarenas
 	government = republic
 	culture = central_american
 	religion = catholic
+	country_names = {
+		communist = "Costa Rican Soviet Republic"
+		fascist = "Costa Rican State"
+	}
 }
 BHU = {
+	ruler = jigme_wangchuck
 	name = "Bhutan"
 	color = { 220 150 60 }
 	capital = thimphu
 	government = kingdom
 	culture = tibetan
 	religion = buddhist
+	country_names = {
+		democratic = "Republic of Bhutan"
+		communist = "Bhutanese People's Republic"
+		fascist = "Bhutanese State"
+		neutrality = "Kingdom of Bhutan"
+	}
 }
 PAN = {
+	ruler = arosemena
 	name = "Panama"
 	color = { 200 80 80 }
 	capital = panama_city
 	government = republic
 	culture = central_american
 	religion = catholic
+	country_names = {
+		communist = "Panamanian Soviet Republic"
+		fascist = "Panamanian State"
+	}
 }
 NIC = {
+	ruler = jose_moncada
 	name = "Nicaragua"
 	color = { 80 130 200 }
 	capital = managua
 	government = republic
 	culture = central_american
 	religion = catholic
+	country_names = {
+		communist = "Nicaraguan Soviet Republic"
+		fascist = "Nicaraguan State"
+	}
 }
 ELS = {
+	ruler = romero_bosque
 	name = "El Salvador"
 	color = { 40 90 170 }
 	capital = san_salvador
 	government = republic
 	culture = central_american
 	religion = catholic
+	country_names = {
+		communist = "Salvadoran Soviet Republic"
+		fascist = "Salvadoran State"
+	}
 }
 NFL = {
+	ruler = richard_squires
 	name = "Newfoundland"
 	color = { 175 140 115 }
 	capital = st_john_s
 	government = dominion
 	culture = anglo_canadian
 	religion = protestant
+	country_names = {
+		subject = "Dominion of Newfoundland"
+		democratic = "Newfoundland"
+		communist = "Newfoundland Soviet Republic"
+		fascist = "Newfoundland State"
+	}
 }
 ICE = {
+	ruler = tryggvi_thorhallsson
 	name = "Iceland"
 	color = { 110 160 210 }
 	capital = reykjavik
 	government = kingdom
 	culture = icelandic
 	religion = protestant
+	country_names = {
+		democratic = "Republic of Iceland"
+		communist = "Icelandic Soviet Republic"
+		fascist = "Icelandic State"
+		neutrality = "Kingdom of Iceland"
+	}
 }
 HAI = {
+	ruler = stenio_vincent
 	name = "Haiti"
 	color = { 60 70 160 }
 	capital = port_au_prince
 	government = republic
 	culture = haitian
 	religion = catholic
+	country_names = {
+		communist = "Haitian Soviet Republic"
+		fascist = "Haitian State"
+	}
 }
 DOM = {
+	ruler = horacio_vasquez
 	name = "Dominican Republic"
 	color = { 100 80 160 }
 	capital = santo_domingo
 	government = republic
 	culture = caribbean
 	religion = catholic
+	country_names = {
+		communist = "Dominican Soviet Republic"
+		fascist = "Dominican State"
+	}
 }
 DNZ = {
+	ruler = heinrich_sahm
 	name = "Free City of Danzig"
 	color = { 170 90 90 }
 	capital = danzig
 	government = free_city
 	culture = german
 	religion = protestant
+	country_names = {
+		democratic = "Free City of Danzig"
+		communist = "Danzig Soviet Republic"
+		fascist = "German Danzig"
+		neutrality = "Free City of Danzig"
+	}
 }

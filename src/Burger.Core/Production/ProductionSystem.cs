@@ -75,8 +75,34 @@ public class ProductionRules
         return null;
     }
 
+    /// <summary>
+    /// How many construction projects the AI keeps going: its building capacity (civilian factories left after consumer goods)
+    /// divided by max_factories_per_project, plus two.
+    /// </summary>
+    public virtual int AiQueueSize(Game game, Country c)
+        => 2 + CivilianForConstruction(game, c) / Math.Max(1, (int)game.Data.Defines.Get("max_factories_per_project", 15));
+
+    /// <summary>
+    /// Which factory the AI builds next: a peacetime country wants ai_peace_military_ratio (0.6) military factories per
+    /// civilian one, a country at war ai_war_military_ratio (1.5); below that it builds military ones, else civilian ones.
+    /// </summary>
+    public virtual BuildingType? AiNextBuilding(Game game, Country c, BuildingType? civ, BuildingType? mil)
+    {
+        bool war = game.World.WarsOf(c).Any();
+        double ratio = game.Data.Defines.Get(war ? "ai_war_military_ratio" : "ai_peace_military_ratio", war ? 1.5 : 0.6);
+        int queuedCiv = civ == null ? 0 : c.Construction.Count(p => p.Building == civ), queuedMil = mil == null ? 0 : c.Construction.Count(p => p.Building == mil);
+        double haveCiv = Factories(game, c, CivilianFactory) + queuedCiv, haveMil = Factories(game, c, MilitaryFactory) + queuedMil;
+        return haveMil < haveCiv * ratio ? mil ?? civ : civ ?? mil;
+    }
+
     /// <summary>Shared factory slots of a state (HOI4: depends on state size; here: locations + tax).</summary>
-    public virtual int SlotsOf(Game game, State s) => (int)Math.Clamp(s.Vars.Get("building_slots") > 0 ? s.Vars.Get("building_slots") : 2 + s.Locations.Count + s.Tax / 2, 1, 25);
+    public virtual int SlotsOf(Game game, State s)
+    {
+        // a state's own number, else its size and wealth; infrastructure (+1 per 3 levels) and the building_slots modifiers of its owner (technology) add to it
+        double baseSlots = s.Vars.Get("building_slots") > 0 ? s.Vars.Get("building_slots") : 2 + s.Locations.Count + s.Tax / 2;
+        if (s.Owner != null) baseSlots += s.Buildings.GetValueOrDefault("infrastructure") / 3.0 + game.Modifiers.Sum(s.Owner, "building_slots");
+        return (int)Math.Clamp(baseSlots, 1, 30);
+    }
 }
 
 /// <summary>
@@ -235,10 +261,12 @@ public sealed class ProductionSystem
             {
                 int f = (int)Math.Floor(line.Factories * scale + 0.0001);
                 if (f <= 0) { line.LastOutput = 0; continue; }
-                line.Progress += Rules.LineOutput(_game, c, line, f);
+                // a shortage of the commodities the equipment needs slows the line (steel, oil, aluminium ...)
+                line.Progress += Rules.LineOutput(_game, c, line, f) * _game.Commodities.Factor(c, line.Equipment);
                 double units = Math.Floor(line.Progress / line.Equipment.Cost);
                 line.Progress -= units * line.Equipment.Cost;
                 line.LastOutput = units;
+                if (units > 0) _game.Commodities.Use(c, line.Equipment, units);
                 if (units > 0) c.Stockpile[line.Equipment.Key] = Stock(c, line.Equipment.Key) + units;
                 line.Efficiency = Rules.GrowEfficiency(_game, c, line);
             }
@@ -268,10 +296,11 @@ public sealed class ProductionSystem
     /// <summary>Keeps production lines for every equipment the AI's templates need and builds factories.</summary>
     public void AiMonthly(Country c)
     {
+        // lines for the equipment of the templates the country can build with what it knows (old equipment is not dropped)
         var needed = _game.Data.Templates.Values
-            .Where(t => string.IsNullOrEmpty(t.OwnerTag) || t.OwnerTag.Equals(c.Tag, StringComparison.OrdinalIgnoreCase))
+            .Where(t => (string.IsNullOrEmpty(t.OwnerTag) || t.OwnerTag.Equals(c.Tag, StringComparison.OrdinalIgnoreCase)) && t.Units.All(u => _game.Tech.CanUse(c, u.Type.Definition)))
             .SelectMany(t => t.Equipment.Keys).Distinct(StringComparer.OrdinalIgnoreCase)
-            .Select(k => _game.Data.Equipment.GetValueOrDefault(k)).Where(e => e != null).Cast<EquipmentType>().ToList();
+            .Select(k => _game.Data.Equipment.GetValueOrDefault(k)).Where(e => e != null && _game.Tech.CanUse(c, e.Definition)).Cast<EquipmentType>().ToList();
         foreach (var e in needed)
             if (!c.ProductionLines.Any(l => l.Equipment == e)) AddLine(c, e, 0);
         // spread military factories by shortage (at least one each, unless the stockpile is already big)
@@ -296,14 +325,18 @@ public sealed class ProductionSystem
             }
             while (given > total) { var big = lines.OrderByDescending(l => l.Factories).First(); big.Factories--; given--; }
         }
-        // construction: military factories first, civilian factories when few
-        if (c.Construction.Count >= 3) return;
+        // construction: as many projects as its building capacity supports (a few new ones a month)
         var civT = _game.Data.BuildingTypes.GetValueOrDefault(Rules.CivilianFactory);
         var milT = _game.Data.BuildingTypes.GetValueOrDefault(Rules.MilitaryFactory);
-        var type = CivilianFactories(c) < MilitaryFactories(c) * 0.8 ? civT ?? milT : milT ?? civT;
-        if (type == null) return;
-        var state = c.OwnedStates.Where(s => CannotBuildReason(c, type, s) == null).OrderByDescending(s => s.Buildings.GetValueOrDefault("infrastructure")).ThenByDescending(s => s.Tax).FirstOrDefault();
-        if (state != null) QueueBuilding(c, type, state);
+        int size = Rules.AiQueueSize(_game, c);
+        for (int added = 0; added < 3 && c.Construction.Count < size; added++)
+        {
+            var type = Rules.AiNextBuilding(_game, c, civT, milT);
+            if (type == null) return;
+            var state = c.OwnedStates.Where(s => CannotBuildReason(c, type, s) == null)
+                .OrderBy(s => c.Construction.Count(p => p.State == s)).ThenByDescending(s => s.Buildings.GetValueOrDefault("infrastructure")).ThenByDescending(s => s.Tax).FirstOrDefault();
+            if (state == null || QueueBuilding(c, type, state) != null) return;
+        }
     }
 
     // ------------------------------------------------------------------------------------- save

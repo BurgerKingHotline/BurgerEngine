@@ -68,6 +68,8 @@ offer_alliance = {
 		opinion_factor = 0.5
 		modifier = { add = 15 borders = scope:recipient }
 		modifier = { add = -1000 scope:recipient = { is_at_war_with = ROOT } }
+		# two countries of one people are rivals for the same nation, not allies
+		modifier = { add = -1000 same_culture = scope:recipient }
 	}
 	on_accept = {
 		create_alliance = scope:recipient
@@ -79,6 +81,7 @@ offer_alliance = {
 	ai_will_do = {
 		base = 0
 		modifier = { add = 1 scope:recipient = { opinion = { target = ROOT value > 25 } } }
+		modifier = { factor = 0 same_culture = scope:recipient }
 	}
 }
 
@@ -88,6 +91,8 @@ break_alliance = {
 	ai_will_do = {
 		base = 0
 		modifier = { add = 2 opinion = { target = scope:recipient value < -20 } }
+		# an ally of our own people is a rival for our nation
+		modifier = { add = 3 same_culture = scope:recipient }
 		# ambition: a strong ally next door that we have claims on is worth more as a conquest
 		modifier = {
 			add = 1
@@ -178,7 +183,7 @@ declare_war = {
 		modifier = { add = 4 has_casus_belli = { target = scope:recipient type = cultural_unification } military_strength > scope:recipient.military_strength }
 		modifier = { add = 4 has_claim_on = scope:recipient borders = scope:recipient military_strength > scope:recipient.military_strength }
 		# subjects that want to be free strike when the overlord is weak or busy
-		modifier = { add = 6 has_casus_belli = { target = scope:recipient type = independence } liberty_desire >= 70 }
+		modifier = { add = 6 has_casus_belli = { target = scope:recipient type = independence } liberty_desire >= 50 }
 		modifier = { add = 3 has_casus_belli = { target = scope:recipient type = independence } stronger_than = { target = scope:recipient ratio = 0.7 } }
 		# ideology: extremists go to war against the governments they despise
 		modifier = { add = 1.5 has_casus_belli = { target = scope:recipient type = ideological_war } borders = scope:recipient stronger_than = { target = scope:recipient ratio = 1.2 } }
@@ -190,6 +195,8 @@ declare_war = {
 			stronger_than = { target = scope:recipient ratio = 1.6 }
 			NOT = { is_overlord_of = scope:recipient }
 		}
+		# enclaves: a country wants back the foreign enclaves inside its land
+		modifier = { add = 4 enclave_held_by = scope:recipient stronger_than = { target = scope:recipient ratio = 1.2 } }
 		modifier = { factor = 0 is_at_war = yes }
 		modifier = { factor = 0.4 war_exhaustion > 4 }
 		modifier = { factor = 0 war_exhaustion > 8 }

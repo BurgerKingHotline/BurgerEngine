@@ -1,0 +1,71 @@
+# Trees of the lesser powers whose 1930s were shaped by a few clear choices (same house rules as 10_great_powers.txt).
+
+tree_hungary = {
+	countries = { HUN }
+
+	focus = { id = hun_consolidation days = 70 x = 0 y = 0
+		name = "Consolidation" desc = "Bethlen's order: finances, agrarian conservatism, a place among the powers."
+		completion_reward = { add_modifier = { name = national_unity years = 5 } }
+		ai_will_do = { base = 3 } }
+	focus = { id = hun_rearm days = 80 x = 0 y = 1
+		name = "Secret Rearmament" desc = "The army beyond the treaty limits."
+		prerequisite = { focus = hun_consolidation }
+		completion_reward = { add_modifier = { name = army_reform_programme years = 6 } }
+		ai_will_do = { base = 2 } }
+	focus = { id = hun_revision days = 50 x = 1 y = 1
+		name = "Revision of Trianon" desc = "The lost lands in Slovakia, Transylvania and the Banat."
+		prerequisite = { focus = hun_consolidation }
+		completion_reward = { add_claim = nitra_state add_claim = banska_bystrica_state add_claim = presov_state add_claim = carpathian_ruthenia_state }
+		ai_will_do = { base = 2 modifier = { add = 2 ai_aggression >= 1.0 } } }
+	focus = { id = hun_demand_slovakia days = 30 x = 1 y = 2
+		name = "Demand the Highlands" desc = "Put the claim to Prague."
+		prerequisite = { focus = hun_revision }
+		available = { can_demand = { target = CZE action = demand_state } }
+		completion_reward = { make_demand = CZE }
+		ai_will_do = { base = 0 modifier = { add = 5 stronger_than = { target = CZE ratio = 1.0 } } modifier = { factor = 0 NOT = { ai_ambition = { target = CZE min = 1 } } } } }
+}
+
+tree_turkey = {
+	countries = { TUR }
+
+	focus = { id = tur_kemalist_reform days = 80 x = 0 y = 0
+		name = "Kemalist Reforms" desc = "A secular, modern republic."
+		completion_reward = { add_modifier = { name = reformed_state years = 8 } }
+		ai_will_do = { base = 4 } }
+	focus = { id = tur_etatism days = 80 x = 1 y = 0
+		name = "Etatism" desc = "State-led industry."
+		prerequisite = { focus = tur_kemalist_reform }
+		completion_reward = { add_modifier = { name = industrial_drive years = 5 } }
+		ai_will_do = { base = 3 } }
+	focus = { id = tur_the_straits days = 40 x = 0 y = 1
+		name = "The Straits" desc = "Turkish forces belong on Turkish shores."
+		prerequisite = { focus = tur_kemalist_reform }
+		available = { has_demilitarized_states = yes NOT = { is_at_war = yes } }
+		completion_reward = { remilitarize_states = yes add_stability = 2 }
+		ai_will_do = { base = 0 modifier = { add = 5 remilitarization_odds >= 0.7 } modifier = { factor = 0 remilitarization_odds < 0.5 } } }
+	focus = { id = tur_hatay days = 50 x = 1 y = 1
+		name = "The Hatay Question" desc = "The sanjak of Alexandretta, with its Turkish population."
+		prerequisite = { focus = tur_kemalist_reform }
+		completion_reward = { add_claim = alexandretta_state make_demand = FRA }
+		ai_will_do = { base = 1 } }
+}
+
+tree_spain = {
+	countries = { SPA }
+
+	focus = { id = spa_republican_reforms days = 80 x = 0 y = 0
+		name = "Land and Church Reform" desc = "The republic breaks up the great estates and the schools of the Church; the landowners and the officers do not forgive it."
+		available = { ruling_ideology = democratic }
+		completion_reward = { add_modifier = { name = land_reform_strife years = 6 } add_popularity = { ideology = communist value = 0.05 } add_popularity = { ideology = fascist value = 0.05 } }
+		ai_will_do = { base = 4 } }
+	focus = { id = spa_regional_statutes days = 60 x = 1 y = 0
+		name = "Regional Statutes" desc = "Autonomy for Catalonia and the Basques."
+		prerequisite = { focus = spa_republican_reforms }
+		completion_reward = { add_popularity = { ideology = fascist value = 0.03 } add_stability = -2 }
+		ai_will_do = { base = 2 } }
+	focus = { id = spa_army_plot days = 60 x = 0 y = 1
+		name = "The Generals" desc = "The officer corps will not tolerate the republic."
+		prerequisite = { focus = spa_republican_reforms }
+		completion_reward = { add_popularity = { ideology = fascist value = 0.06 } }
+		ai_will_do = { base = 0 modifier = { add = 3 popularity_fascist >= 0.12 } } }
+}

@@ -43,6 +43,13 @@ public sealed class Country : IScope
     /// <summary>The raw (unlocalised) name value, for saving.</summary>
     public string RawName => _name;
     public string DefaultName = "";
+    /// <summary>Names for other governments and dependencies (country_names in the definition): an ideology key (democratic), subject, or ideology_subject.</summary>
+    public Dictionary<string, string> NameVariants = new(StringComparer.OrdinalIgnoreCase);
+    /// <summary>Multipliers on division stats from technology (soft_attack -> 1.15); kept up to date by the technology system.</summary>
+    public readonly Dictionary<string, double> StatFactors = new(StringComparer.OrdinalIgnoreCase);
+    public double StatFactor(string key) => StatFactors.Count == 0 ? 1 : StatFactors.GetValueOrDefault(key, 1);
+    /// <summary>Colors for other governments and dependencies (country_colors in the definition), same keys as <see cref="NameVariants"/>.</summary>
+    public Dictionary<string, Rgb> ColorVariants = new(StringComparer.OrdinalIgnoreCase);
     public Rgb Color;
     public Rgb DefaultColor;
 

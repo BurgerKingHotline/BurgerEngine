@@ -1,0 +1,176 @@
+# Decisions (EU4 style). Reusable ones: the conditions pick who can take them and the AI weights (a country's personality, its ideology,
+# its situation) pick who does - nothing here runs on a date. ai_will_do: the AI takes a decision with chance weight x 10% a month.
+
+remilitarize_zone = {
+	name = "Remilitarize the Zone"
+	desc = "Our treaty obligations keep armed forces out of part of our own land. Marching in again will be a challenge to those who imposed it - a country that feels strong enough may dare."
+	potential = { has_demilitarized_states = yes NOT = { is_at_war = yes } }
+	allow = { num_of_divisions >= 3 }
+	effect = { remilitarize_states = yes add_stability = 2 }
+	repeatable = yes
+	cooldown_days = 365
+	ai_will_do = {
+		base = 0
+		modifier = { add = 3 remilitarization_odds >= 0.8 ai_aggression >= 1.0 }
+		modifier = { add = 4 remilitarization_odds >= 1.2 ai_aggression >= 0.8 }
+		modifier = { add = 3 remilitarization_odds >= 2 }
+		modifier = { add = 2 ruling_ideology = fascist remilitarization_odds >= 0.7 }
+		modifier = { factor = 0 remilitarization_odds < 0.55 }
+	}
+}
+
+rearmament_programme = {
+	name = "Rearmament Programme"
+	desc = "Put the economy and the manpower of the nation behind the army."
+	potential = { NOT = { has_modifier = rearmament } NOT = { is_at_war = yes } }
+	allow = { political_power >= 40 }
+	effect = { add_modifier = { name = rearmament years = 6 } add_political_power = -40 set_law = extensive_conscription }
+	ai_will_do = {
+		base = 0
+		modifier = { add = 3 ai_aggression >= 1.2 }
+		modifier = { add = 2 ruling_ideology = fascist }
+		modifier = { add = 1.5 ruling_ideology = communist }
+		modifier = { add = 2 any_neighbor_country = { stronger_than = { target = ROOT ratio = 1.4 } ideological_enemy = ROOT } }
+		modifier = { add = 1.5 war_exhaustion < 1 ai_expansion >= 1.3 }
+		modifier = { factor = 0.25 ai_isolation >= 1.5 }
+		modifier = { factor = 0.5 stability < 40 }
+	}
+}
+
+industrial_drive = {
+	name = "Industrial Drive"
+	desc = "State support for factories, railways and mines: new industry in the richest states."
+	potential = { NOT = { has_modifier = industrial_drive } }
+	allow = { political_power >= 30 stability >= 35 }
+	effect = {
+		add_modifier = { name = industrial_drive years = 4 }
+		add_political_power = -30
+		random_owned_state = { limit = { is_coastal = no } add_building = civilian_factory add_building = military_factory }
+		random_owned_state = { add_building = civilian_factory }
+	}
+	repeatable = yes
+	cooldown_days = 730
+	ai_will_do = {
+		base = 1
+		modifier = { add = 2 commodity_shortage > 0.3 }
+		modifier = { add = 1 num_of_divisions < 6 ai_expansion >= 1 }
+		modifier = { factor = 0.2 stability < 40 }
+	}
+}
+
+five_year_plan = {
+	name = "Five-Year Plan"
+	desc = "A state-directed leap in heavy industry, paid for by the consumer and the countryside."
+	potential = { ruling_ideology = communist NOT = { has_modifier = five_year_plan } }
+	allow = { political_power >= 50 }
+	effect = {
+		add_modifier = { name = five_year_plan years = 5 }
+		add_political_power = -50
+		every_owned_state = { limit = { has_building = civilian_factory } add_building = civilian_factory }
+	}
+	repeatable = yes
+	cooldown_days = 1460
+	ai_will_do = { base = 6 }
+}
+
+autarky_programme = {
+	name = "Autarky Programme"
+	desc = "Synthetic fuel, substitutes and mining at any price: do without what the world will not sell us."
+	potential = { NOT = { has_modifier = autarky_programme } }
+	allow = { political_power >= 40 commodity_shortage > 0.2 }
+	effect = { add_modifier = { name = autarky_programme years = 6 } add_political_power = -40 }
+	ai_will_do = {
+		base = 0
+		modifier = { add = 3 commodity_shortage > 0.4 }
+		modifier = { add = 2 ruling_ideology = fascist commodity_shortage > 0.2 }
+		modifier = { add = 2 oil_satisfied < 0.6 }
+		modifier = { factor = 0.3 ai_isolation < 0.8 }
+	}
+}
+
+economic_stimulus = {
+	name = "Economic Stimulus"
+	desc = "Public works and credit to put people back to work."
+	potential = { NOT = { has_modifier = economic_stimulus } ruling_ideology = democratic }
+	allow = { political_power >= 30 stability < 60 }
+	effect = { add_modifier = { name = economic_stimulus years = 3 } add_political_power = -30 add_stability = 3 }
+	repeatable = yes
+	cooldown_days = 1095
+	ai_will_do = {
+		base = 0
+		modifier = { add = 4 stability < 45 }
+		modifier = { add = 2 stability < 55 }
+	}
+}
+
+suppress_extremists = {
+	name = "Suppress the Extremist Parties"
+	desc = "Emergency decrees against the parties that want to overthrow the republic."
+	potential = { holds_elections = yes }
+	allow = { political_power >= 50 OR = { popularity_fascist > 0.15 popularity_communist > 0.15 } }
+	effect = {
+		add_political_power = -50
+		add_popularity = { ideology = fascist value = -0.03 }
+		add_popularity = { ideology = communist value = -0.03 }
+		add_stability = -3
+	}
+	repeatable = yes
+	cooldown_days = 540
+	ai_will_do = {
+		base = 0
+		modifier = { add = 3 OR = { popularity_fascist > 0.2 popularity_communist > 0.2 } }
+		modifier = { add = 2 stability < 45 }
+		modifier = { factor = 0.3 ruling_popularity > 0.55 }
+	}
+}
+
+colonial_development = {
+	name = "Colonial Development"
+	desc = "Invest in the mines and plantations of the colonies."
+	potential = { num_of_colonies >= 2 NOT = { has_modifier = colonial_development } }
+	allow = { political_power >= 40 }
+	effect = { add_modifier = { name = colonial_development years = 6 } add_political_power = -40 }
+	ai_will_do = {
+		base = 0.5
+		modifier = { add = 2 commodity_shortage > 0.15 }
+		modifier = { add = 2 ai_archetype = imperial }
+	}
+}
+
+naval_programme = {
+	name = "Naval Programme"
+	desc = "A building programme for the fleet."
+	potential = { NOT = { has_modifier = naval_programme } NOT = { ai_archetype = isolationist } }
+	allow = { political_power >= 40 }
+	effect = { add_modifier = { name = naval_programme years = 5 } add_political_power = -40 }
+	ai_will_do = {
+		base = 0
+		modifier = { add = 2 ai_archetype = imperial }
+		modifier = { add = 2 ai_archetype = expansionist }
+		modifier = { add = 1.5 ai_expansion >= 1.3 }
+	}
+}
+
+military_reform = {
+	name = "Military Reform"
+	desc = "Staff colleges, doctrine and training for a modern army."
+	potential = { NOT = { has_modifier = military_reform } }
+	allow = { political_power >= 40 }
+	effect = { add_modifier = { name = military_reform years = 6 } add_political_power = -40 }
+	ai_will_do = {
+		base = 0.5
+		modifier = { add = 2 ai_aggression >= 1.2 }
+		modifier = { add = 1 ai_defense >= 1.4 }
+	}
+}
+
+raise_colonial_levies = {
+	name = "Raise Colonial Levies"
+	desc = "Recruit auxiliaries in the colonies."
+	potential = { num_of_colonies >= 3 }
+	allow = { political_power >= 25 }
+	effect = { add_manpower = 6000 add_political_power = -25 add_stability = -1 }
+	repeatable = yes
+	cooldown_days = 730
+	ai_will_do = { base = 0.3 modifier = { add = 2 is_at_war = yes } }
+}

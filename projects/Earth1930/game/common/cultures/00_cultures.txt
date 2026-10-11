@@ -193,6 +193,7 @@ tibetan = {
 	name = "Tibeto-Mongol"
 	color = { 190 160 90 }
 	mongol = { name = "Mongol" religion = buddhist }
+	kalmyk = { name = "Kalmyk" religion = buddhist }
 	tibetan = { name = "Tibetan" religion = buddhist }
 	buryat = { name = "Buryat" religion = buddhist }
 }

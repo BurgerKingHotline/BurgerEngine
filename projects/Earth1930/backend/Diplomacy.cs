@@ -21,6 +21,10 @@ public class GameDiplomacyRules : DiplomacyRules
         if (r.IsGuaranteeing(to, from)) v += 15;
         if (game.World.AtWar(from, to)) v -= 100;
         if (r.HasTruce(from, to, game.World.Date)) v -= 10;
+        // two countries of one people are rivals for the same nation (same_culture_opinion; not an overlord and its subject)
+        if (game.Population.Enabled && r.OverlordOf(from) != to && r.OverlordOf(to) != from
+            && game.Population.Of(from).Culture is { } people && people == game.Population.Of(to).Culture)
+            v += game.Data.Defines.Get("same_culture_opinion", -60);
         v += game.Modifiers.Sum(to, "opinion");
         if (game.ScriptValues.TryEval("base_opinion", from, out var scripted,
                 new Dictionary<string, IScope?>(StringComparer.OrdinalIgnoreCase) { ["target"] = to, ["recipient"] = to }))
@@ -125,15 +129,20 @@ public class GameDiplomacyRules : DiplomacyRules
                     double total = owner.OwnedStates.Sum(s => s.Locations.Sum(l => LocationWarValue(game, l)));
                     double value = term.State.Locations.Sum(l => LocationWarValue(game, l));
                     if (total <= 0) return 100;
-                    // states someone on the winning side fights for (war goals, also allies') are cheaper
-                    double goal = game.Diplomacy.GoalMultiplier(war, term.State, term.Beneficiary ?? winner);
+                    // states someone on the winning side fights for (war goals, also allies') are cheaper;
+                    // so is land handed to a country of its own people outside the war (as cheap as releasing that people)
+                    var receiver = term.Beneficiary ?? winner;
+                    double goal = war.Involves(receiver) ? game.Diplomacy.GoalMultiplier(war, term.State, receiver)
+                                                         : 0.6 * game.Diplomacy.GoalMultiplier(war, term.State, winner);
                     return Math.Min(100, value / total * 100 * d.PeaceStateCostMultiplier * mult * goal);
                 }
             case PeaceTermType.ReleaseCountry:
                 {
                     if (term.State == null) return 0;
                     var owner = term.State.Owner ?? loser;
-                    var freed = game.Diplomacy.ReleaseStates(owner, term.Culture);
+                    var plan = game.Diplomacy.PlanRelease(war, owner, term.Culture, winner, term.Beneficiary ?? winner, term.AsSubject);
+                    if (plan.Problem != null) return 100;
+                    var freed = plan.AllStates;
                     double total = owner.OwnedStates.Sum(s => s.Locations.Sum(l => LocationWarValue(game, l)));
                     double value = freed.Sum(s => s.Locations.Sum(l => LocationWarValue(game, l)));
                     if (total <= 0) return 100;
@@ -144,6 +153,7 @@ public class GameDiplomacyRules : DiplomacyRules
             case PeaceTermType.Independence: return d.Get("independence_peace_cost", 40) * game.Diplomacy.GoalMultiplierFor(war, term.Beneficiary ?? winner, WarGoalType.Independence);
             case PeaceTermType.RegimeChange: return d.Get("regime_change_cost", 50) * game.Diplomacy.GoalMultiplierFor(war, winner, WarGoalType.Ideology);
             case PeaceTermType.Humiliate: return d.Get("humiliate_cost", 20) * game.Diplomacy.GoalMultiplierFor(war, winner, WarGoalType.Humiliation);
+            case PeaceTermType.Demilitarize: return d.Get("demilitarize_cost", 6);
             case PeaceTermType.Subjugate: return d.SubjugateCost * mult * game.Diplomacy.GoalMultiplierFor(war, term.Beneficiary ?? winner, WarGoalType.Subjugation);
             case PeaceTermType.Annex: return d.AnnexCost;
             case PeaceTermType.Gold:
@@ -161,6 +171,60 @@ public class GameDiplomacyRules : DiplomacyRules
     /// </summary>
     public override bool PrefersPuppets(Game game, Country winner)
         => game.Politics.Enabled && game.Politics.RulingIdeology(winner)?.PeacePuppets == true;
+
+    /// <summary>
+    /// A winner that prefers puppets does not always make one: in some wars (regime_change_instead_of_puppet, half of them;
+    /// decided once per war) it only puts its own ideology in power in the defeated country and leaves it independent.
+    /// </summary>
+    public override bool PrefersRegimeChange(Game game, War war, Country winner, Country loser)
+    {
+        if (!game.Politics.Enabled || game.Politics.Of(winner).Ruling == game.Politics.Of(loser).Ruling) return false;
+        uint h = unchecked((uint)(war.Id * 7919 + winner.Index * 104729 + loser.Index * 1299709) * 2654435761u);
+        return (h >> 8) % 1000 < game.Data.Defines.Get("regime_change_instead_of_puppet", 0.5) * 1000;
+    }
+
+    /// <summary>Does an AI winner demand that a state of the loser is demilitarized? By default states next to its own land, when it is wary of the loser (a rival, or a defensive outlook), at most two.</summary>
+    public override bool WantsDemilitarized(Game game, Country winner, Country loser, State s, int already)
+    {
+        if (!game.Features.Has(FeatureSet.Demilitarization) || s.Demilitarized || already >= 2 || s == loser.Capital?.State) return false;
+        if (!game.Diplomacy.Touches(winner, s)) return false;
+        var p = game.AiProfiles.PersonalityOf(winner);
+        bool rival = p.Profile != null && p.Profile.Rivals.ContainsKey(loser.Tag);
+        return rival || p.Trait("defense") >= 1.2;
+    }
+
+    /// <summary>
+    /// Does an AI winner free a subject of the losing side in a peace deal? By default winners that prefer puppets
+    /// (democracies) do it, and any winner when the subject is of another culture group than its overlord and wants out
+    /// (liberty desire of at least liberate_liberty, 50).
+    /// </summary>
+    public override bool PrefersLiberation(Game game, Country winner, Country subject)
+    {
+        if (PrefersPuppets(game, winner)) return true;
+        var pop = game.Population;
+        var overlord = game.World.Relations.OverlordOf(subject);
+        bool foreign = pop.Enabled && overlord != null && pop.Of(subject).Culture is { } a && pop.Of(overlord).Culture is { } b && pop.Culture(a)?.Group != pop.Culture(b)?.Group;
+        return foreign && game.Diplomacy.LibertyDesire(subject) >= game.Data.Defines.Get("liberate_liberty", 50);
+    }
+
+    /// <summary>
+    /// Does an overlord set a subject free on its own in a month? By default overlords that prefer puppets (democracies),
+    /// when the subject's liberty desire is over grant_independence_liberty (60), with a chance of overlord_release_chance (3%) a month.
+    /// </summary>
+    public override bool WillGrantIndependence(Game game, Country overlord, Country subject)
+    {
+        var d = game.Data.Defines;
+        if (!PrefersPuppets(game, overlord) || game.World.WarsOf(overlord).Any()) return false;
+        return game.Diplomacy.LibertyDesire(subject) >= d.Get("grant_independence_liberty", 60) && game.Rng.NextDouble() < d.Get("overlord_release_chance", 0.03);
+    }
+
+    /// <summary>
+    /// Would <paramref name="winner"/> hand land of <paramref name="kin"/>'s own people to it in a peace deal instead of
+    /// keeping it or setting up another country of that people? By default its own subjects, and countries it likes
+    /// (opinion of at least kin_land_opinion, 25).
+    /// </summary>
+    public override bool GivesLandToKin(Game game, Country winner, Country kin)
+        => game.World.Relations.OverlordOf(kin) == winner || game.Diplomacy.Opinion(winner, kin) >= game.Data.Defines.Get("kin_land_opinion", 25);
 
     /// <summary>
     /// Does an AI country accept a peace offer? War exhaustion, a long war and a stalemate make it give in sooner
@@ -221,7 +285,7 @@ public class GameDiplomacyRules : DiplomacyRules
     /// <summary>Country modifiers from war exhaustion (0-20): stability, manpower and political power fall.</summary>
     public override double WarExhaustionModifier(Game game, Country c, double exhaustion, string key) => key switch
     {
-        "stability_target" => -0.5 * exhaustion,
+        "stability_target" => -game.Data.Defines.Get("war_exhaustion_stability", 1.5) * exhaustion,
         "manpower" => -0.02 * exhaustion,
         "political_power_gain" => -0.1 * exhaustion,
         _ => 0,
@@ -236,7 +300,7 @@ public class GameDiplomacyRules : DiplomacyRules
     public override double LibertyDesire(Game game, Country subject, Country overlord, SubjectType type)
     {
         double ld = type.LibertyDesire;
-        double ss = MilitaryStrength(game, subject), os = MilitaryStrength(game, overlord);
+        double ss = game.Diplomacy.Strength(subject), os = game.Diplomacy.Strength(overlord);
         ld += Math.Min(30, 30 * ss / (os + 1));
         ld += Math.Min(15, 15 * subject.OwnedStates.Count / (double)Math.Max(1, overlord.OwnedStates.Count));
         ld -= game.Diplomacy.Opinion(subject, overlord) * 0.2;
@@ -249,8 +313,27 @@ public class GameDiplomacyRules : DiplomacyRules
         return Math.Clamp(ld, 0, 100);
     }
 
+    /// <summary>Naval power of a country: the number of its ships (0 without the navy feature).</summary>
+    public override double NavalStrength(Game game, Country c)
+        => game.Navy.Enabled ? game.Navy.FleetsOf(c).Sum(f => f.Ships.Count) : 0;
+
+    /// <summary>
+    /// How far over sea (km, coast to coast) a country can take coastal land in a peace deal: a short hop for anyone with a
+    /// coast (peace_sea_range_km, 400), further only with a navy (peace_sea_range_per_ship, 150 km for every ship).
+    /// Without the navy feature every coast is in reach.
+    /// </summary>
+    public override double SeaReachKm(Game game, Country c)
+        => !game.Navy.Enabled ? double.MaxValue
+            : game.Data.Defines.Get("peace_sea_range_km", 400) + NavalStrength(game, c) * game.Data.Defines.Get("peace_sea_range_per_ship", 150);
+
     /// <summary>Extra AI acceptance for a diplomatic action (added to the scripted ai_acceptance).</summary>
-    public override double AcceptanceModifier(Game game, ActionDef action, Country actor, Country recipient) => 0;
+    public override double AcceptanceModifier(Game game, ActionDef action, Country actor, Country recipient)
+    {
+        // alliances, guarantees and pacts follow who the countries are: friends, common enemies, ideologies (rule AiProfile.Affinity)
+        if (game.AiProfiles.Enabled && action.Key is "offer_alliance" or "guarantee_independence" or "offer_non_aggression_pact" or "request_military_access" or "improve_relations")
+            return game.Rules.AiProfile.Affinity(game, actor, recipient);
+        return 0;
+    }
 
     /// <summary>Rough military power of a country (used by AI and acceptance factors).</summary>
     public override double MilitaryStrength(Game game, Country c)

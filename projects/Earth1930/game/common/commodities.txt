@@ -1,0 +1,40 @@
+# Strategic commodities (commodities feature). Deposits per state: history/commodities.txt (yearly output at full extraction).
+#   price          gold per unit when traded
+#   civilian_use   monthly use of every civilian factory (industry, consumer goods, construction)
+# Equipment, ships and planes list what they need: commodities = { steel = 0.02 } (per unit made).
+steel = {
+	name = "Steel"
+	color = { 140 150 165 }
+	price = 2
+	civilian_use = 0.55
+}
+oil = {
+	name = "Oil"
+	color = { 40 40 40 }
+	price = 2
+	civilian_use = 0.25
+}
+rubber = {
+	name = "Rubber"
+	color = { 90 70 60 }
+	price = 3
+	civilian_use = 0.03
+}
+aluminium = {
+	name = "Aluminium"
+	color = { 200 200 215 }
+	price = 3
+	civilian_use = 0.015
+}
+chromium = {
+	name = "Chromium"
+	color = { 120 170 140 }
+	price = 4
+	civilian_use = 0.003
+}
+tungsten = {
+	name = "Tungsten"
+	color = { 170 120 190 }
+	price = 5
+	civilian_use = 0.002
+}

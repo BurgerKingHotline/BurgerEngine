@@ -65,6 +65,107 @@ public sealed partial class DiplomacySystem
         return false;
     }
 
+    // ------------------------------------------------------------------------------------- who can take what
+
+    /// <summary>The state borders land of <paramref name="c"/> (or land it gets in the same deal).</summary>
+    public bool Touches(Country c, State s, HashSet<State>? gained = null)
+    {
+        foreach (var l in s.Locations)
+            foreach (var a in l.Neighbors)
+                if (a.Kind != AdjacencyKind.Sea && a.To.IsLand && a.To.State is { } ns && ns != s && (ns.Owner == c || gained?.Contains(ns) == true))
+                    return true;
+        return false;
+    }
+
+    /// <summary>
+    /// Can <paramref name="c"/> get to the state from its own land: it borders its land (or land it gets in the same
+    /// deal), or the state has a coast within the country's reach over sea (rule SeaReachKm: a short hop for anyone,
+    /// far away only with a navy). Landlocked land far from home cannot be reached.
+    /// </summary>
+    public bool CanReach(Country c, State s, HashSet<State>? gained = null)
+    {
+        if (s.Owner == c || Touches(c, s, gained)) return true;
+        if (!s.Locations.Any(l => l.IsCoastal)) return false;
+        double range = Rules.SeaReachKm(_game, c);
+        return SeaDistanceKm(c, s, gained) <= range;
+    }
+
+    private readonly Dictionary<Country, (int Day, List<Location> Coast)> _coasts = new();
+
+    private List<Location> CoastOf(Country c)
+    {
+        int today = _game.World.Date.TotalDays;
+        if (_coasts.TryGetValue(c, out var e) && e.Day == today) return e.Coast;
+        var coast = c.OwnedStates.SelectMany(o => o.Locations).Where(l => l.IsCoastal).ToList();
+        _coasts[c] = (today, coast);
+        return coast;
+    }
+
+    /// <summary>Distance in km from the nearest coast of <paramref name="c"/> (or of land it gets in the same deal) to the state's coast; endless without a coast.</summary>
+    public double SeaDistanceKm(Country c, State s, HashSet<State>? gained = null)
+    {
+        double best = double.MaxValue;
+        var from = CoastOf(c);
+        var extra = gained?.SelectMany(o => o.Locations).Where(l => l.IsCoastal);
+        foreach (var to in s.Locations)
+        {
+            if (!to.IsCoastal) continue;
+            foreach (var l in extra == null ? from : from.Concat(extra))
+            {
+                double dx = l.CenterX - to.CenterX, dy = l.CenterY - to.CenterY, d2 = dx * dx + dy * dy;
+                if (d2 < best) best = d2;
+            }
+        }
+        return best == double.MaxValue ? double.MaxValue : Math.Sqrt(best) * _game.Data.Defines.KmPerPixel;
+    }
+
+    /// <summary>The country at the top of the chain of overlords above <paramref name="c"/> (itself if it is nobody's subject).</summary>
+    public Country TopOverlord(Country c)
+    {
+        for (int i = 0; i < 8 && R.OverlordOf(c) is { } o && o != c; i++) c = o;
+        return c;
+    }
+
+    /// <summary>A subject of <paramref name="overlord"/> (or of its own overlord: subjects have no subjects) whose people are of this culture (null = none).</summary>
+    public Country? SubjectOfCulture(Country overlord, string culture)
+    {
+        var pop = _game.Population;
+        if (!pop.Enabled || culture.Length == 0) return null;
+        overlord = TopOverlord(overlord);
+        return R.SubjectsOf(overlord).FirstOrDefault(x => x.Exists && pop.Of(x).Culture == culture);
+    }
+
+    /// <summary>True if <paramref name="c"/> stayed out of the war and the state's biggest culture is its own people.</summary>
+    public bool IsKinOutsideWar(War war, Country c, State s)
+    {
+        var pop = _game.Population;
+        return pop.Enabled && c.Exists && !war.Involves(c) && pop.MajorityCulture(s) is { } mc && pop.Of(c).Culture == mc;
+    }
+
+    /// <summary>
+    /// A country of the state's own people that <paramref name="winner"/> would hand the state to in a peace deal (rule
+    /// GivesLandToKin: its subjects first, then countries it likes most). Never the owner's side, never an enemy of the winner.
+    /// </summary>
+    public Country? KinFor(War war, Country winner, State s)
+    {
+        var pop = _game.Population;
+        if (!pop.Enabled || s.Owner == null || pop.MajorityCulture(s) is not { } mc) return null;
+        if (pop.Of(winner).Culture == mc) return null; // the winner's own people: it takes the land itself
+        // core land is conquered or kept, never handed on: not the winner's own, and not the loser's heartland to a third country
+        if (s.Cores.Contains(winner) || s.Cores.Contains(s.Owner)) return null;
+        var ownerSide = war.Involves(s.Owner) ? war.SideOf(s.Owner) : new List<Country> { s.Owner };
+        Country? best = null;
+        double bestScore = double.NegativeInfinity;
+        foreach (var c in _game.World.Countries)
+        {
+            if (!c.Exists || c == winner || c == s.Owner || ownerSide.Contains(c) || pop.Of(c).Culture != mc) continue;
+            if (_game.World.AtWar(winner, c) || !Rules.GivesLandToKin(_game, winner, c)) continue;
+            double score = Opinion(winner, c) + (R.OverlordOf(c) == winner ? 1000 : 0);
+            if (score > bestScore) { bestScore = score; best = c; }
+        }
+        return best;
+    }
+
     /// <summary>Peace cost factor for taking <paramref name="s"/>: the casus belli's goal_cost_multiplier if someone on the beneficiary's side fights for it.</summary>
     public double GoalMultiplier(War war, State s, Country beneficiary)
     {
@@ -91,12 +192,266 @@ public sealed partial class DiplomacySystem
         return goals.Count == 0 ? 100 : goals.Max(g => g.CasusBelli.MaxDemands);
     }
 
-    /// <summary>States of <paramref name="owner"/> where <paramref name="culture"/> is the biggest culture (never its capital state): what releasing that people frees.</summary>
-    public List<State> ReleaseStates(Country owner, string culture)
+    // ------------------------------------------------------------------------------------- releasing a people
+
+    public enum ReleaseOutcome { NewCountry, ToCountry, ToConqueror }
+
+    /// <summary>One nation of a release: what happens to its land.</summary>
+    public sealed class ReleasedPart
+    {
+        public string Culture = "";
+        public List<State> States = new();
+        public ReleaseOutcome Outcome;
+        public Country? Receiver;
+        /// <summary>The receiver is a subject of the losing side and is set free with the land.</summary>
+        public bool FreeReceiver;
+    }
+
+    public sealed class ReleasePlan
+    {
+        public List<ReleasedPart> Parts = new();
+        public string? Problem;
+        public List<State> AllStates => Parts.SelectMany(p => p.States).ToList();
+    }
+
+    /// <summary>
+    /// What releasing a people of <paramref name="owner"/> would do (see rule SeparatistRegion for the land): the land goes to a
+    /// country of that people that exists (the winner's side, or a puppet of the losing side that is set free with it, or a
+    /// neutral friend), else to the winner when it accepts that people, else a new country is made - but never a second country
+    /// of a people that has one, and never land the receiver cannot reach. Without a sensible outcome there is a <see cref="ReleasePlan.Problem"/>.
+    /// </summary>
+    public ReleasePlan PlanRelease(War war, Country owner, string culture, Country winner, Country beneficiary, bool asSubject)
+    {
+        var plan = new ReleasePlan();
+        var pop = _game.Population;
+        if (!pop.Enabled) { plan.Problem = "No peoples in this game"; return plan; }
+        if (!owner.OwnedStates.Any(s => s != owner.Capital?.State && pop.MajorityCulture(s) == culture)) { plan.Problem = $"No {culture} states to release"; return plan; }
+        var parts = _game.Rules.Population.SeparatistRegion(_game, owner, culture, true);
+        if (parts.Count == 0) { plan.Problem = $"The {culture} land cannot be released without cutting up {owner.Name}"; return plan; }
+        var lord = TopOverlord(beneficiary);
+        var winSide = war.SideOf(winner);
+        var ownerSide = war.Involves(owner) ? war.SideOf(owner) : new List<Country> { owner };
+        foreach (var part in parts)
+        {
+            var rp = new ReleasedPart { Culture = part.Culture, States = part.States };
+            bool Reaches(Country c) => part.States.Any(s => CanReach(c, s));
+            Country? best = null;
+            double bestScore = double.NegativeInfinity;
+            bool free = false;
+            var existing = _game.World.Countries.Where(c => c.Exists && c != owner && pop.Of(c).Culture == part.Culture).ToList();
+            foreach (var c in existing)
+            {
+                var top = TopOverlord(c);
+                int rank;
+                if (winSide.Contains(c) || winSide.Contains(top)) rank = 0;
+                else if (ownerSide.Contains(top) && top != c) rank = 1; // a puppet of the losing side: set free with the land
+                else if (!war.Involves(c) && !ownerSide.Contains(top) && !_game.World.AtWar(winner, c) && Rules.GivesLandToKin(_game, winner, c)) rank = 2;
+                else continue;
+                if (!Reaches(c)) continue;
+                double score = -rank * 1000 + Opinion(winner, c);
+                if (score > bestScore) { bestScore = score; best = c; free = rank == 1; }
+            }
+            if (best != null) { rp.Outcome = ReleaseOutcome.ToCountry; rp.Receiver = best; rp.FreeReceiver = free; }
+            else if (pop.IsAccepted(lord, part.Culture) || pop.IsAccepted(beneficiary, part.Culture))
+            {
+                // the conqueror's own people: it takes their land (no 'German Republic' out of German land)
+                if (!part.States.Any(s => CanReach(beneficiary, s))) { plan.Problem = $"{beneficiary.Name} cannot reach the {part.Culture} land"; return plan; }
+                rp.Outcome = ReleaseOutcome.ToConqueror;
+                rp.Receiver = beneficiary;
+            }
+            else if (existing.Count > 0)
+            {
+                plan.Problem = $"The {part.Culture} people already have a country ({existing[0].Name}) that cannot take their land";
+                return plan;
+            }
+            else rp.Outcome = ReleaseOutcome.NewCountry;
+            plan.Parts.Add(rp);
+        }
+        return plan;
+    }
+
+    /// <summary>True if releasing the people would make nations of their own and nothing else (no land for the winner or for an existing country of that people).</summary>
+    public bool ReleaseMakesNewNation(War war, Country owner, string culture, Country winner, bool asSubject)
+        => PlanRelease(war, owner, culture, winner, winner, asSubject) is { Problem: null } plan && plan.Parts.Count > 0
+           && plan.Parts.All(p => p.Outcome == ReleaseOutcome.NewCountry);
+
+    // ------------------------------------------------------------------------------------- land without ties
+
+    /// <summary>
+    /// Takes <paramref name="states"/> (land <paramref name="c"/> has no cultural ties to) away from it: each block of one
+    /// people goes to a country of that people that exists and can reach it, else becomes a country of its own - a subject
+    /// of <paramref name="patron"/> if that is a winner that sets up puppets, else free. Returns how many states were let go.
+    /// </summary>
+    public int DissolveHoldings(Country c, IEnumerable<State> states, Country? patron = null)
     {
         var pop = _game.Population;
-        if (!pop.Enabled) return new List<State>();
-        return owner.OwnedStates.Where(s => s != owner.Capital?.State && pop.MajorityCulture(s) == culture).ToList();
+        if (!pop.Enabled) return 0;
+        int moved = 0;
+        foreach (var grp in states.Where(s => s.Owner == c).GroupBy(s => pop.MajorityCulture(s) ?? "").ToList())
+        {
+            if (grp.Key.Length == 0) continue;
+            foreach (var block in pop.Components(grp))
+            {
+                block.RemoveAll(s => s.Owner != c);
+                if (block.Count == 0) continue;
+                Country? receiver = null;
+                double best = double.NegativeInfinity;
+                foreach (var x in _game.World.Countries)
+                {
+                    if (!x.Exists || x == c || pop.Of(x).Culture != grp.Key || _game.World.AtWar(c, x)) continue;
+                    if (!block.Any(s => CanReach(x, s))) continue;
+                    double score = Opinion(c, x) + (patron != null && TopOverlord(x) == TopOverlord(patron) ? 100 : 0);
+                    if (score > best) { best = score; receiver = x; }
+                }
+                if (receiver != null)
+                {
+                    foreach (var s in block) TransferState(s, receiver);
+                    Record($"{grp.Key} land of {c.Tag} went to {receiver.Tag} (no ties to {c.Tag})");
+                    moved += block.Count;
+                    continue;
+                }
+                var free = pop.ReleaseCulture(c, grp.Key, block);
+                if (free == null) continue;
+                moved += block.Count;
+                if (patron != null && Rules.PrefersPuppets(_game, patron) && R.OverlordOf(patron) == null) MakeSubject(free, patron, _game.Data.SubjectTypes.Values.First());
+                Record($"{grp.Key} land of {c.Tag} became {free.Tag} (no ties to {c.Tag})");
+            }
+        }
+        return moved;
+    }
+
+    private readonly HashSet<Country> _hadTies = new();
+
+    /// <summary>
+    /// Monthly: a country that had a homeland and has lost every state it has ties to (the mainland was taken) cannot go on
+    /// holding the rest from afar: its colonies and conquests become countries of their own peoples (define holdings_collapse).
+    /// </summary>
+    private void CheckHoldingsCollapse()
+    {
+        var pop = _game.Population;
+        if (!pop.Enabled || _game.Data.Defines.Get("holdings_collapse", 1) <= 0) return;
+        foreach (var c in _game.World.Countries.Where(x => x.Exists).ToList())
+        {
+            if (c.OwnedStates.Any(s => _game.Rules.Population.HasCulturalTies(_game, c, s))) { _hadTies.Add(c); continue; }
+            if (!_hadTies.Remove(c)) continue; // never had a homeland: the data says so, leave it
+            int n = DissolveHoldings(c, c.OwnedStates.ToList());
+            if (n > 0) _game.Notify($"{c.Name} lost its homeland and cannot hold its distant lands: {n} states went their own way.", c.IsPlayer ? NotificationKind.Bad : NotificationKind.Info);
+        }
+    }
+
+    // ------------------------------------------------------------------------------------- stranded land
+
+    /// <summary>The home of a country: the block of its states around the capital (its biggest block if the capital is lost).</summary>
+    public HashSet<State> LinkedHome(Country c)
+    {
+        var comps = _game.Population.Components(c.OwnedStates);
+        if (comps.Count == 0) return new HashSet<State>();
+        var cap = c.Capital?.State;
+        var capComp = cap != null && cap.Owner == c ? comps.First(x => x.Contains(cap)) : null;
+        return (capComp ?? comps.OrderByDescending(x => x.Sum(s => s.Locations.Count)).First()).ToHashSet();
+    }
+
+    /// <summary>Which states are linked to the capital now, for the countries of a war (before a peace deal).</summary>
+    private Dictionary<Country, HashSet<State>> SnapshotHomes(War war)
+        => war.Attackers.Concat(war.Defenders).Distinct().Where(c => c.Exists).ToDictionary(c => c, LinkedHome);
+
+    /// <summary>
+    /// After a peace deal: land that was joined to a country's capital and is not any more (the land between was given away)
+    /// goes to the neighbour that surrounds it best - one of its own people, one the old owner likes - never an enemy.
+    /// </summary>
+    private void SettleStranded(Dictionary<Country, HashSet<State>> before, ICollection<Country>? winners = null)
+    {
+        var pop = _game.Population;
+        foreach (var (c, set) in before)
+        {
+            if (!c.Exists) continue;
+            // what was the home before, in blocks now: the capital's block stays home unless another block is bigger - then
+            // the government moves there and the smaller block of the old capital is what is cut off
+            var blocks = pop.Components(set.Where(s => s.Owner == c));
+            if (blocks.Count == 0) continue;
+            int Size(List<State> x) => x.Sum(s => s.Locations.Count);
+            var capBlock = c.Capital?.State is { } cap0 && cap0.Owner == c ? blocks.FirstOrDefault(x => x.Contains(cap0)) : null;
+            var bigBlock = blocks.OrderByDescending(Size).First();
+            var home = (capBlock != null && Size(capBlock) >= Size(bigBlock) ? capBlock : bigBlock).ToHashSet();
+            if (c.Capital?.State is not { } cs || !home.Contains(cs))
+            {
+                var seat = home.OrderByDescending(s => pop.Of(s).Total).ThenByDescending(s => s.Locations.Count).First();
+                var spot = seat.Locations.Where(l => l.IsLand && l.IsPassable).OrderBy(l => l.Key).FirstOrDefault();
+                if (spot != null)
+                {
+                    c.Capital = spot;
+                    _game.NotifyPlayer($"The capital of {c.Name} moves to {seat.DisplayName}.", NotificationKind.Diplomacy, c);
+                }
+            }
+            var orphans = set.Where(s => s.Owner == c && !home.Contains(s)).ToList();
+            if (orphans.Count == 0) continue;
+            foreach (var comp in pop.Components(orphans))
+            {
+                var inComp = comp.ToHashSet();
+                var scores = new Dictionary<Country, double>();
+                foreach (var s in comp)
+                    foreach (var n in pop.NeighbourStates(s))
+                        if (!inComp.Contains(n) && n.Owner is { } o && o != c && o.Exists) scores[o] = scores.GetValueOrDefault(o) + 10;
+                string? major = pop.Enabled ? pop.Breakdown(comp, p => p.Culture).FirstOrDefault().Key : null;
+                Country? best = null;
+                double bestScore = double.NegativeInfinity;
+                foreach (var (o, sc) in scores)
+                {
+                    if (_game.World.AtWar(c, o)) continue;
+                    double v = sc + (major != null && pop.Of(o).Culture == major ? 15 : 0) + Opinion(c, o) / 10 + (winners != null && winners.Contains(o) ? 30 : 0);
+                    if (v > bestScore) { bestScore = v; best = o; }
+                }
+                if (best == null) continue;
+                foreach (var s in comp) TransferState(s, best);
+                Record($"{string.Join(", ", comp.Select(s => s.DisplayName))} of {c.Tag} could no longer be reached: given to {best.Tag}");
+                _game.NotifyPlayer($"{comp[0].DisplayName}{(comp.Count > 1 ? $" and {comp.Count - 1} more" : "")} could not be held by {c.Name} any more and went to {best.Name}.", NotificationKind.Diplomacy, c, best);
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------------------------- enclaves
+
+    private Dictionary<Country, HashSet<Country>>? _enclaves;
+    private int _enclavesDay = int.MinValue;
+
+    /// <summary>Countries that hold an enclave inside the land of <paramref name="c"/>: a state with neighbours of nobody else (counted once a day).</summary>
+    public HashSet<Country> EnclaveHolders(Country c)
+    {
+        int today = _game.World.Date.TotalDays;
+        if (_enclaves == null || _enclavesDay != today)
+        {
+            _enclaves = new Dictionary<Country, HashSet<Country>>();
+            _enclavesDay = today;
+            var pop = _game.Population;
+            foreach (var s in _game.World.States)
+            {
+                if (s.Owner == null) continue;
+                Country? around = null;
+                bool single = true;
+                foreach (var n in pop.NeighbourStates(s))
+                {
+                    if (n.Owner == null || n.Owner == s.Owner) { single = false; break; }
+                    if (around == null) around = n.Owner; else if (around != n.Owner) { single = false; break; }
+                }
+                if (!single || around == null) continue;
+                if (!_enclaves.TryGetValue(around, out var set)) _enclaves[around] = set = new HashSet<Country>();
+                set.Add(s.Owner);
+            }
+        }
+        return _enclaves.TryGetValue(c, out var found) ? found : new HashSet<Country>();
+    }
+
+    /// <summary>The state is an enclave: every neighbour of it belongs to <paramref name="by"/> or its side.</summary>
+    public bool IsEnclaveOf(State s, ICollection<Country> bySide)
+    {
+        bool any = false;
+        foreach (var n in _game.Population.NeighbourStates(s))
+        {
+            if (n.Owner == null || n.Owner == s.Owner) return false;
+            if (!bySide.Contains(n.Owner)) return false;
+            any = true;
+        }
+        return any;
     }
 
     /// <summary>A participant joining a war adds its own war goal against an enemy if it has a casus belli that is about land (faction war goals).</summary>
@@ -248,12 +603,27 @@ public sealed partial class DiplomacySystem
     }
 
     /// <summary>Makes a country a subject: its government follows the overlord's ideology (no democratic puppets of communists).</summary>
+    /// <remarks>
+    /// Subjects have no subjects of their own: if <paramref name="overlord"/> is a subject itself the new subject goes
+    /// to its overlord, and the subjects the new subject had pass to the overlord with it.
+    /// </remarks>
     public void MakeSubject(Country subject, Country overlord, SubjectType type)
     {
+        if (TopOverlord(overlord) == subject) R.ReleaseSubject(overlord); // a subject that turned the tables on its overlord
+        else overlord = TopOverlord(overlord);
         if (subject == overlord) return;
+        foreach (var s in R.SubjectsOf(subject).ToList())
+        {
+            if (s == overlord) continue;
+            R.SetSubject(s, overlord, R.SubjectTypeOf(s) ?? type);
+            _liberty.Remove(s);
+            FollowOverlord(s, overlord, popularity: 0.1);
+            Record($"{s.Tag}, subject of {subject.Tag}, passed to {overlord.Tag}");
+        }
         R.SetSubject(subject, overlord, type);
         _liberty.Remove(subject);
         FollowOverlord(subject, overlord, popularity: 0.2);
+        _game.RefreshName(subject);
         InvalidateCasusBelli();
         _game.RaiseMapChanged();
     }
@@ -279,6 +649,13 @@ public sealed partial class DiplomacySystem
         {
             var (subject, overlord) = (kv.Key, kv.Value.Overlord);
             if (!subject.Exists || !overlord.Exists) continue;
+            // no chains: the subject of a subject answers to the country at the top
+            if (TopOverlord(overlord) is var top && top != overlord && top != subject)
+            {
+                R.SetSubject(subject, top, kv.Value.Type);
+                Record($"{subject.Tag}, subject of the subject {overlord.Tag}, now answers to {top.Tag}");
+                overlord = top;
+            }
             if (_game.World.AtWar(subject, overlord)) continue;
             if (HoldsHomelandOf(overlord, subject))
             {
@@ -288,6 +665,17 @@ public sealed partial class DiplomacySystem
                     overlord.IsPlayer || subject.IsPlayer ? NotificationKind.Diplomacy : NotificationKind.Info);
                 Record($"{overlord.Tag} annexed its subject {subject.Tag} (holds their homeland)");
                 Annex(overlord, subject);
+                continue;
+            }
+            // liberal overlords let restless subjects go
+            if (Rules.WillGrantIndependence(_game, overlord, subject))
+            {
+                R.ReleaseSubject(subject);
+                _liberty.Remove(subject);
+                _game.RefreshName(subject);
+                AddOpinion(subject, overlord, "Granted independence", 50, 0.5);
+                _game.Notify($"{overlord.Name} granted independence to {subject.Name}.", overlord.IsPlayer || subject.IsPlayer ? NotificationKind.Diplomacy : NotificationKind.Info);
+                Record($"{overlord.Tag} granted independence to its subject {subject.Tag}");
                 continue;
             }
             FollowOverlord(subject, overlord, popularity: 0.05);
@@ -306,25 +694,30 @@ public sealed partial class DiplomacySystem
         switch (t.Type)
         {
             case PeaceTermType.Independence:
-                if (t.Beneficiary == null || !war.SideOf(winner).Contains(t.Beneficiary)) return "Invalid country to free";
+                // any subject of the losing side: one that fights on our side, or any puppet of the enemy
+                if (t.Beneficiary == null || !t.Beneficiary.Exists) return "Invalid country to free";
                 if (R.OverlordOf(t.Beneficiary) is not { } ov || !war.SideOf(loser).Contains(ov)) return $"{t.Beneficiary.Name} is not a subject of the losing side";
                 break;
             case PeaceTermType.ReleaseCountry:
                 if (!_game.Population.Enabled) return "No peoples in this game";
                 if (t.State?.Owner == null || !war.SideOf(loser).Contains(t.State.Owner)) return "Invalid state";
-                if (ReleaseStates(t.State.Owner, t.Culture).Count == 0) return $"No {t.Culture} states to release";
-                if (t.AsSubject && (t.Beneficiary == null || R.OverlordOf(t.Beneficiary) != null)) return "A subject cannot have subjects of its own";
-                if (t.AsSubject && t.Beneficiary != null && _game.Population.IsAccepted(t.Beneficiary, t.Culture))
-                    return $"The {t.Culture} people are {t.Beneficiary.Name}'s own: take their land instead";
+                // (released as a subject by a subject: it becomes a subject of that country's overlord)
+                if (t.AsSubject && t.Beneficiary == null) return "Invalid overlord";
+                if (PlanRelease(war, t.State.Owner, t.Culture, winner, t.Beneficiary ?? winner, t.AsSubject).Problem is { } why) return why;
                 break;
             case PeaceTermType.RegimeChange:
                 if (!_game.Politics.Enabled || _game.Politics.Ideology(t.Ideology) == null) return "No ideologies in this game";
+                break;
+            case PeaceTermType.Demilitarize:
+                if (!DemilEnabled) return "No demilitarized zones in this game";
+                if (t.State?.Owner == null || !war.SideOf(loser).Contains(t.State.Owner)) return "Invalid state";
+                if (t.State.Demilitarized) return $"{t.State.DisplayName} is demilitarized already";
                 break;
         }
         return null;
     }
 
-    private void ApplyNewTerm(PeaceTerm t, Country winner, Country loser)
+    private void ApplyNewTerm(War war, PeaceTerm t, Country winner, Country loser)
     {
         switch (t.Type)
         {
@@ -333,17 +726,54 @@ public sealed partial class DiplomacySystem
                 {
                     R.ReleaseSubject(t.Beneficiary);
                     _liberty.Remove(t.Beneficiary);
+                    _game.RefreshName(t.Beneficiary);
+                    AddOpinion(t.Beneficiary, winner, "Freed us", 50, 0.5);
                     _game.Notify($"{t.Beneficiary.Name} is free of its overlord.", NotificationKind.Diplomacy);
                 }
                 break;
             case PeaceTermType.ReleaseCountry:
                 if (t.State?.Owner is { } owner)
                 {
-                    var freed = _game.Population.ReleaseCulture(owner, t.Culture);
-                    if (freed != null && t.AsSubject)
-                        MakeSubject(freed, t.Beneficiary ?? winner, _game.Data.SubjectTypes.Values.First());
-                    else if (freed != null) AddOpinion(freed, winner, "Liberated us", 75, 0.5);
+                    var receiver = t.Beneficiary ?? winner;
+                    var plan = PlanRelease(war, owner, t.Culture, winner, receiver, t.AsSubject);
+                    if (plan.Problem != null) { Record($"release of {t.Culture} from {owner.Tag} dropped: {plan.Problem}"); break; }
+                    foreach (var part in plan.Parts)
+                    {
+                        switch (part.Outcome)
+                        {
+                            case ReleaseOutcome.ToCountry:
+                                {
+                                    var c = part.Receiver!;
+                                    if (part.FreeReceiver && R.OverlordOf(c) != null)
+                                    {
+                                        R.ReleaseSubject(c);
+                                        _liberty.Remove(c);
+                                        _game.RefreshName(c);
+                                        _game.Notify($"{c.Name} is free of its overlord.", NotificationKind.Diplomacy);
+                                    }
+                                    foreach (var st in part.States) TransferState(st, c);
+                                    AddOpinion(c, winner, "Gave us our people's land", 50, 0.5);
+                                    Record($"{part.Culture} land of {owner.Tag} went to {c.Tag}{(part.FreeReceiver ? " (set free)" : "")}");
+                                    break;
+                                }
+                            case ReleaseOutcome.ToConqueror:
+                                foreach (var st in part.States) TransferState(st, part.Receiver!);
+                                Record($"{part.Culture} land of {owner.Tag} taken by {part.Receiver!.Tag} (its own people)");
+                                break;
+                            default:
+                                {
+                                    var freed = _game.Population.ReleaseCulture(owner, part.Culture, part.States);
+                                    if (freed != null && t.AsSubject && part == plan.Parts[0])
+                                        MakeSubject(freed, receiver, _game.Data.SubjectTypes.Values.First());
+                                    else if (freed != null) AddOpinion(freed, winner, "Liberated us", 75, 0.5);
+                                    break;
+                                }
+                        }
+                    }
                 }
+                break;
+            case PeaceTermType.Demilitarize:
+                if (t.State != null) Demilitarize(t.State, winner);
                 break;
             case PeaceTermType.RegimeChange:
                 _game.Politics.SetRulingParty(loser, t.Ideology, "revolution");

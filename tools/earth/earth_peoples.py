@@ -64,7 +64,7 @@ C = {
     'malayali': ('dravidian', 'Malayali', 'hindu'),
     # East and Southeast Asia
     'han': ('east_asian', 'Han Chinese', 'chinese_folk'), 'japanese': ('east_asian', 'Japanese', 'shinto'), 'korean': ('east_asian', 'Korean', 'buddhist'),
-    'mongol': ('tibetan', 'Mongol', 'buddhist'), 'tibetan': ('tibetan', 'Tibetan', 'buddhist'), 'buryat': ('tibetan', 'Buryat', 'buddhist'),
+    'mongol': ('tibetan', 'Mongol', 'buddhist'), 'kalmyk': ('tibetan', 'Kalmyk', 'buddhist'), 'tibetan': ('tibetan', 'Tibetan', 'buddhist'), 'buryat': ('tibetan', 'Buryat', 'buddhist'),
     'burmese': ('southeast_asian', 'Burmese', 'buddhist'), 'thai': ('southeast_asian', 'Thai', 'buddhist'), 'lao': ('southeast_asian', 'Lao', 'buddhist'),
     'khmer': ('southeast_asian', 'Khmer', 'buddhist'), 'vietnamese': ('southeast_asian', 'Vietnamese', 'buddhist'),
     'malay': ('malay', 'Malay', 'sunni'), 'javanese': ('malay', 'Javanese', 'sunni'), 'sumatran': ('malay', 'Sumatran', 'sunni'),
@@ -143,7 +143,7 @@ UNIT = {
     'CA-QC': 'french_canadian',
     # Russia's peoples
     'RU-TA': 'tatar', 'RU-BA': 'bashkir', 'RU-CU': 'chuvash', 'RU-CE': 'chechen', 'RU-IN': 'chechen', 'RU-DA': 'dagestani', 'RU-SA': 'yakut',
-    'RU-BU': 'buryat', 'RU-KL': 'mongol', 'RU-KO': 'komi', 'RU-MO': 'mordvin', 'RU-KB': 'circassian', 'RU-KC': 'circassian', 'RU-AD': 'circassian',
+    'RU-BU': 'buryat', 'RU-KL': 'kalmyk', 'RU-KO': 'komi', 'RU-MO': 'mordvin', 'RU-KB': 'circassian', 'RU-KC': 'circassian', 'RU-AD': 'circassian',
     'RU-TY': 'mongol', 'RU-KGD': 'german',
     # Caucasus and Central Asia
     'GE-AB': 'georgian', 'KZ-SEV': 'russian', 'KZ-VOS': 'russian', 'KZ-KAR': 'russian', 'KZ-PAV': 'russian', 'KZ-KUS': 'russian',
@@ -207,6 +207,8 @@ RELIGION = {
 
 # minorities: key (iso or adm0) -> [(culture, religion or None, share of the unit's people)]
 MINORITY = {
+    # Kalmykia and Astrakhan: Kalmyks (Oirat Mongols, not Mongolians) with Russians and Kazakhs
+    'RU-KL': [('russian', None, 0.38), ('kazakh', None, 0.11)],
     # Jews of Europe and elsewhere
     'POL': [('jewish', None, 0.10)], 'LTU': [('jewish', None, 0.07), ('polish', None, 0.05)], 'LT-VL': [('polish', None, 0.55), ('jewish', None, 0.1)],
     'LVA': [('jewish', None, 0.05), ('russian', None, 0.1), ('german', None, 0.03)], 'EST': [('russian', None, 0.08)],
