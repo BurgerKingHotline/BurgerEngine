@@ -68,6 +68,9 @@ public sealed partial class PoliticsSystem
             if (!Laws.TryGetValue(n.Value ?? "", out var law)) { Log.ErrorOnce("setlaw:" + n.Value, $"set_law: unknown law '{n.Value}'"); return; }
             Enact(c, law, free: true);
         }, (ctx, n) => $"Enact {(Laws.TryGetValue(n.Value ?? "", out var l) ? l.Name : n.Value)}");
+        // give_in_to_movement = fascist / suppress_movement = fascist: answer a movement that demands power
+        s.RegisterEffect("give_in_to_movement", (ctx, n) => { if (ctx.This is Country c && MovementsOf(c).FirstOrDefault(m => m.Ideology == n.Value) is { } m) GiveIn(m); }, (ctx, n) => $"Give in: the {Name(n.Value)} party takes power");
+        s.RegisterEffect("suppress_movement", (ctx, n) => { if (ctx.This is Country c && MovementsOf(c).FirstOrDefault(m => m.Ideology == n.Value) is { } m) Suppress(m); }, (ctx, n) => $"Suppress the {Name(n.Value)} movement");
         s.RegisterEffect("hold_election", (ctx, n) => { if (ctx.This is Country c && n.AsBool(true)) HoldElection(c); }, (ctx, n) => "Hold an election");
         s.RegisterEffect("start_civil_war", (ctx, n) =>
         {

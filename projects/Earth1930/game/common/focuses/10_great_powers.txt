@@ -19,7 +19,7 @@ tree_germany = {
 	focus = { id = ger_work_creation days = 70 x = 0 y = 1
 		name = "Work Creation" desc = "Public works, motorways and rearmament orders put the unemployed back to work."
 		prerequisite = { focus = ger_republic_reform focus = ger_authoritarian_turn }
-		completion_reward = { add_modifier = { name = industrial_drive years = 5 } add_stability = 3 }
+		completion_reward = { add_modifier = { name = industrial_drive years = 5 } add_modifier = { name = rearmament_boom years = 8 } add_stability = 3 }
 		ai_will_do = { base = 3 } }
 	focus = { id = ger_secret_rearmament days = 90 x = 1 y = 1
 		name = "Secret Rearmament" desc = "Training and arms behind the screen of the treaty limits."
@@ -31,12 +31,12 @@ tree_germany = {
 		prerequisite = { focus = ger_secret_rearmament }
 		available = { has_demilitarized_states = yes NOT = { is_at_war = yes } }
 		completion_reward = { remilitarize_states = yes add_stability = 2 }
-		ai_will_do = { base = 0 modifier = { add = 5 remilitarization_odds >= 0.35 ruling_ideology = fascist } modifier = { add = 4 remilitarization_odds >= 0.7 } modifier = { factor = 0 remilitarization_odds < 0.25 } } }
+		ai_will_do = { base = 0 modifier = { add = 8 remilitarization_odds >= 0.35 ruling_ideology = fascist } modifier = { factor = 0 NOT = { ruling_ideology = fascist } } modifier = { factor = 0 remilitarization_odds < 0.25 } } }
 	focus = { id = ger_four_year_plan days = 100 x = 0 y = 2
 		name = "Four-Year Plan" desc = "Make the country ready for war: synthetic fuel and rubber, steel, self-sufficiency."
 		prerequisite = { focus = ger_work_creation }
 		available = { ruling_ideology = fascist }
-		completion_reward = { add_modifier = { name = autarky_programme years = 6 } }
+		completion_reward = { add_modifier = { name = autarky_programme years = 6 } add_modifier = { name = four_year_plan_boom years = 8 } }
 		ai_will_do = { base = 2 modifier = { add = 3 commodity_shortage > 0.2 } } }
 	focus = { id = ger_air_power days = 90 x = 1 y = 2
 		name = "Build the Luftwaffe" desc = "An air force in the open."
@@ -211,6 +211,12 @@ tree_soviet_union = {
 		available = { can_demand = { target = FIN action = demand_state } }
 		completion_reward = { add_claim = viipuri_state make_demand = FIN }
 		ai_will_do = { base = 0 modifier = { add = 4 stronger_than = { target = FIN ratio = 3 } } modifier = { factor = 0 NOT = { ai_ambition = { target = FIN min = 0.5 } } } } }
+	focus = { id = sov_bessarabia days = 40 x = 3 y = 2
+		name = "The Bessarabian Question" desc = "The Union never accepted the loss of Bessarabia in 1918. Put the demand to Bucharest."
+		prerequisite = { focus = sov_red_army }
+		available = { can_demand = { target = ROM action = demand_state } }
+		completion_reward = { make_demand = ROM }
+		ai_will_do = { base = 0 modifier = { add = 5 GER = { is_at_war_with = POL } } modifier = { add = 3 NOT = { exists = POL } } } }
 	focus = { id = sov_western_borderlands days = 60 x = 0 y = 2
 		name = "The Western Borderlands" desc = "Press the Baltic states and Finland about their land."
 		prerequisite = { focus = sov_red_army }
@@ -296,8 +302,8 @@ tree_united_states = {
 	focus = { id = usa_industrial_mobilisation days = 90 x = 0 y = 1
 		name = "Arsenal of Democracy" desc = "Turn the factories toward arms."
 		prerequisite = { focus = usa_new_deal }
-		completion_reward = { add_modifier = { name = industrial_drive years = 6 } add_modifier = { name = rearmament years = 5 } }
-		ai_will_do = { base = 1 modifier = { add = 4 any_country = { is_at_war = yes ideological_enemy = ROOT } } } }
+		completion_reward = { add_modifier = { name = arsenal_of_democracy years = 8 } add_modifier = { name = rearmament years = 5 } }
+		ai_will_do = { base = 3 modifier = { add = 4 any_country = { is_at_war = yes ideological_enemy = ROOT } } } }
 	focus = { id = usa_two_ocean_navy days = 100 x = 1 y = 1
 		name = "A Two-Ocean Navy" desc = "Carriers and battleships for both coasts."
 		prerequisite = { focus = usa_new_deal }

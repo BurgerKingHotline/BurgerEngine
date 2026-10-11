@@ -21,3 +21,10 @@ scientific_drive = { name = "Scientific Drive" research_speed = 0.20 }
 colonial_levies = { name = "Colonial Levies" manpower = 0.10 }
 reformed_state = { name = "Reformed State" stability_target = 4 focus_speed = 0.10 }
 land_reform_strife = { name = "Land Reform Strife" stability_target = -6 }
+army_tradition_elite = { name = "Elite Army Tradition" army_quality = 0.8 }
+army_tradition_high = { name = "Professional Army" army_quality = 0.25 }
+army_tradition_good = { name = "Trained Army" army_quality = 0.1 }
+arsenal_of_democracy = { name = "Arsenal of Democracy" building_slots = 3 construction_speed = 0.3 production = 0.08 }
+army_tradition_superior = { name = "The Wehrmacht" army_quality = 0.55 }
+rearmament_boom = { name = "The Rearmament Boom" building_slots = 2 construction_speed = 0.5 production = 0.06 }
+four_year_plan_boom = { name = "The Four-Year Plan" building_slots = 2 construction_speed = 0.5 production = 0.05 }

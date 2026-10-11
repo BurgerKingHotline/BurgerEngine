@@ -54,7 +54,9 @@ public class GameProductionRules : ProductionRules
     {
         double basePts = game.Data.Defines.Get("construction_per_factory", 5);
         double infra = p.State.Buildings.GetValueOrDefault("infrastructure");
-        return basePts * (1 + 0.1 * infra) * game.Modifiers.Factor(c, "construction_speed");
+        // a poor country builds slower (capital, skills, roads): the square root of its wealth index against the world's (construction_wealth_effect, 0 = off)
+        double wealth = game.Data.Defines.Get("construction_wealth_effect", 0) > 0 && game.Politics.Enabled ? Math.Clamp(Math.Sqrt(Math.Max(0.1, game.Politics.WealthIndex(c))), 0.45, 1.2) : 1;
+        return basePts * (1 + 0.1 * infra) * game.Modifiers.Factor(c, "construction_speed") * wealth;
     }
 
     /// <summary>Why a building cannot be queued in a state (null = allowed).</summary>

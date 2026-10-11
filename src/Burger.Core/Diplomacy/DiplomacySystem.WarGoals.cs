@@ -478,11 +478,34 @@ public sealed partial class DiplomacySystem
     }
 
     /// <summary>Monthly: the front (occupied land) of every war, stalemates and ticking war score.</summary>
+    /// <summary>A country that has lost its capital and half its land stops fighting (its divisions are gone) but stays in the war, occupied, until its faction makes peace.</summary>
+    private void Capitulate(War war, Country c)
+    {
+        war.Vars.SetFlag("cap:" + c.Tag);
+        foreach (var d in _game.World.Divisions.Where(d => d.Owner == c).ToList()) _game.Warfare.DestroyDivision(d);
+        _game.Notify($"{c.Name} has capitulated.", NotificationKind.War);
+        // a leader that capitulates hands the lead to an ally still fighting
+        var side = war.SideOf(c);
+        var next = side.FirstOrDefault(x => x != c && !IsCapitulated(war, x) && _game.World.Relations.OverlordOf(x) == null) ?? side.FirstOrDefault(x => x != c && !IsCapitulated(war, x));
+        if (next != null)
+        {
+            if (war.AttackerLeader == c) war.AttackerLeader = next;
+            if (war.DefenderLeader == c) war.DefenderLeader = next;
+        }
+        _game.Events.FireOnAction("on_capitulation", c);
+    }
+
     private void MonthlyWars()
     {
         int today = _game.World.Date.TotalDays;
-        foreach (var war in _game.World.Wars)
+        foreach (var war in _game.World.Wars.ToList())
         {
+            if (!war.Vars.HasFlag("civil_war"))
+            {
+                if (!war.Vars.HasFlag("total") && Rules.IsTotalWar(_game, war)) { war.Vars.SetFlag("total"); _game.Notify($"The {war.Name} has become a total war.", NotificationKind.War); }
+                foreach (var c in war.Attackers.Concat(war.Defenders).ToList())
+                    if (!IsCapitulated(war, c) && Rules.Capitulates(_game, war, c)) Capitulate(war, c);
+            }
             var att = war.Attackers.ToHashSet();
             var def = war.Defenders.ToHashSet();
             int occupied = 0;

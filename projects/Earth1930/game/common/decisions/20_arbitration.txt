@@ -1,0 +1,85 @@
+# Arbitrations: land that changes hands by the decision of a great power, not by war (decisions of the great powers' tables, 1938-39).
+# The conditions say who can take it; the AI weights (what the country has done, who its friends are) say who does.
+
+vienna_award = {
+	name = "The Vienna Award"
+	desc = "Hungary asks for the Magyar lands of southern Slovakia and Ruthenia. As the arbiter of Prague's fate, we can give them - and bind Budapest to us."
+	potential = {
+		NOT = { has_country_flag = vienna_award_done }
+		exists = HUN
+		ruling_ideology = fascist
+		OR = { has_completed_focus = ger_demand_sudeten has_completed_focus = ger_czech_rump has_completed_focus = ger_anschluss NOT = { exists = AUS } is_subject_of = GER NOT = { exists = CZE } }
+	}
+	allow = { NOT = { is_at_war_with = HUN } NOT = { is_overlord_of = HUN } }
+	effect = {
+		transfer_state = { state = nitra_state target = HUN }
+		transfer_state = { state = banska_bystrica_state target = HUN }
+		transfer_state = { state = presov_state target = HUN }
+		transfer_state = { state = carpathian_ruthenia_state target = HUN }
+		add_opinion = { target = HUN value = 40 name = "Gave us back our land" }
+		HUN = { add_opinion = { target = ROOT value = 40 name = "The Vienna Award" } }
+		set_country_flag = vienna_award_done
+	}
+	ai_will_do = {
+		base = 4
+		modifier = { add = 3 any_neighbor_country = { tag = HUN } }
+		modifier = { add = 3 is_allied_with = HUN }
+		modifier = { factor = 0 NOT = { exists = HUN } }
+	}
+}
+
+montreux_convention = {
+	name = "The Montreux Convention"
+	desc = "The Straits are Turkish water. A conference of the powers is asked to let Turkey fortify them again, and to agree to it."
+	potential = { tag = TUR has_demilitarized_states = yes }
+	allow = { NOT = { is_at_war = yes } }
+	effect = { remilitarize_states = treaty add_stability = 3 }
+	ai_will_do = {
+		base = 4
+		modifier = { factor = 0 NOT = { tag = TUR } }
+		modifier = { factor = 0 is_at_war = yes }
+	}
+}
+
+danzig_decree = {
+	name = "Danzig Returns to the Reich"
+	desc = "The Free City's own government is of our party. It can proclaim the union with the Reich; Warsaw will have to answer."
+	potential = { exists = DNZ ruling_ideology = fascist NOT = { has_country_flag = danzig_returned } }
+	allow = { NOT = { is_at_war_with = DNZ } }
+	effect = { annex_country = DNZ set_country_flag = danzig_returned add_political_power = 20 }
+	ai_will_do = {
+		base = 4
+		modifier = { factor = 0 NOT = { ai_ambition = { target = DNZ min = 1.5 } } }
+	}
+}
+
+hatay_accord = {
+	name = "The Hatay Accord"
+	desc = "Turkey asks for the sanjak of Alexandretta as the price of its friendship, and France - with Germany in Europe - cannot afford to refuse."
+	potential = { tag = FRA NOT = { has_country_flag = hatay_given } }
+	allow = { NOT = { is_at_war_with = TUR } }
+	effect = {
+		transfer_state = { state = alexandretta_state target = TUR }
+		TUR = { add_opinion = { target = ROOT value = 40 name = "The Hatay Accord" } }
+		set_country_flag = hatay_given
+	}
+	ai_will_do = {
+		base = 0
+		modifier = { add = 4 TUR = { has_completed_focus = tur_hatay } }
+		modifier = { factor = 0 NOT = { TUR = { has_completed_focus = tur_hatay } } }
+		modifier = { factor = 0 is_at_war_with = TUR }
+	}
+}
+
+abdicate_to_republic = {
+	name = "The King Leaves: the Republic"
+	desc = "The municipal elections went to the republicans and the army will not fire on the crowds. The monarchy gives way, and a republic is proclaimed."
+	potential = { tag = SPA ruling_ideology = neutrality }
+	allow = { popularity_democratic >= 0.3 stability < 45 }
+	effect = { set_ruling_party = democratic add_stability = -4 add_popularity = { ideology = democratic value = 0.04 } }
+	ai_will_do = {
+		base = 2
+		modifier = { add = 3 stability < 45 }
+		modifier = { factor = 0 popularity_democratic < 0.3 }
+	}
+}

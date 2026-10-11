@@ -46,7 +46,7 @@ tree_turkey = {
 	focus = { id = tur_hatay days = 50 x = 1 y = 1
 		name = "The Hatay Question" desc = "The sanjak of Alexandretta, with its Turkish population."
 		prerequisite = { focus = tur_kemalist_reform }
-		completion_reward = { add_claim = alexandretta_state make_demand = FRA }
+		completion_reward = { add_claim = alexandretta_state }
 		ai_will_do = { base = 1 } }
 }
 

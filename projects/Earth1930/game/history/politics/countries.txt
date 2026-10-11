@@ -46,7 +46,7 @@ JAP = {
 }
 CHI = {
 	ruling_party = neutrality
-	popularity = { democratic = 14 communist = 20 fascist = 14 neutrality = 52 }
+	popularity = { democratic = 10 communist = 30 fascist = 10 neutrality = 50 }
 	parties = { neutrality = "Kuomintang" communist = "Chinese Communist Party" fascist = "Blue Shirts" }
 	laws = { political_parties = single_party press = state_press conscription = extensive_conscription }
 }
@@ -64,7 +64,7 @@ TUR = {
 }
 SPA = {
 	ruling_party = neutrality
-	popularity = { democratic = 38 communist = 14 fascist = 12 neutrality = 36 }
+	popularity = { democratic = 38 communist = 18 fascist = 8 neutrality = 36 }
 	parties = { neutrality = "Monarchist government" democratic = "Republicans and Socialists" communist = "PCE" fascist = "Falange precursors" }
 	laws = { political_parties = restricted_parties press = state_press conscription = limited_conscription }
 }
@@ -99,8 +99,8 @@ HUN = {
 	laws = { political_parties = restricted_parties press = state_press conscription = limited_conscription }
 }
 AUS = {
-	ruling_party = democratic
-	popularity = { democratic = 40 communist = 12 fascist = 14 neutrality = 34 }
+	ruling_party = neutrality
+	popularity = { democratic = 36 communist = 12 fascist = 14 neutrality = 38 }
 	parties = { democratic = "Social Democrats" neutrality = "Christian Social Party" fascist = "Heimwehr and Nazis" }
 	laws = { political_parties = multi_party press = free_press conscription = limited_conscription }
 }

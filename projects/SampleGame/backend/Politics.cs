@@ -51,6 +51,8 @@ public class GamePoliticsRules : PoliticsRules
             double plurality = Math.Clamp((gov - rival * 1.25) / 0.15, 0, 1);
             double weak = Math.Max(Math.Clamp((d.Get("weak_democracy_stability", 40) - stability) / 30, 0, 1),
                                    Math.Clamp((d.Get("weak_democracy_support", 0.35) - gov) / 0.2, 0, 1) * (1 - plurality));
+            // (an old parliamentary tradition - the profile trait democratic_roots, 0-1 - resists the pull of the strong hand)
+            if (game.AiProfiles.Enabled) weak *= 1 - Math.Clamp(game.AiProfiles.PersonalityOf(c).Trait("democratic_roots", 0), 0, 1);
             if (weak > 0)
                 foreach (var i in pol.Ideologies.Where(i => i.WeakDemocracyDrift > 0 && !p.Government.Contains(i.Key))) Add(i.Key, i.WeakDemocracyDrift * weak);
         }
@@ -124,6 +126,10 @@ public class GamePoliticsRules : PoliticsRules
         }
         // chance
         foreach (var i in pol.Ideologies) Add(i.Key, (game.Rng.NextDouble() - 0.5) * d.Get("random_drift", 0.4));
+        // an old parliamentary tradition (profile trait democratic_roots) holds the extremists back, whatever feeds them: war, neighbours, lost land
+        if (game.AiProfiles.Enabled && game.AiProfiles.PersonalityOf(c).Trait("democratic_roots", 0) is var roots && roots > 0)
+            foreach (var i in pol.Ideologies.Where(i => i.Extremist && i.Key != p.Ruling))
+                if (drift[i.Key] > 0) drift[i.Key] *= 1 - 0.85 * Math.Clamp(roots, 0, 1);
         return drift;
     }
 
@@ -208,6 +214,53 @@ public class GamePoliticsRules : PoliticsRules
     public override bool CanSeizePower(Game game, Country c, IdeologyDef ideology)
         => ideology.Extremist && StabilityOf(game, c) < game.Data.Defines.Get("democracy_coup_stability", 25);
 
+    /// <summary>
+    /// Can this ideology take government by winning an election? By default yes; with the define extremists_need_assent (1) the extremist ones cannot:
+    /// a fascist or communist party that wins the vote becomes a movement that demands power, and the ruling parties either give in (a coalition that
+    /// "appoints" it), suppress it, or face a revolt - a coup or a civil war.
+    /// </summary>
+    public override bool NeedsAssent(Game game, Country c, IdeologyDef ideology)
+        => game.Data.Defines.Get("extremists_need_assent", 0) > 0
+           && (ideology.Extremist || game.AiProfiles.Enabled && game.AiProfiles.PersonalityOf(c).Trait("civil_war_prone", 0) > 0.5); // (in a country split into two camps nobody takes the government from the other by the vote)
+
+    /// <summary>
+    /// Monthly chance an AI government gives in to a movement that demands power. Parties that would govern with it (WillGovernWith: the conservatives
+    /// and the fascists in Germany 1933, the king and the Blackshirts in Italy 1922) give in far more readily than the rest, which fight it; the more
+    /// popular the movement against the government, and the shakier the country, the likelier the surrender.
+    /// </summary>
+    public override double AiGivesIn(Game game, Country c, Movement m, double popularity)
+    {
+        var pol = game.Politics;
+        var p = pol.Of(c);
+        var ide = pol.Ideology(m.Ideology);
+        if (ide == null) return 0;
+        bool kin = p.Government.Any(g => pol.Ideology(g) is { } gi && WillGovernWith(game, c, gi, ide));
+        double govSupport = GovernmentSupport(game, c);
+        double chance = kin ? 0.30 : 0.03;
+        chance *= 0.5 + Math.Clamp((popularity - govSupport) * 3, 0, 1.5);
+        chance *= StabilityOf(game, c) < 40 ? 1.5 : 1;
+        if (p.Ruling == "democratic") chance *= game.Data.Defines.Get("democracy_resilience", 1); // (the parliamentary democracies of the west did not hand over power; the profile trait appease overrides it)
+        if (game.AiProfiles.Enabled) chance *= game.AiProfiles.PersonalityOf(c).Trait("appease"); // (profile trait appease: 1 = as usual, near 0 = never gives in)
+        return Math.Clamp(chance, 0, 0.8);
+    }
+
+    /// <summary>
+    /// The support a shut-out ideology can call on for a movement or a revolt: its own popularity plus that of the parties out of government that
+    /// would govern with it (the monarchists, the army and the Falange against the Republic). Only where the define movement_blocs is 1.
+    /// </summary>
+    public override double MovementSupport(Game game, Country c, IdeologyDef ideology)
+    {
+        var pol = game.Politics;
+        var p = pol.Of(c);
+        double v = p.Popularity.GetValueOrDefault(ideology.Key);
+        // (only in a country split into two camps - the profile trait civil_war_prone - do the right's parties rise together)
+        if (game.Data.Defines.Get("movement_blocs", 0) <= 0 || !ideology.Extremist || !game.AiProfiles.Enabled || game.AiProfiles.PersonalityOf(c).Trait("civil_war_prone", 0) < 0.5) return v;
+        foreach (var o in pol.Ideologies)
+            if (o.Key != ideology.Key && !o.Extremist && !p.Government.Contains(o.Key) && o.Key != p.Ruling && WillGovernWith(game, c, o, ideology))
+                v += p.Popularity.GetValueOrDefault(o.Key);
+        return Math.Min(1, v);
+    }
+
     /// <summary>Share of the vote of each ideology in an election (popularity with a little chance).</summary>
     public override Dictionary<string, double> Votes(Game game, Country c)
     {
@@ -269,13 +322,17 @@ public class GamePoliticsRules : PoliticsRules
     public override double CoupChance(Game game, Country c, IdeologyDef ideology, double popularity)
     {
         var d = game.Data.Defines;
+        if (game.AiProfiles.Enabled && game.AiProfiles.PersonalityOf(c).Trait("civil_war_prone", 0) > 0.5) return 0; // (a country split in two camps is not toppled by a coup: it fights)
+        // (a dictatorship that holds the army and the police - the profile trait regime_hold, 0-1 - is not toppled by a coup)
+        double hold = game.AiProfiles.Enabled && game.Politics.Ideology(game.Politics.Of(c).Ruling)?.Extremist == true ? game.AiProfiles.PersonalityOf(c).Trait("regime_hold", 0) : 0;
+        if (hold >= 1) return 0;
         // a country in turmoil is toppled by less (UnrestPressure lowers the support a coup needs by up to 20 points)
         double threshold = d.Get("coup_threshold", 0.4) - 0.2 * UnrestPressure(game, c);
         if (popularity < threshold) return 0;
         double ruling = game.Politics.Of(c).Popularity.GetValueOrDefault(game.Politics.Of(c).Ruling);
         double stability = StabilityOf(game, c);
         // (where the country is poor and unstable, or worn out by war, the struggle is fought out in a civil war instead)
-        return d.Get("coup_chance", 0.06) * (1 + (popularity - threshold) * 5) * (1.5 - ruling) * (1.5 - stability / 100.0) * (1 - 0.7 * UnrestPressure(game, c));
+        return (1 - hold) * d.Get("coup_chance", 0.06) * (1 + (popularity - threshold) * 5) * (1.5 - ruling) * (1.5 - stability / 100.0) * (1 - 0.7 * UnrestPressure(game, c));
     }
 
     /// <summary>
@@ -299,12 +356,18 @@ public class GamePoliticsRules : PoliticsRules
     {
         var p = game.Politics.Of(c);
         double loyal = p.Government.Sum(g => p.Popularity.GetValueOrDefault(g));
+        // (a country split down the middle - the profile trait civil_war_prone - fights it out as long as the government keeps some of the country behind it)
+        if (game.AiProfiles.Enabled && game.AiProfiles.PersonalityOf(c).Trait("civil_war_prone", 0) > 0.5 && loyal >= 0.15) return true;
+        // (in a country whose history was one of coups, not wars - the profile trait coup_only - the army simply changes sides)
+        if (game.AiProfiles.Enabled && game.AiProfiles.PersonalityOf(c).Trait("coup_only", 0) > 0.5) return false;
+        // (a movement that has clearly outgrown the government - 40% and a third more than it - does not need a war: the army and the officials go over to it)
+        if (popularity >= game.Data.Defines.Get("coup_outgrown_share", 0.5) && popularity > loyal * game.Data.Defines.Get("coup_outgrown_ratio", 1.6)) return false;
         return loyal >= game.Data.Defines.Get("civil_war_loyal_share", 0.2) && popularity < game.Data.Defines.Get("coup_above", 0.75);
     }
 
     /// <summary>Share of the country (states, divisions, treasury) that joins the rebels: the ideology's support.</summary>
     public override double CivilWarShare(Game game, Country c, string ideology, double popularity)
-        => Math.Clamp(popularity, 0.1, 0.9);
+        => Math.Clamp(popularity * (game.AiProfiles.Enabled && game.Politics.Ideology(ideology)?.Extremist == true ? game.AiProfiles.PersonalityOf(c).Trait("rebel_share", 1) : 1), 0.1, 0.9); // (the profile trait rebel_share: the army sided with the rebels)
 
     /// <summary>
     /// Who has won a civil war: true = the old government, false = the rebels, null = not decided. A side that is beaten

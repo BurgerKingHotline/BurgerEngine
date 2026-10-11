@@ -111,7 +111,7 @@ public sealed partial class DiplomacySystem
             double sf = a.AiAcceptance.GetDouble("strength_factor", 0);
             if (sf != 0)
             {
-                double sa = Strength(actor), sr = Strength(rc);
+                var (sa, sr) = Rules.ContestStrength(_game, actor, rc);
                 v += sf * Math.Clamp((sa + 1) / (sr + 1) - 1, -3, 3);
             }
             v += Rules.AcceptanceModifier(_game, a, actor, rc);
@@ -213,8 +213,15 @@ public sealed partial class DiplomacySystem
     }
 
     /// <summary>Declares war. Returns the war or null (reason is logged/notified).</summary>
+    private readonly Dictionary<(string, string), int> _warCounts = new();
+    /// <summary>How many wars these two have fought (either way round): a second war between them is a fight to the finish when the defender is big.</summary>
+    public int WarCount(Country a, Country b) => _warCounts.GetValueOrDefault(string.CompareOrdinal(a.Tag, b.Tag) < 0 ? (a.Tag, b.Tag) : (b.Tag, a.Tag));
+    public bool IsCapitulated(War war, Country c) => war.Vars.HasFlag("cap:" + c.Tag);
+    public bool IsTotal(War war) => war.Vars.HasFlag("total");
+
     public War? DeclareWar(Country attacker, Country defender, CasusBelli? cb = null, State? goal = null, bool force = false)
     {
+        if (Environment.GetEnvironmentVariable("BURGER_WARCAUSE_LOG") is { } wc && attacker.Tag == wc) Console.WriteLine($"WARCAUSE {_game.World.Date.ToDisplay()} {attacker.Tag}->{defender.Tag} cb {cb?.Key}: " + string.Join(" <- ", new System.Diagnostics.StackTrace().GetFrames().Skip(1).Take(6).Select(f => f.GetMethod()?.Name)));
         cb ??= BestCasusBelli(attacker, defender);
         if (!force)
         {
@@ -240,6 +247,7 @@ public sealed partial class DiplomacySystem
             Name = $"{attacker.Name} - {defender.Name} War",
         };
         w.Wars.Add(war);
+        { var key = string.CompareOrdinal(attacker.Tag, defender.Tag) < 0 ? (attacker.Tag, defender.Tag) : (defender.Tag, attacker.Tag); _warCounts[key] = _warCounts.GetValueOrDefault(key) + 1; }
         InvalidateCasusBelli();
         war.LastChangeDay = w.Date.TotalDays;
         if (cb != null) war.Goals.Add(new WarGoal { Holder = attacker, Target = defender, CasusBelli = cb });
@@ -304,7 +312,7 @@ public sealed partial class DiplomacySystem
             return;
         }
         if (Rules.WillJoinWar(_game, ally, war, asAttacker, caller)) JoinWar(ally, war, asAttacker);
-        else if (R.AreAllied(ally, caller))
+        else if (R.AreAllied(ally, caller) && !(asAttacker && _game.Data.Defines.Get("offensive_calls_optional", 0) > 0)) // (with offensive_calls_optional, refusing to join an ally's aggression does not end the alliance)
         {
             R.SetAlliance(ally, caller, false);
             AddOpinion(caller, ally, "Refused call to arms", -50);
@@ -500,6 +508,9 @@ public sealed partial class DiplomacySystem
     public bool AiWouldAccept(PeaceOffer o)
     {
         if (InvalidReason(o) != null) return false;
+        // a capitulated country takes what its faction is given; in a total war nobody who is not beaten (or worn out) makes peace
+        if (o.FromIsWinner && IsCapitulated(o.War, o.To)) return true;
+        if (IsTotal(o.War) && !o.NoEnd && o.War.EnemiesOf(o.To).Any() && !IsCapitulated(o.War, o.To) && WarExhaustion(o.To) < _game.Data.Defines.Get("total_war_exhaustion", 14)) return false;
         return Rules.AiAcceptsPeace(_game, o, OfferCost(o));
     }
 
@@ -589,7 +600,21 @@ public sealed partial class DiplomacySystem
         _game.RefreshNames();
         bool leadersPeace = war.LeaderOf(o.From) == o.From && war.LeaderOf(o.To) == o.To;
         if (!_game.World.Wars.Contains(war)) return; // e.g. annexation ended it
-        if (leadersPeace) EndWar(war);
+        // the faction makes peace: the allies that capitulated earlier are dealt with now (what each of them loses is decided like any other deal)
+        if (leadersPeace && !o.NoEnd)
+            foreach (var member in war.SideOf(loser).Where(m => m != loser && IsCapitulated(war, m)).ToList())
+            {
+                var extra = _game.Ai.BuildDemands(war, winner, member, 100);
+                if (extra.Terms.Count > 0) { extra.NoEnd = true; ApplyPeace(extra); }
+            }
+        if (o.NoEnd) return;
+        if (leadersPeace && Rules.SeparatePeace(_game, war, loser))
+        {
+            // the beaten leader makes peace and its subjects with it; the independent allies that are still in the war fight on under a new leader
+            foreach (var sub in R.SubjectsOf(loser).Where(war.Involves).ToList()) LeaveWar(sub, war);
+            if (_game.World.Wars.Contains(war)) LeaveWar(loser, war);
+        }
+        else if (leadersPeace) EndWar(war);
         else LeaveWar(war.LeaderOf(o.From) == o.From ? o.To : o.From, war);
         _game.RaiseMapChanged();
     }
@@ -599,6 +624,7 @@ public sealed partial class DiplomacySystem
     {
         var old = s.Owner;
         if (old == newOwner) return;
+        if (s.Demilitarized && DemilEnabled) Remilitarize(s, "treaty"); // (a demilitarization binds the owner that signed it: land that changes hands is free of it)
         s.Owner = newOwner;
         s.Claims.Remove(newOwner);
         foreach (var l in s.Locations) _game.Warfare.SetController(l, newOwner, silent: true);

@@ -151,6 +151,8 @@ public sealed class Movement
     /// <summary>0-100. At 100 the movement revolts.</summary>
     public double Progress;
     public GameDate Started;
+    /// <summary>The player has been told it is about to revolt (on_movement_ultimatum fired).</summary>
+    public bool Warned;
 }
 
 /// <summary>A running civil war between a country and the rebels that split from it.</summary>

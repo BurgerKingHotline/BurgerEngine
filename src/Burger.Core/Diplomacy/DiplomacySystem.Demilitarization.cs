@@ -90,7 +90,7 @@ public sealed partial class DiplomacySystem
         Record($"{s.DisplayName} of {owner?.Tag} remilitarized ({how})");
         _game.RaiseMapChanged();
         if (owner == null) return;
-        if (how == "war") return; // a country at war does not ask anybody
+        if (how == "war" || how == "treaty") return; // a country at war does not ask anybody; one that has the powers' consent (a conference) is not challenged
         _game.Notify($"{owner.Name} has remilitarized {s.DisplayName}!", NotificationKind.War);
         var challengers = new HashSet<Country>();
         foreach (var n in _game.Population.NeighbourStates(s)) if (n.Owner is { } o && o != owner) challengers.Add(o);
@@ -101,10 +101,10 @@ public sealed partial class DiplomacySystem
     }
 
     /// <summary>Remilitarizes every demilitarized state of a country (the decision).</summary>
-    public int RemilitarizeAll(Country c)
+    public int RemilitarizeAll(Country c, string how = "decision")
     {
         var list = DemilitarizedOf(c);
-        foreach (var s in list) Remilitarize(s, "decision");
+        foreach (var s in list) Remilitarize(s, how);
         return list.Count;
     }
 

@@ -40,6 +40,17 @@ public sealed class ResearchSlot
 /// </summary>
 public class TechRules
 {
+    /// <summary>
+    /// How well equipped and trained a country's army is, as a factor added to its attack, defence and breakthrough: 0.35 per point of wealth index
+    /// above or below the world's average (1), at most +0.15 and at least -0.5 (a poor country's divisions are half the worth of a rich one's),
+    /// plus the modifier army_quality (doctrine, training, discipline). Recomputed monthly.
+    /// </summary>
+    public virtual double ArmyQuality(Game game, Country c)
+    {
+        double wealth = game.Politics.Enabled ? game.Politics.WealthIndex(c) : 1;
+        return Math.Clamp(game.Data.Defines.Get("army_quality_per_wealth", 0.35) * (wealth - 1), -game.Data.Defines.Get("army_quality_floor", 0.5), 0.15) + game.Modifiers.Sum(c, "army_quality");
+    }
+
     /// <summary>Research points a country gains each month: a base, its factories, and the modifier research_speed.</summary>
     public virtual double MonthlyPoints(Game game, Country c)
     {
@@ -194,9 +205,13 @@ public sealed class TechSystem
     }
 
     /// <summary>Recomputes the division stat factors of a country from what it knows.</summary>
+    private static readonly string[] CombatStats = { "soft_attack", "hard_attack", "defense", "breakthrough" };
+
     private void UpdateFactors(Country c)
     {
         c.StatFactors.Clear();
+        double quality = Rules.ArmyQuality(_game, c);
+        if (Math.Abs(quality) > 1e-6) foreach (var stat in CombatStats) c.StatFactors[stat] = 1 + quality;
         if (!Known.TryGetValue(c, out var set)) return;
         foreach (var k in set)
         {
@@ -255,6 +270,7 @@ public sealed class TechSystem
         foreach (var c in _game.World.Countries.Where(c => c.Exists).ToList())
         {
             if (!Research.TryGetValue(c, out var slots)) Research[c] = slots = new List<ResearchSlot>();
+            UpdateFactors(c); // (the army's quality follows the country's wealth)
             double points = Rules.MonthlyPoints(_game, c);
             int n = Math.Max(1, slots.Count);
             foreach (var slot in slots.ToList())

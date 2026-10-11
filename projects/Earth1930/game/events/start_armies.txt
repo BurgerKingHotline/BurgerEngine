@@ -1,0 +1,18 @@
+# The armies of 1930 are not equal in training, doctrine and discipline whatever their wealth: a starting condition (the modifier army_quality is added to
+# the quality the country's wealth gives it, TechRules.ArmyQuality). What the armies do with it is up to the game.
+namespace = armies
+
+country_event = {
+	id = armies.1
+	title = "The Armies of 1930"
+	desc = "Some armies are better than their countries are rich."
+	is_triggered_only = yes
+	trigger = { always = yes }
+	immediate = {
+		if = { limit = { tag = JAP } add_modifier = { name = army_tradition_elite years = 30 } }
+		else_if = { limit = { tag = GER } add_modifier = { name = army_tradition_superior years = 30 } }
+		else_if = { limit = { tag = SOV } add_modifier = { name = army_tradition_good years = 30 } }
+		else_if = { limit = { OR = { tag = FRA tag = ENG tag = USA tag = ITA } } add_modifier = { name = army_tradition_good years = 30 } }
+	}
+	option = { name = "As it is" }
+}

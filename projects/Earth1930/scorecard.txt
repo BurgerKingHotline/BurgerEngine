@@ -1,75 +1,104 @@
-# Historical scorecard for 1930-1950 (burger validate Earth1930 --days 7300 --seeds 1,2,3,4,5,6 --scorecard).
+# Historical scorecard for 1930-1950 (burger validate Earth1930 --days 7300 --seeds 1,2,3,4,5,6,7,8 --bias 1 --scorecard).
 # These are QUESTIONS asked of every simulated world, not things the game makes happen. Each line asks once per world; the hit rate over the
-# worlds is compared with the band `expect = low-high`. Where history was one possible outcome among several the band is wide; where the
-# outcome was heavily favoured (Italy against Ethiopia) the band is narrow. A line marked 'given' is only asked in worlds where the war arose.
+# worlds is compared with the band `expect = low-high`. Events that happened in history are expected in nearly every world at maximum Historical
+# Bias (a band of 0.8-1.0); outcomes that depended on how a war went keep wider bands. Wars that did NOT happen are asked too, with a band of
+# 0-0.1: a world that fights one scores against the card. `priority` (1-5, 5 = the most important event; the focus is 1930-1940) says how much it matters:
+# every line of priority 2-5 must be within its band (at most 15 points wide).
 #   kinds: war a b | war_result a b (a's side takes at least `share` of b's land within two years) | war_holds | ruling a=tag b=ideology year |
-#          ruling_ever | exists | gone | owns a=tag b=state year | owns_country a b year | alliance a b | alliance_at | independent |
+#          ruling_ever | ruling_not | exists | gone | owns a=tag b=state year | owns_country a b year | alliance a b | alliance_at | independent |
 #          civil_war | countries min max year | wars min max | world_war | tech a=tag b=tech year | industry_rank | growth | remilitarized b=state year
 
 # ---------------------------------------------------------------------------------------------------------------- politics
-germany_fascist_by_1936 = { kind = ruling a = GER b = fascist year = 1936 expect = 0.35-0.85 note = "the Nazis in power by 1936" }
-germany_fascist_ever = { kind = ruling_ever a = GER b = fascist from = 1930 to = 1945 expect = 0.5-0.95 note = "a fascist Germany at some time" }
-germany_not_democratic_1938 = { kind = ruling_not a = GER b = democratic year = 1938 expect = 0.6-0.95 note = "Weimar did not last" }
-italy_fascist_1940 = { kind = ruling a = ITA b = fascist year = 1940 expect = 0.7-1.0 note = "Mussolini stays" }
-soviet_communist_1945 = { kind = ruling a = SOV b = communist year = 1945 expect = 0.85-1.0 note = "the USSR stays communist" }
-france_democratic_1938 = { kind = ruling a = FRA b = democratic year = 1938 expect = 0.5-0.95 note = "the Third Republic" }
-britain_democratic_1945 = { kind = ruling a = ENG b = democratic year = 1945 expect = 0.65-1.0 note = "Britain holds" }
-usa_democratic_1945 = { kind = ruling a = USA b = democratic year = 1945 expect = 0.85-1.0 note = "the USA holds" }
-japan_not_democratic_1938 = { kind = ruling_not a = JAP b = democratic year = 1938 expect = 0.6-0.95 note = "the military takes over politics" }
-austria_not_democratic_1936 = { kind = ruling_not a = AUS b = democratic year = 1936 expect = 0.4-0.85 note = "Austrofascism" }
-portugal_authoritarian_1940 = { kind = ruling_not a = POR b = democratic year = 1940 expect = 0.75-1.0 note = "the Estado Novo" }
-spain_civil_war = { kind = civil_war a = SPA from = 1931 to = 1940 expect = 0.35-0.8 note = "the Spanish Civil War" }
-china_civil_war = { kind = civil_war a = CHI from = 1930 to = 1949 expect = 0.3-0.8 note = "Nationalists against Communists" }
-china_communist_ever = { kind = ruling_ever a = CHI b = communist from = 1930 to = 1950 expect = 0.15-0.6 note = "the communists win in China" }
-india_independent_1950 = { kind = independent a = RAJ year = 1950 expect = 0.35-0.8 note = "India free by 1950" }
-yugoslavia_survives_1940 = { kind = exists a = YUG year = 1940 expect = 0.6-1.0 note = "Yugoslavia survives to 1940" }
-spain_not_democratic_1945 = { kind = ruling_not a = SPA b = democratic year = 1945 expect = 0.5-0.95 note = "Franco or something like it" }
+germany_fascist_by_1936 = { kind = ruling a = GER b = fascist year = 1936 expect = 0.85-1.0 note = "the Nazis in power by 1936" priority = 5 }
+germany_fascist_ever = { kind = ruling_ever a = GER b = fascist from = 1930 to = 1945 expect = 0.85-1.0 note = "a fascist Germany at some time" priority = 4 }
+germany_not_democratic_1938 = { kind = ruling_not a = GER b = democratic year = 1938 expect = 0.85-1.0 note = "Weimar did not last" priority = 5 }
+italy_fascist_1940 = { kind = ruling a = ITA b = fascist year = 1940 expect = 0.85-1.0 note = "Mussolini stays" priority = 3 }
+soviet_communist_1945 = { kind = ruling a = SOV b = communist year = 1945 expect = 0.85-1.0 note = "the USSR stays communist" priority = 1 }
+france_democratic_1938 = { kind = ruling a = FRA b = democratic year = 1938 expect = 0.85-1.0 note = "the Third Republic" priority = 4 }
+britain_democratic_1945 = { kind = ruling a = ENG b = democratic year = 1945 expect = 0.85-1.0 note = "Britain holds" priority = 1 }
+usa_democratic_1945 = { kind = ruling a = USA b = democratic year = 1945 expect = 0.85-1.0 note = "the USA holds" priority = 1 }
+japan_not_democratic_1938 = { kind = ruling_not a = JAP b = democratic year = 1938 expect = 0.85-1.0 note = "the military takes over politics" priority = 4 }
+austria_not_democratic_1936 = { kind = ruling_not a = AUS b = democratic year = 1936 expect = 0.85-1.0 note = "Austrofascism" priority = 4 }
+portugal_authoritarian_1940 = { kind = ruling_not a = POR b = democratic year = 1940 expect = 0.85-1.0 note = "the Estado Novo" priority = 2 }
+spain_civil_war = { kind = civil_war a = SPA from = 1931 to = 1940 expect = 0.85-1.0 note = "the Spanish Civil War" priority = 5 }
+china_civil_war = { kind = civil_war a = CHI from = 1930 to = 1949 expect = 0.85-1.0 note = "Nationalists against Communists" priority = 3 }
+china_communist_wins = { kind = ideology_land a = CHI b = communist share = 0.3 year = 1950 expect = 0.85-1.0 note = "the communists hold China (any tag) by 1950" priority = 1 }
+india_independent_1950 = { kind = independent a = RAJ year = 1950 expect = 0.85-1.0 note = "India free by 1950" priority = 1 }
+yugoslavia_survives_1940 = { kind = exists a = YUG year = 1940 expect = 0.85-1.0 note = "Yugoslavia survives to 1940" priority = 2 }
+spain_not_democratic_1940 = { kind = ruling_not a = SPA b = democratic year = 1940 expect = 0.85-1.0 note = "Franco or something like it" priority = 3 }
 # ---------------------------------------------------------------------------------------------------------------- diplomacy
-italy_germany_alliance = { kind = alliance a = GER b = ITA from = 1932 to = 1945 expect = 0.35-0.8 note = "the Axis" }
-japan_germany_alliance = { kind = alliance a = GER b = JAP from = 1934 to = 1945 expect = 0.25-0.7 note = "the Anti-Comintern/Tripartite world" }
-france_poland_alliance_1936 = { kind = alliance_at a = FRA b = POL year = 1936 expect = 0.75-1.0 note = "French allies in the east" }
-little_entente_1935 = { kind = alliance_at a = CZE b = YUG year = 1935 expect = 0.7-1.0 note = "the Little Entente" }
-britain_france_alliance = { kind = alliance a = ENG b = FRA from = 1930 to = 1945 expect = 0.3-0.8 note = "Entente becomes alliance" }
-usa_britain_alliance = { kind = alliance a = USA b = ENG from = 1936 to = 1950 expect = 0.3-0.8 note = "the Atlantic alliance" }
-germany_soviet_pact = { kind = alliance a = GER b = SOV from = 1930 to = 1945 expect = 0.0-0.3 note = "an alliance between the great enemies is rare" }
-# ---------------------------------------------------------------------------------------------------------------- wars
-japan_china_war = { kind = war a = JAP b = CHI from = 1931 to = 1940 expect = 0.6-0.95 note = "Manchuria and the war with China" }
-japan_takes_china_land = { kind = war_result a = JAP b = CHI from = 1931 to = 1940 share = 0.08 expect = 0.65-1.0 note = "given the war, Japan gains territory" }
-italy_ethiopia_war = { kind = war a = ITA b = ETH from = 1931 to = 1940 expect = 0.5-0.9 note = "the Ethiopian war" }
-italy_wins_ethiopia = { kind = war_result a = ITA b = ETH from = 1931 to = 1940 share = 0.3 expect = 0.8-1.0 note = "given the war, Italy wins - heavily favoured" }
-germany_poland_war = { kind = war a = GER b = POL from = 1936 to = 1943 expect = 0.35-0.75 note = "the invasion of Poland" }
-germany_france_war = { kind = war a = GER b = FRA from = 1935 to = 1946 expect = 0.4-0.8 note = "Germany against France" }
-germany_britain_war = { kind = war a = GER b = ENG from = 1935 to = 1946 expect = 0.4-0.8 note = "Germany against Britain" }
-germany_soviet_war = { kind = war a = GER b = SOV from = 1936 to = 1948 expect = 0.3-0.75 note = "the eastern front" }
-japan_usa_war = { kind = war a = JAP b = USA from = 1936 to = 1948 expect = 0.25-0.7 note = "the Pacific war" }
-japan_britain_war = { kind = war a = JAP b = ENG from = 1936 to = 1948 expect = 0.25-0.7 note = "Japan against the British empire" }
-soviet_finland_war = { kind = war a = SOV b = FIN from = 1932 to = 1946 expect = 0.25-0.65 note = "the Winter War" }
-soviet_poland_war = { kind = war a = SOV b = POL from = 1934 to = 1946 expect = 0.3-0.7 note = "the eastern partition" }
-chaco_war = { kind = war a = BOL b = PAR from = 1930 to = 1938 expect = 0.5-1.0 note = "the Chaco War (it happened)" }
-italy_france_war = { kind = war a = ITA b = FRA from = 1936 to = 1946 expect = 0.3-0.75 note = "Italy against France" }
-hungary_romania_or_czech_war = { kind = war a = HUN b = ROM from = 1932 to = 1946 expect = 0.15-0.6 note = "Hungary and Transylvania" }
-a_world_war = { kind = world_war from = 1936 to = 1949 expect = 0.45-0.9 note = "three great powers on opposite sides of one war" }
-wars_in_twenty_years = { kind = wars min = 30 max = 100 from = 1930 to = 1949 expect = 0.6-1.0 note = "between 30 and 100 wars begin in twenty years" }
+italy_germany_alliance = { kind = alliance a = GER b = ITA from = 1932 to = 1945 expect = 0.85-1.0 note = "the Axis" priority = 5 }
+japan_germany_alliance = { kind = alliance a = GER b = JAP from = 1934 to = 1945 expect = 0.85-1.0 note = "the Anti-Comintern/Tripartite world" priority = 4 }
+france_poland_alliance_1936 = { kind = alliance_at a = FRA b = POL year = 1936 expect = 0.85-1.0 note = "French allies in the east" priority = 4 }
+little_entente_1935 = { kind = alliance_at a = CZE b = YUG year = 1935 expect = 0.85-1.0 note = "the Little Entente" priority = 3 }
+britain_france_alliance = { kind = alliance a = ENG b = FRA from = 1930 to = 1945 expect = 0.85-1.0 note = "Entente becomes alliance" priority = 4 }
+usa_britain_alliance = { kind = alliance a = USA b = ENG from = 1936 to = 1950 expect = 0.85-1.0 note = "the Atlantic alliance" priority = 1 }
+germany_soviet_pact = { kind = alliance a = GER b = SOV from = 1930 to = 1945 expect = 0.0-0.1 note = "never an alliance between the great enemies" priority = 4 }
+# ---------------------------------------------------------------------------------------------------------------- wars that happened
+japan_china_war = { kind = war a = JAP b = CHI from = 1931 to = 1940 expect = 0.85-1.0 note = "Manchuria and the war with China" priority = 5 }
+japan_takes_china_land = { kind = war_result a = JAP b = CHI from = 1931 to = 1940 share = 0.05 expect = 0.85-1.0 note = "given the war, Japan gains territory" priority = 4 }
+italy_ethiopia_war = { kind = war a = ITA b = ETH from = 1933 to = 1938 expect = 0.85-1.0 note = "the Ethiopian war" priority = 5 }
+italy_wins_ethiopia = { kind = war_result a = ITA b = ETH from = 1933 to = 1938 share = 0.3 expect = 0.85-1.0 note = "given the war, Italy wins - heavily favoured" priority = 5 }
+germany_poland_war = { kind = war a = GER b = POL from = 1936 to = 1941 expect = 0.85-1.0 note = "the invasion of Poland" priority = 5 }
+germany_france_war = { kind = war a = GER b = FRA from = 1938 to = 1942 expect = 0.85-1.0 note = "Germany against France" priority = 5 }
+germany_britain_war = { kind = war a = GER b = ENG from = 1938 to = 1942 expect = 0.85-1.0 note = "Germany against Britain" priority = 5 }
+germany_soviet_war = { kind = war a = GER b = SOV from = 1939 to = 1943 expect = 0.85-1.0 note = "the eastern front" priority = 1 }
+japan_usa_war = { kind = war a = JAP b = USA from = 1938 to = 1946 expect = 0.85-1.0 note = "the Pacific war" priority = 1 }
+japan_britain_war = { kind = war a = JAP b = ENG from = 1938 to = 1946 expect = 0.85-1.0 note = "Japan against the British empire" priority = 1 }
+soviet_finland_war = { kind = war a = SOV b = FIN from = 1938 to = 1942 expect = 0.85-1.0 note = "the Winter War" priority = 4 }
+soviet_poland_war = { kind = war a = SOV b = POL from = 1938 to = 1942 expect = 0.85-1.0 note = "the eastern partition (a war in the game's terms)" priority = 4 }
+chaco_war = { kind = war a = BOL b = PAR from = 1930 to = 1938 expect = 0.85-1.0 note = "the Chaco War" priority = 4 }
+italy_france_war = { kind = war a = ITA b = FRA from = 1938 to = 1942 expect = 0.85-1.0 note = "Italy against France" priority = 3 }
+italy_greece_war = { kind = war a = ITA b = GRE from = 1938 to = 1942 expect = 0.85-1.0 note = "Italy against Greece" priority = 2 }
+germany_norway_war = { kind = war a = GER b = NOR from = 1938 to = 1942 expect = 0.85-1.0 note = "the invasion of Norway" priority = 3 }
+germany_low_countries_war = { kind = war a = GER b = HOL from = 1938 to = 1942 expect = 0.85-1.0 note = "the invasion of the Netherlands" priority = 3 }
+germany_yugoslavia_war = { kind = war a = GER b = YUG from = 1939 to = 1943 expect = 0.85-1.0 note = "the invasion of Yugoslavia" priority = 1 }
+a_world_war = { kind = world_war from = 1936 to = 1949 expect = 0.85-1.0 note = "three great powers on opposite sides of one war" priority = 5 }
+wars_in_twenty_years = { kind = wars min = 30 max = 90 from = 1930 to = 1949 expect = 0.85-1.0 note = "between 30 and 90 wars begin in twenty years" priority = 2 }
+# ---------------------------------------------------------------------------------------------------------------- wars that did NOT happen
+no_germany_italy_war = { kind = war a = GER b = ITA from = 1930 to = 1946 expect = 0.0-0.1 note = "Germany and Italy never fought" priority = 4 }
+no_britain_france_war = { kind = war a = ENG b = FRA from = 1930 to = 1946 expect = 0.0-0.1 note = "Britain and France never fought" priority = 3 }
+no_britain_usa_war = { kind = war a = ENG b = USA from = 1930 to = 1950 expect = 0.0-0.1 note = "Britain and the USA never fought" priority = 3 }
+no_france_usa_war = { kind = war a = FRA b = USA from = 1930 to = 1950 expect = 0.0-0.1 note = "France and the USA never fought" priority = 3 }
+no_germany_japan_war = { kind = war a = GER b = JAP from = 1930 to = 1950 expect = 0.0-0.1 note = "Germany and Japan never fought" priority = 3 }
+no_italy_japan_war = { kind = war a = ITA b = JAP from = 1930 to = 1950 expect = 0.0-0.1 note = "Italy and Japan never fought" priority = 3 }
+no_usa_soviet_war = { kind = war a = USA b = SOV from = 1930 to = 1950 expect = 0.0-0.1 note = "the USA and the USSR never fought" priority = 3 }
+no_britain_soviet_war = { kind = war a = ENG b = SOV from = 1930 to = 1950 expect = 0.0-0.1 note = "Britain and the USSR never fought" priority = 3 }
+no_france_soviet_war = { kind = war a = FRA b = SOV from = 1930 to = 1950 expect = 0.0-0.1 note = "France and the USSR never fought" priority = 3 }
+no_early_germany_soviet_war = { kind = war a = GER b = SOV from = 1930 to = 1940 expect = 0.0-0.1 note = "no German-Soviet war before 1941" priority = 4 }
+no_early_germany_britain_war = { kind = war a = GER b = ENG from = 1930 to = 1937 expect = 0.0-0.1 note = "no German-British war before the Polish crisis" priority = 4 }
+no_early_germany_france_war = { kind = war a = GER b = FRA from = 1930 to = 1937 expect = 0.0-0.1 note = "no German-French war before the Polish crisis" priority = 4 }
+no_early_japan_usa_war = { kind = war a = JAP b = USA from = 1930 to = 1939 expect = 0.0-0.1 note = "no Pacific war before 1940" priority = 4 }
+no_early_italy_france_war = { kind = war a = ITA b = FRA from = 1930 to = 1938 expect = 0.0-0.1 note = "no Italian-French war before 1939" priority = 4 }
+no_poland_czech_war = { kind = war a = POL b = CZE from = 1930 to = 1950 expect = 0.0-0.1 note = "Poland and Czechoslovakia never fought a war" priority = 3 }
+no_turkey_greece_war = { kind = war a = TUR b = GRE from = 1930 to = 1950 expect = 0.0-0.1 note = "Turkey and Greece never fought" priority = 3 }
+no_hungary_romania_war = { kind = war a = HUN b = ROM from = 1930 to = 1950 expect = 0.0-0.1 note = "Hungary and Romania never fought" priority = 3 }
+no_germany_hungary_war = { kind = war a = GER b = HUN from = 1930 to = 1945 expect = 0.0-0.1 note = "Germany and Hungary never fought" priority = 3 }
+no_france_poland_war = { kind = war a = FRA b = POL from = 1930 to = 1950 expect = 0.0-0.1 note = "France and Poland never fought" priority = 3 }
+no_sweden_war = { kind = war a = GER b = SWE from = 1930 to = 1950 expect = 0.0-0.1 note = "Sweden stayed neutral" priority = 3 }
+no_switzerland_war = { kind = war a = GER b = SWI from = 1930 to = 1950 expect = 0.0-0.1 note = "Switzerland stayed neutral" priority = 3 }
+no_spain_britain_war = { kind = war a = SPA b = ENG from = 1930 to = 1950 expect = 0.0-0.1 note = "Spain stayed out of the world war" priority = 3 }
 # ---------------------------------------------------------------------------------------------------------------- territory
-germany_gets_sudetenland = { kind = owns a = GER b = usti_nad_labem_state year = 1941 expect = 0.35-0.95 note = "the Sudeten land goes to Germany" }
-germany_gets_austria = { kind = owns_country a = GER b = AUS year = 1941 expect = 0.35-0.8 note = "the Anschluss" }
-germany_gets_danzig = { kind = owns a = GER b = danzig_state year = 1942 expect = 0.35-0.95 note = "Danzig returns to Germany" }
-italy_gets_albania = { kind = owns_country a = ITA b = ALB year = 1942 expect = 0.5-0.95 note = "Albania is Italian by 1942 (it was a client already)" }
-poland_gone_1945 = { kind = gone a = POL year = 1945 expect = 0.25-0.65 note = "Poland partitioned or annexed" }
-czechoslovakia_gone_1945 = { kind = gone a = CZE year = 1945 expect = 0.3-0.75 note = "Czechoslovakia is dismembered" }
-countries_1950 = { kind = countries min = 55 max = 90 year = 1950 expect = 0.6-1.0 note = "the world has 55 to 90 countries in 1950" }
-hungary_gains_land = { kind = owns a = HUN b = nitra_state year = 1942 expect = 0.2-0.6 note = "Hungary takes back southern Slovakia" }
-turkey_gets_hatay = { kind = owns a = TUR b = alexandretta_state year = 1946 expect = 0.2-0.6 note = "Hatay joins Turkey" }
+germany_gets_sudetenland = { kind = owns a = GER b = usti_nad_labem_state year = 1940 expect = 0.85-1.0 note = "the Sudeten land goes to Germany" priority = 5 }
+germany_gets_austria = { kind = owns_country a = GER b = AUS year = 1939 expect = 0.85-1.0 note = "the Anschluss" priority = 5 }
+germany_gets_danzig = { kind = owns a = GER b = danzig_state year = 1941 expect = 0.85-1.0 note = "Danzig returns to Germany" priority = 4 }
+italy_gets_albania = { kind = owns_country a = ITA b = ALB year = 1940 expect = 0.85-1.0 note = "Albania is Italian by 1942" priority = 4 }
+italy_gets_ethiopia = { kind = owns_country a = ITA b = ETH year = 1938 expect = 0.85-1.0 note = "Italian East Africa" priority = 4 }
+poland_gone_1941 = { kind = gone a = POL share = 0.7 year = 1941 expect = 0.85-1.0 note = "Poland partitioned or annexed (70% of its land held by others)" priority = 4 }
+czechoslovakia_gone_1941 = { kind = gone a = CZE year = 1941 expect = 0.85-1.0 note = "Czechoslovakia is dismembered" priority = 4 }
+countries_1950 = { kind = countries min = 55 max = 90 year = 1950 expect = 0.85-1.0 note = "the world has 55 to 90 countries in 1950" priority = 1 }
+hungary_gains_land = { kind = owns a = HUN b = nitra_state year = 1940 expect = 0.85-1.0 note = "Hungary takes back southern Slovakia" priority = 4 }
+turkey_gets_hatay = { kind = owns a = TUR b = alexandretta_state year = 1946 expect = 0.85-1.0 note = "Hatay joins Turkey" priority = 3 }
 # ---------------------------------------------------------------------------------------------------------------- demilitarized zones
-rhineland_remilitarized_1938 = { kind = remilitarized b = southwest_north_rhine_westphalia_state year = 1938 expect = 0.55-1.0 note = "Germany remilitarizes the Rhineland" }
-straits_remilitarized_1940 = { kind = remilitarized b = canakkale_state year = 1940 expect = 0.4-1.0 note = "Turkey remilitarizes the Straits" }
+rhineland_remilitarized_1938 = { kind = remilitarized b = southwest_north_rhine_westphalia_state year = 1938 expect = 0.85-1.0 note = "Germany remilitarizes the Rhineland" priority = 5 }
+straits_remilitarized_1938 = { kind = remilitarized b = canakkale_state year = 1938 expect = 0.85-1.0 note = "Turkey remilitarizes the Straits" priority = 3 }
 # ---------------------------------------------------------------------------------------------------------------- economy and technology
-usa_first_industry_1940 = { kind = industry_rank a = USA rank = 1 year = 1940 expect = 0.85-1.0 note = "the USA is the first industrial power" }
-germany_top_three_1940 = { kind = industry_rank a = GER rank = 3 year = 1940 expect = 0.7-1.0 note = "Germany is a top-three industrial power" }
-soviet_industrialises = { kind = growth a = SOV factor = 1.4 year = 1941 expect = 0.55-1.0 note = "the Soviet industrial leap" }
-usa_arms_growth = { kind = growth a = USA factor = 1.8 year = 1945 expect = 0.35-0.9 note = "the arsenal of democracy" }
-germany_medium_tanks_1939 = { kind = tech a = GER b = medium_tank_1 year = 1939 expect = 0.6-1.0 note = "medium tanks by 1939" }
-soviet_medium_tanks_1941 = { kind = tech a = SOV b = medium_tank_1 year = 1941 expect = 0.6-1.0 note = "the Soviet medium tank" }
-usa_monoplane_fighters_1940 = { kind = tech a = USA b = fighter_2 year = 1940 expect = 0.75-1.0 note = "the monoplane fighter" }
-japan_fleet_tech_1940 = { kind = tech a = JAP b = destroyer_2 year = 1940 expect = 0.5-1.0 note = "modern destroyers" }
-britain_radar_1940 = { kind = tech a = ENG b = radar_1 year = 1940 expect = 0.5-1.0 note = "radar" }
+usa_first_industry_1940 = { kind = industry_rank a = USA rank = 1 year = 1940 expect = 0.85-1.0 note = "the USA is the first industrial power" priority = 2 }
+germany_top_three_1940 = { kind = industry_rank a = GER rank = 3 year = 1940 expect = 0.85-1.0 note = "Germany is a top-three industrial power" priority = 2 }
+soviet_industrialises = { kind = growth a = SOV factor = 1.4 year = 1941 expect = 0.85-1.0 note = "the Soviet industrial leap" priority = 2 }
+usa_arms_growth = { kind = growth a = USA factor = 1.8 year = 1945 expect = 0.85-1.0 note = "the arsenal of democracy" priority = 1 }
+germany_medium_tanks_1939 = { kind = tech a = GER b = medium_tank_1 year = 1939 expect = 0.85-1.0 note = "medium tanks by 1939" priority = 2 }
+soviet_medium_tanks_1941 = { kind = tech a = SOV b = medium_tank_1 year = 1941 expect = 0.85-1.0 note = "the Soviet medium tank" priority = 1 }
+usa_monoplane_fighters_1940 = { kind = tech a = USA b = fighter_2 year = 1940 expect = 0.85-1.0 note = "the monoplane fighter" priority = 2 }
+japan_fleet_tech_1940 = { kind = tech a = JAP b = destroyer_2 year = 1940 expect = 0.85-1.0 note = "modern destroyers" priority = 2 }
+britain_radar_1940 = { kind = tech a = ENG b = radar_1 year = 1940 expect = 0.85-1.0 note = "radar" priority = 2 }

@@ -26,7 +26,7 @@ public sealed class ScorecardRecorder : Burger.Core.Modding.GameScript
     private readonly List<WarRecord> _wars = new();
     private readonly Dictionary<(string, string), int> _pairSeen = new();      // pair (either order, sorted) -> first month
     private readonly Dictionary<(string, string), int> _rulingSeen = new();    // (tag, ideology) -> first month
-    private readonly Dictionary<(string, string), int> _allianceSeen = new();
+    private readonly Dictionary<(string, string), HashSet<int>> _allianceSeen = new(); // pair -> the months it was in force
     private readonly Dictionary<string, int> _civilWarSeen = new();
     private readonly Dictionary<int, Dictionary<string, string>> _owners = new();   // year -> state -> owner tag
     private readonly Dictionary<int, Dictionary<string, string>> _rulers = new();   // year -> country -> ruling ideology
@@ -56,6 +56,7 @@ public sealed class ScorecardRecorder : Burger.Core.Modding.GameScript
         r.SideB.Add(r.B);
         r.BStates = war.DefenderLeader.OwnedStates.Select(s => s.Key).ToList();
         r.AStates = war.AttackerLeader.OwnedStates.Select(s => s.Key).ToList();
+        foreach (var x in war.Attackers) foreach (var y in war.Defenders) _pairSeen.TryAdd(Pair(x.Tag, y.Tag), r.StartMonth); // (a war that is over before the next monthly sample still counts)
         _wars.Add(r);
     }
 
@@ -74,6 +75,14 @@ public sealed class ScorecardRecorder : Burger.Core.Modding.GameScript
         var w = _game.World;
         var live = w.Countries.Where(c => c.Exists).ToList();
         // wars: every pair on opposite sides, and which great powers are at war together
+        if (Environment.GetEnvironmentVariable("BURGER_WARSCORE_LOG") is { } wl)
+            foreach (var war in w.Wars.Where(x => x.AttackerLeader.Tag == wl || x.DefenderLeader.Tag == wl))
+            {
+                int da = _game.World.Divisions.Count(x => war.Attackers.Contains(x.Owner)), db = _game.World.Divisions.Count(x => war.Defenders.Contains(x.Owner));
+                int held = war.DefenderLeader.OwnedStates.Count(st => st.Locations.Any(l => l.Controller != null && war.Attackers.Contains(l.Controller)));
+                Console.WriteLine($"WS {d.ToDisplay()} {war.AttackerLeader.Tag} vs {war.DefenderLeader.Tag}: score {war.WarScore:0} divisions {da} vs {db}, states of the defender with attackers on them {held}/{war.DefenderLeader.OwnedStates.Count}");
+                Console.WriteLine("   at: " + string.Join(", ", _game.World.Divisions.Where(x => x.Owner == war.AttackerLeader && x.Location != null).GroupBy(x => x.Location!.State?.Key ?? "?").OrderByDescending(g => g.Count()).Take(5).Select(g => $"{g.Key} {g.Count()}")) + "; armies " + string.Join(",", _game.World.ArmiesOf(war.AttackerLeader).Take(6).Select(a => $"{a.Mode}/{a.FrontEnemy?.Tag}/{a.Divisions.Count}/pairs{a.FrontPairs.Count}")));
+            }
         foreach (var war in w.Wars)
         {
             foreach (var a in war.Attackers) foreach (var b in war.Defenders) _pairSeen.TryAdd(Pair(a.Tag, b.Tag), month);
@@ -88,7 +97,7 @@ public sealed class ScorecardRecorder : Burger.Core.Modding.GameScript
         foreach (var c in live)
         {
             if (_game.Politics.Enabled) _rulingSeen.TryAdd((c.Tag, _game.Politics.Of(c).Ruling), month);
-            foreach (var a in w.Relations.AlliesOf(c)) _allianceSeen.TryAdd(Pair(c.Tag, a.Tag), month);
+            foreach (var a in w.Relations.AlliesOf(c)) { var key = Pair(c.Tag, a.Tag); if (!_allianceSeen.TryGetValue(key, out var set)) _allianceSeen[key] = set = new HashSet<int>(); set.Add(month); }
         }
         foreach (var cw in _game.Politics.CivilWars) _civilWarSeen.TryAdd(cw.Origin.Tag, month);
         // the outcome of wars two years on
@@ -124,6 +133,8 @@ public sealed class ScorecardRecorder : Burger.Core.Modding.GameScript
         public double Min, Max;
         public Node Node = null!;
         public double Weight = 1;
+        /// <summary>1-5: how much the event matters (5 = the most important). Lines of priority 2-5 must all be within their band.</summary>
+        public int Priority = 3;
     }
 
     public static List<Line> Parse(string path)
@@ -133,7 +144,7 @@ public sealed class ScorecardRecorder : Burger.Core.Modding.GameScript
         foreach (var n in root.All)
         {
             if (n.Children == null) continue;
-            var l = new Line { Name = n.Key, Kind = n.GetString("kind", "")!, Note = n.GetString("note", "")!, Node = n, Weight = n.GetDouble("weight", 1) };
+            var l = new Line { Name = n.Key, Kind = n.GetString("kind", "")!, Note = n.GetString("note", "")!, Node = n, Weight = n.GetDouble("weight", 1), Priority = n.GetInt("priority", 3) };
             string band = n.GetString("expect", "0.5")!;
             var parts = band.Split('-');
             if (parts.Length == 2 && double.TryParse(parts[0], NumberStyles.Float, CultureInfo.InvariantCulture, out var lo) && double.TryParse(parts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out var hi)) { l.Min = lo; l.Max = hi; }
@@ -180,9 +191,24 @@ public sealed class ScorecardRecorder : Burger.Core.Modding.GameScript
             case "exists":
                 return _alive.TryGetValue(year, out var al) && al.Contains(a) ? 1 : 0;
             case "gone":
-                return _alive.TryGetValue(year, out var al2) && !al2.Contains(a) ? 1 : 0;
+            {
+                // the country no longer exists - or, with share, is left with less than (1 - share) of the land it had in 1930 (a partition leaves a remnant)
+                if (_alive.TryGetValue(year, out var al2) && !al2.Contains(a)) return 1;
+                if (n.GetDouble("share", 0) <= 0 || !_owners.TryGetValue(year, out var oy3) || !_owners.TryGetValue(1930, out var o03)) return 0;
+                var own = o03.Where(kv => kv.Value == a).Select(kv => kv.Key).ToList();
+                return own.Count > 0 && own.Count(k => oy3.GetValueOrDefault(k) == a) <= (1 - n.GetDouble("share")) * own.Count ? 1 : 0;
+            }
             case "owns":
                 return _owners.TryGetValue(year, out var o1) && o1.GetValueOrDefault(b) == a ? 1 : 0;
+            case "ideology_land":
+            {
+                // countries ruled by ideology b hold at least `share` of the land country a held in 1930 (the communists win China: whatever the tag of the winner)
+                if (!_owners.TryGetValue(year, out var oy2) || !_owners.TryGetValue(1930, out var o02) || !_rulers.TryGetValue(year, out var ry)) return 0;
+                var land = o02.Where(kv => kv.Value == a).Select(kv => kv.Key).ToList();
+                if (land.Count == 0) return 0;
+                int held = land.Count(k => oy2.TryGetValue(k, out var owner) && ry.TryGetValue(owner, out var ru) && ru == b);
+                return held >= n.GetDouble("share", 0.3) * land.Count ? 1 : 0;
+            }
             case "owns_country":
             {
                 // a owns at least half of the states b owned in 1930
@@ -193,9 +219,9 @@ public sealed class ScorecardRecorder : Burger.Core.Modding.GameScript
                 return client || (bs.Count > 0 && bs.Count(k => oy.GetValueOrDefault(k) == a) * 2 >= bs.Count) ? 1 : 0;
             }
             case "alliance":
-                return _allianceSeen.TryGetValue(Pair(a, b), out var m3) && m3 >= from && m3 <= to ? 1 : 0;
+                return _allianceSeen.TryGetValue(Pair(a, b), out var m3) && m3.Any(m => m >= from && m <= to) ? 1 : 0;
             case "alliance_at":
-                return _owners.ContainsKey(year) && _allianceSeen.TryGetValue(Pair(a, b), out var m4) && m4 <= year * 12 + 11 ? 1 : 0;
+                return _owners.ContainsKey(year) && _allianceSeen.TryGetValue(Pair(a, b), out var m4) && m4.Any(m => m >= year * 12 && m <= year * 12 + 11) ? 1 : 0;
             case "independent":
                 return _subjects.TryGetValue(year, out var sb) && _alive.TryGetValue(year, out var al3) && al3.Contains(a) && !sb.Any(x => x.Item1 == a) ? 1 : 0;
             case "civil_war":
@@ -230,6 +256,14 @@ public sealed class ScorecardRecorder : Burger.Core.Modding.GameScript
             default:
                 return Yes(false) ? 1 : null;
         }
+    }
+
+    /// <summary>The wars of the great powers: when, who led each side and who joined (BURGER_WAR_LOG).</summary>
+    public string WarTable()
+    {
+        var big = new HashSet<string> { "GER", "ITA", "JAP", "SOV", "ENG", "FRA", "USA", "POL", "CZE", "CHI" };
+        return string.Join("\n", _wars.Where(w => w.SideA.Concat(w.SideB).Any(big.Contains)).OrderBy(w => w.StartMonth)
+            .Select(w => $"    {w.StartMonth / 12}.{w.StartMonth % 12 + 1:00} {w.A} [{string.Join(" ", w.SideA.Where(x => x != w.A))}] vs {w.B} [{string.Join(" ", w.SideB.Where(x => x != w.B))}]"));
     }
 
     /// <summary>Factories of the biggest industrial powers on 1 January of the years recorded (BURGER_FACT_LOG).</summary>

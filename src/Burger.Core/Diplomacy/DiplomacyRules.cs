@@ -57,6 +57,7 @@ public class DiplomacyRules
         if (cb != null && NeedsGoalStates(cb.WarGoal) && WarGoalStates(game, attacker, defender, cb).Count == 0)
             return $"No states to take for '{cb.Name}'";
         if (w.Relations.OverlordOf(defender) == attacker) return "Cannot attack your own subject";
+        if (cb?.WarGoal != WarGoalType.Independence && !HasWarReach(game, attacker, defender)) return "Too far away to make war";
         if (cb?.Allow != null)
         {
             var ctx = game.Context(attacker);
@@ -92,6 +93,96 @@ public class DiplomacyRules
         };
     }
 
+    /// <summary>
+    /// With the define war_reach (1) a country can only go to war with one it can reach: a neighbour (or a neighbour of a neighbour - a sea crossing,
+    /// a buffer state), or any country if it is one of the great powers (the war_reach_powers, 8, strongest). Keeps Poland from fighting Persia.
+    /// </summary>
+    public virtual bool HasWarReach(Game game, Country attacker, Country defender)
+    {
+        if (game.Data.Defines.Get("war_reach", 0) <= 0) return true;
+        var near = Burger.Core.Scripting.Builtins.NeighborCountries(game, attacker);
+        if (near.Contains(defender)) return true;
+        if (IsGreatPower(game, attacker)) return true;
+        foreach (var n in near) if (Burger.Core.Scripting.Builtins.NeighborCountries(game, n).Contains(defender)) return true;
+        return false;
+    }
+
+    private int _powersMonth = -1;
+    private HashSet<Country> _powers = new();
+
+    /// <summary>One of the war_reach_powers (8) strongest countries (recomputed monthly).</summary>
+    public virtual bool IsGreatPower(Game game, Country c)
+    {
+        int month = game.World.Date.Year * 12 + game.World.Date.Month;
+        if (month != _powersMonth)
+        {
+            _powersMonth = month;
+            // (the great powers are the industrial ones - factories, else strength: Poland and Yugoslavia have big armies, not big industries)
+            double Weight(Country x) => game.Production.Enabled ? game.Production.CivilianFactories(x) + game.Production.MilitaryFactories(x) : game.Diplomacy.Strength(x);
+            _powers = game.World.Countries.Where(x => x.Exists).OrderByDescending(Weight).Take((int)game.Data.Defines.Get("war_reach_powers", 8)).ToHashSet();
+        }
+        return _powers.Contains(c);
+    }
+
+    /// <summary>
+    /// When the leader of the beaten side makes peace: does the war go on for that side's independent allies (with the define separate_peace, 1)?
+    /// Then only the leader (and its subjects) leave, and the strongest ally takes over the side; otherwise the whole war ends.
+    /// </summary>
+    public virtual bool SeparatePeace(Game game, War war, Country loser)
+        => game.Data.Defines.Get("separate_peace", 0) > 0
+           && war.SideOf(loser).Any(x => x != loser && x.Exists && game.World.Relations.OverlordOf(x) != loser && game.World.Relations.OverlordOf(x) == null);
+
+    /// <summary>
+    /// The strengths a demand is weighed by: each side's own strength plus its allies' and guarantors' (60%, 50%) - counted only as far as they would
+    /// really come (AiProfileRules.JoinFactor: friends of a country that have no quarrel with the other side stay home).
+    /// </summary>
+    public virtual (double Actor, double Recipient) ContestStrength(Game game, Country actor, Country recipient)
+    {
+        var R = game.World.Relations;
+        double Reliable(Country ally, Country enemy, Country caller, bool asAttacker) => game.AiProfiles.Enabled ? game.Rules.AiProfile.JoinFactor(game, ally, enemy, caller, asAttacker) : 1;
+        double sa = game.Diplomacy.Strength(actor) + R.AlliesOf(actor).Where(a => a != recipient).Sum(a => game.Diplomacy.Strength(a) * 0.6 * Reliable(a, recipient, actor, true));
+        double sr = game.Diplomacy.Strength(recipient) + R.AlliesOf(recipient).Where(a => a != actor).Sum(a => game.Diplomacy.Strength(a) * 0.6 * Reliable(a, actor, recipient, false))
+                    + R.GuarantorsOf(recipient).Where(a => a != actor).Sum(a => game.Diplomacy.Strength(a) * 0.5 * Reliable(a, actor, recipient, false));
+        return (sa, sr);
+    }
+
+    /// <summary>
+    /// May the winner annex the loser outright? With the define annex_great_powers_only (1) only a great power may: Yugoslavia does not swallow Bulgaria,
+    /// Paraguay does not swallow Bolivia, the Saudis do not swallow Muscat; they take land, make a puppet or change a government.
+    /// </summary>
+    public virtual bool AllowsAnnex(Game game, Country winner, Country loser)
+        => game.Data.Defines.Get("annex_great_powers_only", 0) <= 0 || IsGreatPower(game, winner);
+
+    /// <summary>
+    /// A total war is fought to the end: no peace until the beaten side is occupied. With the define total_wars (1) a war is total when at least
+    /// total_war_powers (3) great powers fight in it (a world war), or when the same two leaders fight again and the defender is big
+    /// (total_war_states, 30 states: the second Sino-Japanese war, not the first). Once total, always total.
+    /// </summary>
+    public virtual bool IsTotalWar(Game game, War war)
+    {
+        if (game.Data.Defines.Get("total_wars", 0) <= 0) return false;
+        // (the great powers fighting in this war and in the other wars of its belligerents: the Pacific war and the European war are one world war)
+        var linked = war.Attackers.Concat(war.Defenders).SelectMany(c => game.World.WarsOf(c)).Distinct().SelectMany(w => w.Attackers.Concat(w.Defenders)).Distinct().Count(c => IsGreatPower(game, c));
+        if (linked >= (int)game.Data.Defines.Get("total_war_powers", 3) && war.Attackers.Any(c => IsGreatPower(game, c)) && war.Defenders.Any(c => IsGreatPower(game, c))) return true;
+        return game.Diplomacy.WarCount(war.AttackerLeader, war.DefenderLeader) >= 2 && war.DefenderLeader.OwnedStates.Count >= game.Data.Defines.Get("total_war_states", 30);
+    }
+
+    /// <summary>
+    /// Does a country capitulate: its capital is in the enemy's hands and the enemy controls capitulation_share (50%) of its land. It stays in the war, its
+    /// army gone, and is dealt with when its whole faction makes peace - the war goes on for the allies that are still fighting.
+    /// </summary>
+    public virtual bool Capitulates(Game game, War war, Country c)
+    {
+        if (game.Data.Defines.Get("capitulation", 0) <= 0 || c.Capital?.Controller == null) return false;
+        // (a country in a total war holds out for total_war_min_months, 30: the second Sino-Japanese war is not over in a year)
+        if (war.Vars.HasFlag("total") && (game.World.Date.TotalDays - war.StartDate.TotalDays) / 30 < game.Data.Defines.Get("total_war_min_months", 30)) return false;
+        var enemies = war.EnemiesOf(c);
+        if (!enemies.Contains(c.Capital.Controller)) return false;
+        var locs = c.OwnedStates.SelectMany(s => s.Locations).Where(l => !l.IsWater).ToList();
+        if (locs.Count == 0) return true;
+        return locs.Count(l => l.Controller != null && enemies.Contains(l.Controller)) >= game.Data.Defines.Get("capitulation_share", 0.5) * locs.Count;
+    }
+
     /// <summary>Does a country answer a call to arms? <paramref name="caller"/> is the war leader asking.</summary>
     public virtual bool WillJoinWar(Game game, Country ally, War war, bool asAttacker, Country caller)
     {
@@ -101,6 +192,8 @@ public class DiplomacyRules
         // worn-out countries stay home
         if (game.Diplomacy.WarExhaustion(ally) >= game.Data.Defines.Get("exhausted_refuse_war", 12)) return false;
         double opinion = game.Diplomacy.Opinion(ally, caller);
+        // a country with a history joins the wars its history cares about (the enemy is one it has an awakened ambition on) - the rest it leaves alone
+        if (game.AiProfiles.Enabled && game.Rng.NextDouble() > game.Rules.AiProfile.JoinFactor(game, ally, enemyLeader, caller, asAttacker)) return false;
         if (!asAttacker) return opinion > -50; // defensive calls are usually honoured
         return opinion > 0 && game.Rng.NextDouble() < 0.75;
     }

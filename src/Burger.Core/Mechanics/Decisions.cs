@@ -115,6 +115,7 @@ public sealed class DecisionSystem
         if (_game.Features.Has(Burger.Core.Modding.FeatureSet.Economy)) c.Gold -= d.CostGold;
         c.Vars.SetFlag(TakenFlag(d));
         c.Vars.Set(LastVar(d), _game.World.Date.TotalDays);
+        if (Environment.GetEnvironmentVariable("BURGER_DECISION_LOG") is { } dl && d.Key.Contains(dl)) Console.WriteLine($"DECISION {_game.World.Date.ToDisplay()} {c.Tag}: {d.Key} [{(_game.Features.Has(Burger.Core.Modding.FeatureSet.Demilitarization) ? string.Join(",", _game.Diplomacy.DemilitarizedOf(c).Select(x => x.Key + " by " + _game.Diplomacy.ImposedBy(x)?.Tag)) : "")}]");
         _game.Script.Execute(d.Effect, Ctx(d, c));
         _game.Events.FireOnAction("on_decision_taken", c);
         if (!c.IsPlayer && _game.World.Player != null)
@@ -130,7 +131,7 @@ public sealed class DecisionSystem
         {
             if (d.AiWillDo == null || !CanTake(d, c)) continue;
             double w = _game.Script.EvalWeight(d.AiWillDo, Ctx(d, c), 0);
-            if (w > 0 && _game.Rng.NextDouble() < Math.Min(1, w * 0.1)) { Take(d, c); return; }
+            if (w > 0 && _game.Rng.NextDouble() < Math.Min(1, w * _game.Data.Defines.Get("ai_decision_speed", 0.1))) { Take(d, c); return; }
         }
     }
 }

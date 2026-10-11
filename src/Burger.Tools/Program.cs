@@ -429,6 +429,7 @@ public static class Program
             Console.WriteLine($"=== seed {run.Seed}");
             var textLines = text.Split((char)10);
             Console.Write(string.Join(((char)10).ToString(), textLines.Where(l => !l.StartsWith("SCORE|"))));
+            Console.WriteLine("  FAILED-IN seed " + run.Seed + ": " + string.Join(" ", textLines.Where(l => l.StartsWith("SCORE|") && l.TrimEnd().EndsWith("|0")).Select(l => l.Split((char)124)[1])));
             foreach (var l in textLines.Where(l => l.StartsWith("SCORE|")))
             {
                 var parts = l.Trim().Split('|');
@@ -446,7 +447,7 @@ public static class Program
         string path = Path.Combine(Path.GetDirectoryName(GameDir(ResolveProject(project)))!, "scorecard.txt");
         var lines = ScorecardRecorder.Parse(path);
         int ok = 0, low = 0, high = 0, na = 0;
-        double okW = 0, allW = 0;
+        double okW = 0, allW = 0; int prio = 0, prioOk = 0; var prioFail = new List<string>();
         Console.WriteLine();
         Console.WriteLine($"HISTORICAL SCORECARD over {worlds} worlds (hit rate / band):");
         foreach (var l in lines)
@@ -458,8 +459,10 @@ public static class Program
             string verdict = rate < l.Min - 1e-9 ? "LOW " : rate > l.Max + 1e-9 ? "HIGH" : "ok  ";
             if (verdict == "ok  ") ok++; else if (verdict == "LOW ") low++; else high++;
             allW += l.Weight; if (verdict == "ok  ") okW += l.Weight;
-            Console.WriteLine($"  [{verdict}] {l.Name,-34} {hits}/{n} = {rate:P0}  band {l.Min:P0}-{l.Max:P0}   {l.Note}");
+            if (l.Priority >= 2) { prio++; if (verdict == "ok  ") prioOk++; else prioFail.Add($"{l.Name} P{l.Priority} {rate:P0}"); }
+            Console.WriteLine($"  [{verdict}] P{l.Priority} {l.Name,-34} {hits}/{n} = {rate:P0}  band {l.Min:P0}-{l.Max:P0}   {l.Note}");
         }
+        Console.WriteLine($"  PRIORITY 2-5: {prioOk} of {prio} within band" + (prioFail.Count > 0 ? "; outside: " + string.Join(", ", prioFail) : " - ALL WITHIN BAND"));
         Console.WriteLine($"  within band {ok}, too rare {low}, too common {high}, not arisen {na}; weighted score {(allW > 0 ? okW / allW : 0):P0}");
     }
 
@@ -500,7 +503,7 @@ public static class Program
             if (watchTags.Length > 0 && game.World.Date.Day == 1 && game.World.Date.Month % 6 == 1 && game.World.Date.Hour == 0 && game.Politics.Enabled)
                 foreach (var wt in watchTags.Select(t => game.World.GetCountry(t)).Where(c => c != null))
                     Console.WriteLine($"  watch {game.World.Date.ToDisplay()} {wt!.Tag} {game.Politics.Of(wt).Ruling} stab {game.Rules.Politics.StabilityOf(game, wt):0} " +
-                                      $"pop {string.Join("/", game.Politics.Ideologies.Select(i => game.Politics.Of(wt).Popularity.GetValueOrDefault(i.Key).ToString("P0")))} wealth {game.Politics.WealthIndex(wt):0.0} war {game.World.WarsOf(wt).Count()} exh {game.Diplomacy.WarExhaustion(wt):0.0} div {game.World.DivisionsOf(wt).Count()}");
+                                      $"pop {string.Join("/", game.Politics.Ideologies.Select(i => game.Politics.Of(wt).Popularity.GetValueOrDefault(i.Key).ToString("P0")))} wealth {game.Politics.WealthIndex(wt):0.0} oil {(game.Commodities.Enabled ? game.Commodities.BalanceOf(wt, "oil").Satisfied : 1):0.00} war {game.World.WarsOf(wt).Count()} exh {game.Diplomacy.WarExhaustion(wt):0.0} div {game.World.DivisionsOf(wt).Count()}");
             if (days >= 3650 && (d + 1) % 3650 == 0)
             {
                 Console.WriteLine($"  year {(d + 1) / 365}: {wars - warsAtDecade} wars declared in the last 10 years, {game.World.Wars.Count} active, {game.World.Countries.Count(c => c.Exists)} countries");
@@ -536,6 +539,7 @@ public static class Program
         if (recorder != null)
         {
             var lines = ScorecardRecorder.Parse(Path.Combine(Path.GetDirectoryName(GameDir(project))!, "scorecard.txt"));
+            if (Environment.GetEnvironmentVariable("BURGER_WAR_LOG") != null) Console.WriteLine("  wars of the powers:\n" + recorder.WarTable());
             if (Environment.GetEnvironmentVariable("BURGER_FACT_LOG") != null) Console.WriteLine("  factories (civilian + military):\n" + recorder.FactoryTable());
             foreach (var (name, result) in recorder.EvaluateAll(lines)) Console.WriteLine($"SCORE|{name}|{(result.HasValue ? result.Value.ToString() : "NA")}");
         }
@@ -942,6 +946,7 @@ public static class Program
             }
         }
         // war exhaustion makes the loser accept more
+        war.Vars.ClearFlag("total"); // (an ordinary war: a total war is not ended by tiredness)
         D.UpdateWarScores();
         double score = war.ScoreFor(a);
         var offer = new PeaceOffer { War = war, From = a, To = b, FromIsWinner = true };
@@ -1140,12 +1145,21 @@ public static class Program
         var demo = alive.FirstOrDefault(P.HoldsElections);
         if (demo != null)
         {
-            var other = P.Ideologies.FirstOrDefault(i => i.Key != P.Of(demo).Ruling && !P.IsBanned(demo, i.Key));
+            var other = P.Ideologies.FirstOrDefault(i => i.Key != P.Of(demo).Ruling && !P.IsBanned(demo, i.Key) && !g.Rules.Politics.NeedsAssent(g, demo, i));
             if (other != null)
             {
                 P.AddPopularity(demo, other.Key, 0.9);
                 P.HoldElection(demo);
                 Check(P.InGovernment(demo, other.Key), $"politics: an election puts the most popular party in government ({demo.Tag}: {string.Join(", ", P.Of(demo).Government)})");
+                // an extremist party that wins the vote is not handed the government: it becomes a movement that demands power (extremists_need_assent)
+                var extreme = P.Ideologies.FirstOrDefault(i => i.Key != P.Of(demo).Ruling && g.Rules.Politics.NeedsAssent(g, demo, i) && !P.InGovernment(demo, i.Key));
+                if (extreme != null)
+                {
+                    P.SetRulingParty(demo, P.Ideologies.First(i => !g.Rules.Politics.NeedsAssent(g, demo, i)).Key, "test");
+                    P.AddPopularity(demo, extreme.Key, 0.9);
+                    P.HoldElection(demo);
+                    Check(!P.InGovernment(demo, extreme.Key), $"politics: a winning {extreme.Key} party does not simply take the government ({demo.Tag})");
+                }
             }
         }
         var c = alive.OrderByDescending(x => x.OwnedStates.Count).First();

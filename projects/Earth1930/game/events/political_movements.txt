@@ -1,0 +1,45 @@
+# A movement that demands power (politics feature). When a movement the government has not met is about to revolt, the player is given the choice the
+# rulers of the time had: give in, fight it, or let it come to a revolt - a coup or a civil war. The AI answers by its own rules (PoliticsRules.AiGivesIn).
+namespace = movement
+
+country_event = {
+	id = movement.1
+	title = "The Nationalist Movement Demands Power"
+	desc = "The nationalist party has the streets and a third of the voters behind it. Its leaders say they will govern, by appointment or by force. Our conservative partners are ready to hand it the chancellery."
+	is_triggered_only = yes
+	trigger = { has_country_flag = ultimatum:fascist }
+	option = {
+		name = "Give in: let them govern"
+		give_in_to_movement = fascist
+	}
+	option = {
+		name = "Suppress the movement"
+		suppress_movement = fascist
+		add_stability = -3
+	}
+	option = {
+		name = "Refuse, and risk what follows"
+		add_stability = -2
+	}
+}
+
+country_event = {
+	id = movement.2
+	title = "The Communists Demand Power"
+	desc = "The party of the workers fills the factories and the squares. Its leaders say the government's time is over."
+	is_triggered_only = yes
+	trigger = { has_country_flag = ultimatum:communist }
+	option = {
+		name = "Give in: let them govern"
+		give_in_to_movement = communist
+	}
+	option = {
+		name = "Suppress the movement"
+		suppress_movement = communist
+		add_stability = -3
+	}
+	option = {
+		name = "Refuse, and risk what follows"
+		add_stability = -2
+	}
+}

@@ -27,7 +27,7 @@ public sealed partial class PoliticsSystem
             }
             return (MovementDemand.Power, null);
         }
-        if (HoldsElections(c, p)) return null; // free elections: it can win seats
+        if (HoldsElections(c, p) && !Rules.NeedsAssent(_game, c, Ideology(ideology)!)) return null; // free elections: it can win seats
         return (MovementDemand.Power, null);
     }
 
@@ -49,7 +49,7 @@ public sealed partial class PoliticsSystem
             bool calm = _game.World.Date.TotalDays < p.CalmUntilDay;
             foreach (var i in Ideologies)
             {
-                double pop = p.Popularity.GetValueOrDefault(i.Key);
+                double pop = Rules.MovementSupport(_game, c, i);
                 var m = Movements.FirstOrDefault(x => x.Country == c && x.Ideology == i.Key);
                 var demand = DemandOf(c, p, i.Key);
                 if (m == null)
@@ -63,6 +63,13 @@ public sealed partial class PoliticsSystem
                 else if (demand == null) { Movements.Remove(m); continue; } // its demand was met
                 else { m.Demand = demand.Value.Demand; m.TargetLaw = demand.Value.Law; }
                 m.Progress = Math.Clamp(m.Progress + Rules.MovementProgress(_game, c, m, pop), 0, 100);
+                if (m.Progress >= 70 && !m.Warned && c.IsPlayer && m.Demand == MovementDemand.Power)
+                {
+                    m.Warned = true;
+                    c.Vars.SetFlag("ultimatum:" + m.Ideology);
+                    _game.Events.FireOnAction("on_movement_ultimatum", c);
+                    c.Vars.ClearFlag("ultimatum:" + m.Ideology);
+                }
                 if (m.Progress <= 0 && pop < threshold) { Movements.Remove(m); continue; }
                 if (m.Progress >= 100 && !calm)
                 {
@@ -76,7 +83,7 @@ public sealed partial class PoliticsSystem
             foreach (var i in Ideologies.OrderByDescending(i => p.Popularity.GetValueOrDefault(i.Key)))
             {
                 if (InGovernment(c, i.Key)) continue;
-                double pop = p.Popularity.GetValueOrDefault(i.Key);
+                double pop = Rules.MovementSupport(_game, c, i);
                 // it can simply win the next election - unless the democracy is falling apart (rule CanSeizePower)
                 if (DemandOf(c, p, i.Key) == null && !Rules.CanSeizePower(_game, c, i)) continue;
                 // (the civil war first: in a poor, unstable or war-weary country it needs less support than a coup)
@@ -120,11 +127,11 @@ public sealed partial class PoliticsSystem
     {
         foreach (var m in MovementsOf(c).ToList())
         {
-            if (m.Progress < 60) continue;
-            // give in to legalisation, fight attempts to take power
+            if (m.Progress < 40) continue;
+            // give in to legalisation; a government that could work with the movement may hand it power, the rest fight it
             if (m.Demand == MovementDemand.Legalize && _game.Rng.NextDouble() < 0.5) GiveIn(m);
-            else if (CannotSuppress(m) == null) Suppress(m);
-            else if (m.Progress > 85 && _game.Rng.NextDouble() < 0.3) GiveIn(m);
+            else if (_game.Rng.NextDouble() < Rules.AiGivesIn(_game, c, m, PopularityOf(c, m.Ideology))) GiveIn(m);
+            else if (m.Progress >= 60 && CannotSuppress(m) == null) Suppress(m);
         }
     }
 

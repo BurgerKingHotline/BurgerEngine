@@ -290,6 +290,8 @@ demand_subjugation = {
 		opinion_factor = 0.3
 		strength_factor = 20
 		modifier = { add = -50 scope:recipient = { num_of_states >= 4 } }
+		# a fifth column: where the actor's own party has a third of the country behind it, the government cannot hold out
+		modifier = { add = 80 ruling_ideology = fascist scope:recipient = { popularity_fascist >= 0.2 } }
 	}
 	on_accept = {
 		make_subject = { target = scope:recipient type = client_state }

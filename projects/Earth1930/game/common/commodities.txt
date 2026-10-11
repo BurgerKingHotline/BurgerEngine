@@ -12,7 +12,7 @@ oil = {
 	name = "Oil"
 	color = { 40 40 40 }
 	price = 2
-	civilian_use = 0.25
+	civilian_use = 0.15
 }
 rubber = {
 	name = "Rubber"

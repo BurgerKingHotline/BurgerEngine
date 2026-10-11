@@ -149,4 +149,6 @@ public sealed class PeaceOffer
     public List<PeaceTerm> Terms = new();
     /// <summary>True if <see cref="From"/> is the one making demands (otherwise it is offering concessions).</summary>
     public bool FromIsWinner = true;
+    /// <summary>The deal of a capitulated ally at its faction's peace: applied, but it does not end the war.</summary>
+    public bool NoEnd;
 }

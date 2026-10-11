@@ -21,3 +21,30 @@ weak_democracy_support = 0.5
 
 # alliances, guarantees and subjects a country can have (the great powers of the 1930s had many more ties than the engine default of 3)
 base_diplomatic_relations = 7
+# extremist parties cannot win government by the vote: they become movements that demand power (see PoliticsRules.NeedsAssent)
+extremists_need_assent = 1
+# a country can only go to war with a neighbour (or a neighbour's neighbour); the war_reach_powers strongest countries reach anywhere
+war_reach = 1
+war_reach_powers = 8
+army_quality_per_wealth = 1.0
+army_quality_floor = 0.8
+awaken_months = 0.5
+separate_peace = 0
+offensive_calls_optional = 1
+join_unprompted = 0.0
+awaken_months = 0.5
+construction_wealth_effect = 1
+democracy_resilience = 0.15
+movement_blocs = 1
+conquest_war_months = 9
+ai_decision_speed = 0.4
+ai_focus_chance = 1.0
+war_aim_cost = 0.35
+total_wars = 1
+total_war_powers = 3
+total_war_states = 30
+capitulation = 1
+capitulation_share = 0.5
+annex_great_powers_only = 1
+total_war_exhaustion = 30
+total_war_min_months = 30

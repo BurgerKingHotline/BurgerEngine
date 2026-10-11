@@ -6,6 +6,17 @@
 
 public class GameTechRules : TechRules
 {
+    /// <summary>
+    /// How well equipped and trained a country's army is, as a factor added to its attack, defence and breakthrough: 0.35 per point of wealth index
+    /// above or below the world's average (1), at most +0.15 and at least -0.5 (a poor country's divisions are half the worth of a rich one's),
+    /// plus the modifier army_quality (doctrine, training, discipline). Recomputed monthly.
+    /// </summary>
+    public override double ArmyQuality(Game game, Country c)
+    {
+        double wealth = game.Politics.Enabled ? game.Politics.WealthIndex(c) : 1;
+        return Math.Clamp(game.Data.Defines.Get("army_quality_per_wealth", 0.35) * (wealth - 1), -game.Data.Defines.Get("army_quality_floor", 0.5), 0.15) + game.Modifiers.Sum(c, "army_quality");
+    }
+
     /// <summary>Research points a country gains each month: a base, its factories, and the modifier research_speed.</summary>
     public override double MonthlyPoints(Game game, Country c)
     {

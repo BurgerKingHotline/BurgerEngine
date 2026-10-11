@@ -32,6 +32,9 @@ public static partial class Builtins
         s.RegisterTrigger("can_demand", (ctx, n) => C(ctx.This) is { } c && game.World.GetCountry(n.GetString("target") ?? "") is { } t
             && game.Data.DiplomaticActions.GetValueOrDefault(n.GetString("action", "demand_state")!) is { } a && game.Diplomacy.CanUse(a, c, t),
             (ctx, n) => $"Can put a demand to {n.GetString("target")}");
+        // war_months_with = { target = CHI min = 30 }: the country has been at war with that country for at least that many months
+        s.RegisterTrigger("war_months_with", (ctx, n) => C(ctx.This) is { } c && game.World.GetCountry(n.GetString("target") ?? "") is { } t && game.World.WarBetween(c, t) is { } w
+            && (game.World.Date.TotalDays - w.StartDate.TotalDays) / 30.0 >= n.GetDouble("min", 0), (ctx, n) => $"At war with {n.GetString("target")} for {n.GetDouble("min", 0):0} months");
         // ---- focuses
         s.RegisterTrigger("has_completed_focus", (ctx, n) => C(ctx.This) is { } c && game.Focus.IsDone(c, n.Value ?? ""), (ctx, n) => $"Has completed the focus {game.Focus.Defs.GetValueOrDefault(n.Value ?? "")?.Name ?? n.Value}");
         s.RegisterTrigger("is_working_on_focus", (ctx, n) => C(ctx.This) is { } c && game.Focus.Current(c)?.Key.Equals(n.Value, StringComparison.OrdinalIgnoreCase) == true);
@@ -43,7 +46,7 @@ public static partial class Builtins
         s.RegisterTrigger("has_demilitarized_states", (ctx, n) => C(ctx.This) is { } c && YesNo(n, game.Diplomacy.DemilitarizedOf(c).Count > 0));
         s.RegisterTrigger("demilitarized", (ctx, n) => ctx.This is State st ? YesNo(n, st.Demilitarized) : ctx.This is Location l && l.State != null && YesNo(n, l.State.Demilitarized));
         s.RegisterValue("remilitarization_odds", (ctx, x) => C(x) is { } c ? game.Diplomacy.RemilitarizationOdds(c) : null);
-        s.RegisterEffect("remilitarize_states", (ctx, n) => { if (NeedCountry(ctx, n) is { } c) game.Diplomacy.RemilitarizeAll(c); }, (ctx, n) => "Remilitarizes its demilitarized states");
+        s.RegisterEffect("remilitarize_states", (ctx, n) => { if (NeedCountry(ctx, n) is { } c) game.Diplomacy.RemilitarizeAll(c, string.Equals(n.Value, "treaty", StringComparison.OrdinalIgnoreCase) ? "treaty" : "decision"); }, (ctx, n) => "Remilitarizes its demilitarized states");
         s.RegisterEffect("demilitarize_state", (ctx, n) => { if (ctx.This is State st) game.Diplomacy.Demilitarize(st, null); }, (ctx, n) => "The state is demilitarized");
     }
 

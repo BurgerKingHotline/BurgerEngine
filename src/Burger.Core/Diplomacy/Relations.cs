@@ -28,6 +28,7 @@ public sealed class Relations
     public void SetAlliance(Country a, Country b, bool allied)
     {
         if (a == b) return;
+        if (!allied && Environment.GetEnvironmentVariable("BURGER_ALLY_LOG") is { } al && (a.Tag == al || b.Tag == al) && Alliances.Contains(Pair(a, b))) Console.WriteLine($"ALLY ended {a.Tag}-{b.Tag}: {new System.Diagnostics.StackTrace().GetFrame(1)?.GetMethod()?.Name} <- {new System.Diagnostics.StackTrace().GetFrame(2)?.GetMethod()?.Name}");
         if (allied) Alliances.Add(Pair(a, b)); else Alliances.Remove(Pair(a, b));
     }
     public IEnumerable<Country> AlliesOf(Country c)
